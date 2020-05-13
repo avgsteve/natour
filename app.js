@@ -3,7 +3,7 @@
 const express = require('express');
 
 const app = express();
-
+/* REFERENCE
 //http method, when browser sends a get request
 app.get('/', (req, res) => {
   //// ==== send message via .send method (see ref: http://expressjs.com/en/api.html#res.status)
@@ -18,13 +18,16 @@ app.get('/', (req, res) => {
   // console.log(req);
 });
 
-
 //// http method, when browser sends a get request
 // app.post(path, callback [, callback ...])  // ref: http://expressjs.com/en/api.html#app.post.method
 app.post('/', (req, res) => {
   res.send("This is a response to the POST request! 🧡");
 });
+*/
 
+app.get('/api/v1/tours', (req, res) => {
+
+});
 
 
 const port = 3000;
