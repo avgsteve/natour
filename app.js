@@ -5,8 +5,7 @@ const express = require('express');
 const app = express();
 //app.use(express.json()) ==> middleware: can modify incoming data
 //http://expressjs.com/en/api.html#express
-app.use(express.json());
-
+app.use(express.json()); //middleware的使用解說參照git commit 54-1 Node.js Express 的 Middleware的使用 &解說
 
 /* REFERENCE
 //http method, when browser sends a get request
