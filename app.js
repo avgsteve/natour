@@ -7,24 +7,8 @@ const morgan = require('morgan'); // https://www.npmjs.com/package/morgan
 const app = express();
 
 // 1) ============== MIDDLE-WARES
-//app.use(express.json()) ==> middleware: can modify incoming data
-//http://expressjs.com/en/api.html#express
 app.use(morgan('dev')); // https://www.npmjs.com/package/morgan#dev
-/*
-Concise output colored by response status for development use. The :status token will be colored green for success codes, red for server error codes, yellow for client error codes, cyan for redirection codes, and uncolored for information codes.
-
-:method :url :status :response-time ms - :res[content-length]
-ex (will show in terminal) :
-GET /api/v1/tours/ 200 0.844 ms - 9011
-*/
-
 app.use(express.json()); //middleware的使用解說參照git commit 54-1 Node.js Express 的 Middleware的使用 &解說
-//
-app.use((req, res, next) => {
-  console.log('\n==== Hello from the middleware#1 ❤');
-  next();
-});
-
 //to show when a request happened
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString(); // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
@@ -178,6 +162,58 @@ const deleteTour = (req, res) => {
   });
 };
 
+//2-2) ======= ROUTE-HANDLERS for user
+/* for following routes
+app.route('/api/v1/users').get(getAllUsers).post(createUser);
+app.route('/api/v1/users/:id').get(getUser).patch(updateUser).delete(deleteUser);
+*/
+/* code template
+
+const getAllUsers = (req, res) => {
+  // 500 Internal Server Error
+  res.status(500).json({
+    status: 'error',
+    message: 'This route is not yet defined!'
+  });
+}; */
+const getAllUsers = (req, res) => {
+  // 500 Internal Server Error
+  res.status(500).json({
+    status: 'error',
+    message: 'This route is not yet defined!'
+  });
+};
+const getUser = (req, res) => {
+  // 500 Internal Server Error
+  res.status(500).json({
+    status: 'error',
+    message: 'This route is not yet defined!'
+  });
+};
+const createUser = (req, res) => {
+  // 500 Internal Server Error
+  res.status(500).json({
+    status: 'error',
+    message: 'This route is not yet defined!'
+  });
+};
+const updateUser = (req, res) => {
+  // 500 Internal Server Error
+  res.status(500).json({
+    status: 'error',
+    message: 'This route is not yet defined!'
+  });
+};
+const deleteUser = (req, res) => {
+  // 500 Internal Server Error
+  res.status(500).json({
+    status: 'error',
+    message: 'This route is not yet defined!'
+  });
+};
+
+
+
 // 3) ============== ROUTES
 
 // 將 app.get('/api/v1/tours', getAllTours) 跟 app.post('/api/v1/tours', createTour) 改寫為以下
@@ -186,8 +222,15 @@ app.route('/api/v1/tours').get(getAllTours).post(createTour);
 // 將 URI : ('/api/v1/tours/:id') 的相關 request 改寫為以下
 app.route('/api/v1/tours/:id').get(getTour).patch(updateTour).delete(deleteTour);
 
+// route actions for All users
+app.route('/api/v1/users').get(getAllUsers).post(createUser);
+
+// route actions for SINGLE user
+app.route('/api/v1/users/:id').get(getUser).patch(updateUser).delete(deleteUser);
+
+
 /*
-git commit records
+git commit records of how to refactor routes into concise code
 1. app.route('/api/v1/tours'). ....
 https://github.com/avgsteve/natour/commit/731c2b4b05e3fe62019cb1a0cf2f2e9134737051
 */
