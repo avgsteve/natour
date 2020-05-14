@@ -7,35 +7,14 @@ const app = express();
 //http://expressjs.com/en/api.html#express
 app.use(express.json()); //middleware的使用解說參照git commit 54-1 Node.js Express 的 Middleware的使用 &解說
 
-/* REFERENCE
-//http method, when browser sends a get request
-app.get('/', (req, res) => {
-  //// ==== send message via .send method (see ref: http://expressjs.com/en/api.html#res.status)
-  // res.status(200).send('Hello from the server side! :)');
-  // ==== send .json via .json method
-  res.status(200).json({
-    message: 'Hello from the server side! :)',
-    app: 'Natours',
-  });
-  //// ====
-  // res.status(200).json(req);
-  // console.log(req);
-});
-
-//// http method, when browser sends a get request
-// app.post(path, callback [, callback ...])  // ref: http://expressjs.com/en/api.html#app.post.method
-app.post('/', (req, res) => {
-  res.send("This is a response to the POST request! 🧡");
-});
-*/
-
 //將JSON檔案轉成物件(Obj)檔案格式
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
 );
 
-//設定GET request 會傳內容為JSON格式的資料到瀏覽器，
-app.get('/api/v1/tours', (req, res) => {
+// get all data
+const getAllTours = (req, res) => {
+  console.log('typeof(tours): ' + typeof(tours));
   res.status(200).json({
     status: 'success',
     results: tours.length,
@@ -43,10 +22,41 @@ app.get('/api/v1/tours', (req, res) => {
       tours: tours,
     }
   });
-});
+};
 
-//設定POST request 收到資料後之後將 new data 寫入 目前資料Array，並轉成JSON寫回原檔案
-app.post('/api/v1/tours', (req, res) => {
+// get only one result from Obj's "tours" array
+const getTour = (req, res) => {
+  //ex: 127.0.0.1:3000/api/v1/tours/5 的GET request 會顯示  "req.params": {"id": "5"}
+
+  console.log('\n===== req.param is:');
+  console.log(req.params);
+
+  //在tours Array 裡面搜尋有key: id跟req.params相符內容，並透過find傳回整個符合條件的 Array
+  const tour = tours.find(el => el.id === +req.params.id); //req.params.id前的+號是coersion為數值
+  console.log(tour === undefined ? `%c invalid id input from URL: ${req.params.id}` : tour); // is a obj
+
+  //to make sure user entered the correct id
+  if (+req.params.id > tours.length || !tour) {
+    //when can't find the correct id
+    return res.status(404).json({
+      status: "fail",
+      message: "Invalid id",
+      incorrect_input: req.params,
+    });
+  }
+
+  res.status(200).json({
+    status: 'success',
+    inputs: {
+      'req.params': req.params,
+      'numberOfResults': "1",
+      'tour': tour,
+    }
+  });
+};
+
+// create new data from POST request and assign it to current data obj
+const createTour = (req, res) => {
   //middleware
   console.log("\n=== POST request received! The req.body is:");
   console.log(req.body);
@@ -81,43 +91,11 @@ app.post('/api/v1/tours', (req, res) => {
     });
   });
 
-  // res.send('Done');
-  console.log('...New obj created!');
-});
+  console.log(`...New obj created via method : app.post('/api/v1/tours', createTour); `);
+};
 
-//將路徑的:id的內容透過.params顯示
-app.get('/api/v1/tours/:id', (req, res) => {
-  //ex: 127.0.0.1:3000/api/v1/tours/5 的GET request 會顯示  "req.params": {"id": "5"}
-
-  console.log('\n===== req.param is:');
-  console.log(req.params);
-
-  //在tours Array 裡面搜尋有key: id跟req.params相符內容，並透過find傳回整個符合條件的 Array
-  const tour = tours.find(el => el.id === +req.params.id); //req.params.id前的+號是coersion為數值
-  console.log(tour === undefined ? `%c invalid id input from URL: ${req.params.id}` : tour); // is a obj
-
-  //to make sure user entered the correct id
-  if (+req.params.id > tours.length || !tour) {
-    //when can't find the correct id
-    return res.status(404).json({
-      status: "fail",
-      message: "Invalid id",
-      incorrect_input: req.params,
-    });
-  }
-
-  res.status(200).json({
-    status: 'success',
-    inputs: {
-      'req.params': req.params,
-      'numberOfResults': "1",
-      'tour': tour,
-    }
-  });
-});
-
-//更新資料的PATCH request(僅先使用來自url的id param)
-app.patch('/api/v1/tours/:id', (req, res) => {
+// updateTour
+const updateTour = (req, res) => {
   //在tours Array 裡面搜尋有key: id跟req.params相符內容，並透過find傳回整個符合條件的 Array
   const tour = tours.find(el => el.id === +req.params.id); //req.params.id前的+號是coersion為數值
   console.log(tour === undefined ? `%c invalid id input from URL: ${req.params.id}` : tour); // is a obj
@@ -140,10 +118,10 @@ app.patch('/api/v1/tours/:id', (req, res) => {
     }
   });
 
-});
+};
 
-// DELETE request , 將不會送出資料到browser
-app.delete('/api/v1/tours/:id', (req, res) => {
+// deleteTour
+const deleteTour = (req, res) => {
   //ex: 127.0.0.1:3000/api/v1/tours/5 的GET request 會顯示  "req.params": {"id": "5"}
 
   console.log('\n===== req.param for DELETE request is:');
@@ -168,10 +146,20 @@ app.delete('/api/v1/tours/:id', (req, res) => {
     status: 'success',
     data: null,
   });
-});
+};
 
-const port = 3000;
+//設定GET request 會傳出所有tours內容的資料到瀏覽器
+app.get('/api/v1/tours', getAllTours);
+//設定POST request 收到資料後之後將 new data 寫入 目前資料Array，並轉成JSON寫回原檔案
+app.post('/api/v1/tours', createTour);
+//將路徑的:id的內容透過.params顯示
+app.get('/api/v1/tours/:id', getTour);
+//更新資料的PATCH request(僅先使用來自url的id param)
+app.patch('/api/v1/tours/:id', updateTour);
+// DELETE request , 將不會送出資料到browser
+app.delete('/api/v1/tours/:id', deleteTour);
 
+const port = 3000; // the port to be used for the localhost page
 app.listen(port, () => {
   console.log(`App running on port ${port}...\nThe address is: http://127.0.0.1:${port}`);
 });
