@@ -30,12 +30,12 @@ app.post('/', (req, res) => {
 });
 */
 
-//將JSON檔案轉乘物件檔案格式
+//將JSON檔案轉成物件檔案格式
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
 );
 
-//設定GET request 會傳到瀏覽器的內容，傳出的內容為JSON格式的資料
+//設定GET request 會傳內容為JSON格式的資料到瀏覽器，
 app.get('/api/v1/tours', (req, res) => {
   res.status(200).json({
     status: 'success',
@@ -74,6 +74,7 @@ app.post('/api/v1/tours', (req, res) => {
   fs.writeFile(`${__dirname}/dev-data/data/tours-simple.json`, JSON.stringify(tours), err => {
     // 201 = created
     res.status(201).json({
+      // then show created tour results from the POST request
       status: 'success',
       data: {
         tour: newTour,
@@ -83,6 +84,37 @@ app.post('/api/v1/tours', (req, res) => {
 
   // res.send('Done');
   console.log('...New obj created!');
+});
+
+//將路徑的:id的內容透過.params顯示
+app.get('/api/v1/tours/:id/:x/:y?', (req, res) => {
+  //ex: 127.0.0.1:3000/api/v1/tours/5  params 會顯示 obj { id:5 }
+  console.log(req.params);
+  console.log(Object.keys(req.params));
+  /*
+  當 app.get('/api/v1/tours/:id/:x/:y?', (req, res) => {
+  使用 GET request : 127.0.0.1:3000/api/v1/tours/5/user/data;
+  資料內容為:
+  {
+      "status": "success",
+      "iputs": {
+          "req.params": {
+              "id": "5",
+              "x": "user",
+              // "y" 沒有顯示是因為 y key的來源 get request的y 設定為:y?，表示optional
+          }
+      }
+  }
+  */
+  console.log(typeof(req.params)); // object
+  console.log(Object.keys(req.params).length); // 3( "req.params": { "id": "5", "x": "user","y": "data" })
+
+  res.status(200).json({
+    status: 'success',
+    inputs: {
+      'req.params': req.params,
+    }
+  });
 });
 
 
