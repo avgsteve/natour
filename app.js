@@ -2,17 +2,26 @@
 /*jshint esversion: 8 */
 const fs = require('fs');
 const express = require('express');
-const morgan = require('morgan');
+const morgan = require('morgan'); // https://www.npmjs.com/package/morgan
 
 const app = express();
 
 // 1) ============== MIDDLE-WARES
 //app.use(express.json()) ==> middleware: can modify incoming data
 //http://expressjs.com/en/api.html#express
+app.use(morgan('dev')); // https://www.npmjs.com/package/morgan#dev
+/*
+Concise output colored by response status for development use. The :status token will be colored green for success codes, red for server error codes, yellow for client error codes, cyan for redirection codes, and uncolored for information codes.
+
+:method :url :status :response-time ms - :res[content-length]
+ex (will show in terminal) :
+GET /api/v1/tours/ 200 0.844 ms - 9011
+*/
+
 app.use(express.json()); //middleware的使用解說參照git commit 54-1 Node.js Express 的 Middleware的使用 &解說
 //
 app.use((req, res, next) => {
-  console.log('Hello from the middleware#1 ❤');
+  console.log('\n==== Hello from the middleware#1 ❤');
   next();
 });
 
