@@ -148,16 +148,19 @@ const deleteTour = (req, res) => {
   });
 };
 
-//設定GET request 會傳出所有tours內容的資料到瀏覽器
-app.get('/api/v1/tours', getAllTours);
-//設定POST request 收到資料後之後將 new data 寫入 目前資料Array，並轉成JSON寫回原檔案
-app.post('/api/v1/tours', createTour);
-//將路徑的:id的內容透過.params顯示
+//  == 設定GET request 會傳出所有tours內容的資料到瀏覽器
+//  app.get('/api/v1/tours', getAllTours);  改寫為 app.route('/api/v1/tours').get(getAllTous);
+//  == 設定POST request 收到資料後之後將 new data 寫入 目前資料Array，並轉成JSON寫回原檔案
+//  app.post('/api/v1/tours', createTour);
+//  == 將路徑的:id的內容透過.params顯示
 app.get('/api/v1/tours/:id', getTour);
-//更新資料的PATCH request(僅先使用來自url的id param)
+//  == 更新資料的PATCH request(僅先使用來自url的id param)
 app.patch('/api/v1/tours/:id', updateTour);
-// DELETE request , 將不會送出資料到browser
+//  == DELETE request , 將不會送出資料到browser
 app.delete('/api/v1/tours/:id', deleteTour);
+
+// 將 app.get('/api/v1/tours', getAllTours) 跟 app.post('/api/v1/tours', createTour) 改寫為以下
+app.route('/api/v1/tours').get(getAllTours).post(createTour);
 
 const port = 3000; // the port to be used for the localhost page
 app.listen(port, () => {
