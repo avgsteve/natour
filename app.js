@@ -148,20 +148,27 @@ const deleteTour = (req, res) => {
   });
 };
 
-//  == 設定GET request 會傳出所有tours內容的資料到瀏覽器
-//  app.get('/api/v1/tours', getAllTours);  改寫為 app.route('/api/v1/tours').get(getAllTous);
-//  == 設定POST request 收到資料後之後將 new data 寫入 目前資料Array，並轉成JSON寫回原檔案
-//  app.post('/api/v1/tours', createTour);
-//  == 將路徑的:id的內容透過.params顯示
-app.get('/api/v1/tours/:id', getTour);
-//  == 更新資料的PATCH request(僅先使用來自url的id param)
-app.patch('/api/v1/tours/:id', updateTour);
-//  == DELETE request , 將不會送出資料到browser
-app.delete('/api/v1/tours/:id', deleteTour);
+// ==========================================
+// //  == 將路徑的:id的內容透過.params顯示
+// app.get('/api/v1/tours/:id', getTour);
+// //  == 更新資料的PATCH request(僅先使用來自url的id param)
+// app.patch('/api/v1/tours/:id', updateTour);
+// //  == DELETE request , 將不會送出資料到browser
+// app.delete('/api/v1/tours/:id', deleteTour);
 
+// 以上內容改寫為  app.route('/api/v1/tours/:id').get(getTour).patch(updateTour).delete(deleteTour);
+// ==========================================
 // 將 app.get('/api/v1/tours', getAllTours) 跟 app.post('/api/v1/tours', createTour) 改寫為以下
 app.route('/api/v1/tours').get(getAllTours).post(createTour);
 
+// 將 URI : ('/api/v1/tours/:id') 的相關 request 改寫為以下
+app.route('/api/v1/tours/:id').get(getTour).patch(updateTour).delete(deleteTour);
+
+/*
+git commit records
+1. app.route('/api/v1/tours'). ....
+https://github.com/avgsteve/natour/commit/731c2b4b05e3fe62019cb1a0cf2f2e9134737051
+*/
 const port = 3000; // the port to be used for the localhost page
 app.listen(port, () => {
   console.log(`App running on port ${port}...\nThe address is: http://127.0.0.1:${port}`);
