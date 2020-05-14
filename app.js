@@ -29,7 +29,7 @@ app.post('/', (req, res) => {
 });
 */
 
-//將JSON檔案轉成物件檔案格式
+//將JSON檔案轉成物件(Obj)檔案格式
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
 );
@@ -45,7 +45,7 @@ app.get('/api/v1/tours', (req, res) => {
   });
 });
 
-//設定POST request 收到資料後之後將 new data
+//設定POST request 收到資料後之後將 new data 寫入 目前資料Array，並轉成JSON寫回原檔案
 app.post('/api/v1/tours', (req, res) => {
   //middleware
   console.log("\n=== POST request received! The req.body is:");
@@ -116,7 +116,7 @@ app.get('/api/v1/tours/:id', (req, res) => {
   });
 });
 
-//
+//更新資料的PATCH request(僅先使用來自url的id param)
 app.patch('/api/v1/tours/:id', (req, res) => {
   //在tours Array 裡面搜尋有key: id跟req.params相符內容，並透過find傳回整個符合條件的 Array
   const tour = tours.find(el => el.id === +req.params.id); //req.params.id前的+號是coersion為數值
