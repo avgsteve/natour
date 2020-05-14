@@ -216,18 +216,23 @@ const deleteUser = (req, res) => {
 
 // 3) ============== ROUTES
 
-// 將 app.get('/api/v1/tours', getAllTours) 跟 app.post('/api/v1/tours', createTour) 改寫為以下
-app.route('/api/v1/tours').get(getAllTours).post(createTour);
+// 3-1) 針對 tour 跟 user的 express.Router 的 middleware 設定
+// ==> creating and (mounting) new router (as a middleware & sub-application to be able to change URL)
+const tourRouter = express.Router(); //
+const userRouter = express.Router(); //
 
-// 將 URI : ('/api/v1/tours/:id') 的相關 request 改寫為以下
-app.route('/api/v1/tours/:id').get(getTour).patch(updateTour).delete(deleteTour);
+// 3-2) 將 app.get('/api/v1/tours', getAllTours) 跟 app.post('/api/v1/tours', createTour) 改寫為以下
+tourRouter.route('/').get(getAllTours).post(createTour);
+// 將 app.route('/api/v1/tours/:id').get(getTour).patch(updateTour).delete(deleteTour); 改寫為以下
+tourRouter.route('/:id').get(getTour).patch(updateTour).delete(deleteTour);
 
-// route actions for All users
-app.route('/api/v1/users').get(getAllUsers).post(createUser);
-
+// 3-3) route actions for users
+userRouter.route('/').get(getAllUsers).post(createUser); //從 app.route('/api/v1/users').get 換成 userRouter.route('/').get
 // route actions for SINGLE user
-app.route('/api/v1/users/:id').get(getUser).patch(updateUser).delete(deleteUser);
+userRouter.route('/:id').get(getUser).patch(updateUser).delete(deleteUser);
 
+app.use('/api/v1/tours', tourRouter);
+app.use('/api/v1/users', userRouter);
 
 /*
 git commit records of how to refactor routes into concise code
