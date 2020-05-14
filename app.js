@@ -7,6 +7,18 @@ const app = express();
 //http://expressjs.com/en/api.html#express
 app.use(express.json()); //middleware的使用解說參照git commit 54-1 Node.js Express 的 Middleware的使用 &解說
 
+//
+app.use((req, res, next) => {
+  console.log('Hello from the middleware#1 ❤');
+  next();
+});
+
+//to show when a request happened
+app.use((req, res, next) => {
+  req.requestTime = new Date().toISOString(); // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
+  next();
+});
+
 //將JSON檔案轉成物件(Obj)檔案格式
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
@@ -14,9 +26,13 @@ const tours = JSON.parse(
 
 // get all data
 const getAllTours = (req, res) => {
-  console.log('typeof(tours): ' + typeof(tours));
+
+  //using newly create middleware function to log time
+  console.log(`The requested was made at ${req.requestTime}`);
+  // console.log('typeof(tours): ' + typeof(tours));
   res.status(200).json({
     status: 'success',
+    requestedAt: req.requestTime,
     results: tours.length,
     data: {
       tours: tours,
