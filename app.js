@@ -87,32 +87,34 @@ app.post('/api/v1/tours', (req, res) => {
 });
 
 //將路徑的:id的內容透過.params顯示
-app.get('/api/v1/tours/:id/:x/:y?', (req, res) => {
-  //ex: 127.0.0.1:3000/api/v1/tours/5  params 會顯示 obj { id:5 }
+app.get('/api/v1/tours/:id', (req, res) => {
+  //ex: 127.0.0.1:3000/api/v1/tours/5 的GET request 會顯示  "req.params": {"id": "5"}
+
+  console.log('\n===== req.param is:');
   console.log(req.params);
-  console.log(Object.keys(req.params));
-  /*
-  當 app.get('/api/v1/tours/:id/:x/:y?', (req, res) => {
-  使用 GET request : 127.0.0.1:3000/api/v1/tours/5/user/data;
-  資料內容為:
-  {
-      "status": "success",
-      "iputs": {
-          "req.params": {
-              "id": "5",
-              "x": "user",
-              // "y" 沒有顯示是因為 y key的來源 get request的y 設定為:y?，表示optional
-          }
-      }
+
+  //在tours Array 裡面搜尋有key: id跟req.params相符內容，並透過find傳回整個符合條件的 Array
+  const tour = tours.find(el => el.id === +req.params.id); //req.params.id前的+號是coersion為數值
+  console.log(tour === undefined ? `%c invalid id input from URL: ${req.params.id}` : tour); // is a obj
+
+  //to make sure user entered the correct id
+  if (+req.params.id > tours.length || !tour) {
+    //when can't find the correct id
+    return res.status(404).json({
+      status: "fail",
+      message: "Invalid id",
+      incorrect_input: req.params,
+    });
   }
-  */
-  console.log(typeof(req.params)); // object
-  console.log(Object.keys(req.params).length); // 3( "req.params": { "id": "5", "x": "user","y": "data" })
+
+
 
   res.status(200).json({
     status: 'success',
     inputs: {
       'req.params': req.params,
+      'numberOfResults': "1",
+      'tour': tour,
     }
   });
 });
