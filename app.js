@@ -45,7 +45,7 @@ app.get('/api/v1/tours', (req, res) => {
   });
 });
 
-//設定POST request and add new data
+//設定POST request 收到資料後之後將 new data
 app.post('/api/v1/tours', (req, res) => {
   //middleware
   console.log("\n=== POST request received! The req.body is:");
@@ -106,8 +106,6 @@ app.get('/api/v1/tours/:id', (req, res) => {
     });
   }
 
-
-
   res.status(200).json({
     status: 'success',
     inputs: {
@@ -118,6 +116,31 @@ app.get('/api/v1/tours/:id', (req, res) => {
   });
 });
 
+//
+app.patch('/api/v1/tours/:id', (req, res) => {
+  //在tours Array 裡面搜尋有key: id跟req.params相符內容，並透過find傳回整個符合條件的 Array
+  const tour = tours.find(el => el.id === +req.params.id); //req.params.id前的+號是coersion為數值
+  console.log(tour === undefined ? `%c invalid id input from URL: ${req.params.id}` : tour); // is a obj
+
+  // 如果傳入的id數值大於資料Array的長度，或是找不到資料
+  if (+req.params.id > tours.length || !tour) {
+    return res.status(404).json({
+      status: "fail",
+      message: "Invalid id",
+      incorrect_input: req.params,
+    });
+  }
+
+  // 如果傳入資料正確 (無上列的if狀況發生)
+  res.status(200).json({
+    status: "success",
+    message: "data patched!",
+    data: {
+      tour: 'updated content here...',
+    }
+  });
+
+});
 
 const port = 3000;
 
