@@ -2,11 +2,14 @@
 /*jshint esversion: 8 */
 const fs = require('fs');
 const express = require('express');
+const morgan = require('morgan');
+
 const app = express();
+
+// 1) ============== MIDDLE-WARES
 //app.use(express.json()) ==> middleware: can modify incoming data
 //http://expressjs.com/en/api.html#express
 app.use(express.json()); //middleware的使用解說參照git commit 54-1 Node.js Express 的 Middleware的使用 &解說
-
 //
 app.use((req, res, next) => {
   console.log('Hello from the middleware#1 ❤');
@@ -18,6 +21,8 @@ app.use((req, res, next) => {
   req.requestTime = new Date().toISOString(); // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
   next();
 });
+
+// 2) ============== ROUTE-HANDLERS
 
 //將JSON檔案轉成物件(Obj)檔案格式
 const tours = JSON.parse(
@@ -164,16 +169,8 @@ const deleteTour = (req, res) => {
   });
 };
 
-// ==========================================
-// //  == 將路徑的:id的內容透過.params顯示
-// app.get('/api/v1/tours/:id', getTour);
-// //  == 更新資料的PATCH request(僅先使用來自url的id param)
-// app.patch('/api/v1/tours/:id', updateTour);
-// //  == DELETE request , 將不會送出資料到browser
-// app.delete('/api/v1/tours/:id', deleteTour);
+// 3) ============== ROUTES
 
-// 以上內容改寫為  app.route('/api/v1/tours/:id').get(getTour).patch(updateTour).delete(deleteTour);
-// ==========================================
 // 將 app.get('/api/v1/tours', getAllTours) 跟 app.post('/api/v1/tours', createTour) 改寫為以下
 app.route('/api/v1/tours').get(getAllTours).post(createTour);
 
@@ -185,6 +182,9 @@ git commit records
 1. app.route('/api/v1/tours'). ....
 https://github.com/avgsteve/natour/commit/731c2b4b05e3fe62019cb1a0cf2f2e9134737051
 */
+
+// 4) ============== START THE SERVER
+
 const port = 3000; // the port to be used for the localhost page
 app.listen(port, () => {
   console.log(`App running on port ${port}...\nThe address is: http://127.0.0.1:${port}`);
