@@ -6,6 +6,8 @@ const morgan = require('morgan'); // https://www.npmjs.com/package/morgan
 //import the relocated codes for route-handlers and router from corresponding files
 const tourRouter = require('./routes/tourRoutes'); // tourRoutes.js
 const userRouter = require('./routes/userRoutes'); // userRoutes.js
+const startServer = require('./server'); // server.js
+
 
 const app = express();
 
@@ -43,8 +45,12 @@ git commit records of how to refactor routes into concise code
 https://github.com/avgsteve/natour/commit/731c2b4b05e3fe62019cb1a0cf2f2e9134737051
 */
 
+module.exports = app; // export all config in "app" as a standalone module
+
 // 4) ============== START THE SERVER
+/* (---=== moved below to server.js ===---)
 const port = 3000; // the port to be used for the localhost page
 app.listen(port, () => {
   console.log(`App running on port ${port}...\nThe address is: http://127.0.0.1:${port}`);
 });
+*/
