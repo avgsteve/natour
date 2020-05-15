@@ -27,14 +27,14 @@ app.use((req, res, next) => {
 // 2) ============== ROUTE-HANDLERS (moved to ./routes/tourRoutes.js &  ./routes/userRoutes.js)
 // ex:  const getAllTours = (req, res) => { ....
 
-// 3) ============== ROUTES
+// 3) ============== ROUTES ()
 // --->>> 3-1)  *針對 tour 跟 user的 express.Router (middleware) 設定
 // --->>> const tourRouter = express.Router();      //移到 tourRouter.js
 
-// --->>> 3-2) 將 tourRouter.route('/:id').get(getTour).patch(updateTour).delete(deleteTour);    移到 tourRouter.js
+// --->>> 3-2) 將 tourRouter.route('/:id').get(getTour).patch(updateTour).delete(deleteTour);    移到 tourRouter.js，針對此URI '/api/v1/tours'  改為使用 tourRouter middleware的方式作為 router
 app.use('/api/v1/tours', tourRouter);
 
-// --->>> 3-3) 將 route actions for users  //移到 tourRouter.js
+// --->>> 3-3) 將 route actions for users  //移到 tourRouter.js，針對此URI '/api/v1/users'  改為使用 middleware的方式作為 router
 app.use('/api/v1/users', userRouter);
 
 /*
