@@ -2,6 +2,14 @@
 /*jshint esversion: 8 */
 const express = require('express');
 const morgan = require('morgan'); // https://www.npmjs.com/package/morgan
+const dotenv = require('dotenv'); // ref:  https://www.npmjs.com/package/dotenv
+
+// for reading Environment Variables from config.env file
+dotenv.config({
+  path: './config.env'
+});
+
+console.log(process.env.NODE_ENV); //若只有process.env 則會列出所有property
 
 //import the relocated codes for route-handlers and router from corresponding files
 const tourRouter = require('./routes/tourRoutes'); // tourRoutes.js
@@ -12,7 +20,11 @@ const startServer = require('./server'); // server.js
 const app = express();
 
 // 1) ============== MIDDLE-WARES
-app.use(morgan('dev')); // https://www.npmjs.com/package/morgan#dev
+
+// 67. Environment Variables: 透過 env variable 來控制 development 或是 production stage 的某些 middleware是否要啟用
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev')); // https://www.npmjs.com/package/morgan#dev
+}
 app.use(express.json()); //middleware的使用解說參照git commit 54-1 Node.js Express 的 Middleware的使用 &解說
 
 // build-in middleware "express.static" for serving static file like .html
