@@ -17,7 +17,7 @@ app.use(express.json()); //middleware的使用解說參照git commit 54-1 Node.j
 
 //for testing middleware
 app.use((req, res, next) => {
-  console.log('this is a middleware 🎈🎈🎃🎃');
+  console.log('\n=== this is a middleware log from app.js\n');
   next();
 });
 //to show WHEN a request happened

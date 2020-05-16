@@ -10,6 +10,13 @@ const express = require('express');
 // Router 部分
 const router = express.Router(); //原本是 const tourRouter = express.Router(); 因為需要按照convention去export router的關係就改掉
 
+//router.param middleware will be triggered by the setup of other middleware router.route()
+router.param('id', (req, res, next, val) => {
+  console.log(`(from router.param middleware function in tourRoutes.js) \nthe Tour id is: ${val}`);
+  next();
+  //ref:  https://expressjs.com/en/api.html#router.param
+});
+
 router.route('/').get(tourController.getAllTours).post(tourController.createTour);
 router.route('/:id').get(tourController.getTour).patch(tourController.updateTour).delete(tourController.deleteTour);
 

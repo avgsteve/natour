@@ -1,6 +1,8 @@
 /*jshint esversion: 6 */
 /*jshint esversion: 8 */
 const fs = require('fs');
+const path = require('path');
+const scriptName = path.basename(__filename);
 
 
 //將JSON檔案轉成物件(Obj)檔案格式
@@ -14,7 +16,7 @@ const tours = JSON.parse(
 // exports.getAllTours = (req, res) => { 將 宣告變數的 const 改為 exports.
 exports.getAllTours = (req, res) => {
   //using newly create middleware function to log time
-  console.log(`The requested was made at ${req.requestTime}`);
+  console.log(` (from ${scriptName}:) The requested was made at ${req.requestTime}`);
   // console.log('typeof(tours): ' + typeof(tours));
   res.status(200).json({
     status: 'success',
@@ -31,14 +33,14 @@ exports.getAllTours = (req, res) => {
 exports.getTour = (req, res) => {
   // req來自於 router.route('/:id').get(getTour)，params property key為 :id
   // to log the current req params from URI
-  console.log('\n===== req.param is:');
+  console.log(`\n (from ${scriptName}:) ===== req.param is:`);
   console.log(req.params);
   //ex: 127.0.0.1:3000/api/v1/tours/5 的GET request 會顯示  "req.params": {"id": "5"}
 
 
   //在tours Array 裡面搜尋有key: id跟req.params相符內容，並透過find傳回整個符合條件的 Array
-  exports.tour = tours.find(el => el.id === +req.params.id); //req.params.id前的+號是coersion為數值
-  console.log(tour === undefined ? `%c invalid id input from URL: ${req.params.id}` : tour); // is a obj
+  const tour = tours.find(el => el.id === +req.params.id); //req.params.id前的+號是coersion為數值
+  console.log(tour === undefined ? ` (from ${scriptName}:)  invalid id input from URL: ${req.params.id}` : tour); // is a obj
 
   //to make sure user entered the correct id
   if (+req.params.id > tours.length || !tour) {
@@ -63,7 +65,7 @@ exports.getTour = (req, res) => {
 // ===> create new data from POST request and assign it to current data obj
 exports.createTour = (req, res) => {
   //middleware
-  console.log("\n=== POST request received! The req.body is:");
+  console.log(`\n===  (from ${scriptName}:) POST request received! The req.body is:`);
   console.log(req.body);
   const newID = tours[tours.length - 1].id + 1;
 
