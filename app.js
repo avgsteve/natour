@@ -15,6 +15,10 @@ const app = express();
 app.use(morgan('dev')); // https://www.npmjs.com/package/morgan#dev
 app.use(express.json()); //middleware的使用解說參照git commit 54-1 Node.js Express 的 Middleware的使用 &解說
 
+// build-in middleware "express.static" for serving static file like .html
+app.use(express.static(`${__dirname}/public`)); //https://expressjs.com/en/starter/static-files.html
+//the URL for page is http://127.0.0.1:3000/overview.html as the app.use doesn't set any router
+
 //for testing middleware
 app.use((req, res, next) => {
   console.log('\n=== this is a middleware log from app.js\n');
