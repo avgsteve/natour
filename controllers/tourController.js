@@ -29,13 +29,29 @@ exports.checkID = (req, res, next, val) => {
   next();
 };
 
+//// Check req body middleware :  to make sure user entered the name and price property
+exports.checkReqBody = (req, res, next) => {
+  console.log(`\n(From tourControllers.js  <=== checkReqBody middleware.) \nThe req.body input has an error\n`);
+
+  if (!req.body.name || !req.body.price) {
+    // 400: Bad(invalid) request
+    return res.status(400).json({
+      status: "fail",
+      message: "Invalid input",
+      incorrect_input: 'Missing name or price property',
+    });
+  }
+
+  next();
+};
+
 
 // 2) ============== ROUTE-HANDLERS
 // // ===> get all data
 // exports.getAllTours = (req, res) => { 將 宣告變數的 const 改為 exports.
 exports.getAllTours = (req, res) => {
   //using newly create middleware function to log time
-  console.log(` (from ${scriptName}:) The requested was made at ${req.requestTime}`);
+  console.log(`(from ${scriptName}: ) The requested was made at ${req.requestTime}`);
   // console.log('typeof(tours): ' + typeof(tours));
   res.status(200).json({
     status: 'success',
@@ -52,7 +68,7 @@ exports.getAllTours = (req, res) => {
 exports.getTour = (req, res) => {
   // req來自於 router.route('/:id').get(getTour)，params property key為 :id
   // to log the current req params from URI
-  console.log(`\n (from ${scriptName}:) ===== req.param is:`);
+  console.log(`\n(from ${scriptName}: ) The req.param is: `);
   console.log(req.params);
   //ex: 127.0.0.1:3000/api/v1/tours/5 的GET request 會顯示  "req.params": {"id": "5"}
 
@@ -73,7 +89,7 @@ exports.getTour = (req, res) => {
 // ===> create new data from POST request and assign it to current data obj
 exports.createTour = (req, res) => {
   //middleware
-  console.log(`\n===  (from ${scriptName}:) POST request received! The req.body is:`);
+  console.log(`\n=== (from ${scriptName}: ) POST request received!The req.body have the value as below: `);
   console.log(req.body);
   //to give this new input a new id
   const newID = tours[tours.length - 1].id + 1;
@@ -106,7 +122,7 @@ exports.createTour = (req, res) => {
     });
   });
 
-  console.log(`...New obj created via method : app.post('/api/v1/tours', createTour); `);
+  console.log(`...New obj created via method: app.post('/api/v1/tours', createTour);`);
 };
 
 // ===> updateTour
