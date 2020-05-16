@@ -4,12 +4,31 @@ const fs = require('fs');
 const path = require('path');
 const scriptName = path.basename(__filename);
 
-
-//將JSON檔案轉成物件(Obj)檔案格式
+// 1) ============== middleware functions
+//// 將JSON檔案轉成物件(Obj)檔案格式
 const tours = JSON.parse(
   // fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
 );
+
+//// Check id middleware :  to make sure user entered the correct id. Export this function
+exports.checkID = (req, res, next, val) => {
+  console.log(`\n(From tourControllers.js, checkID middleware.) \nthe param for 'id' is: ${val}`);
+
+  //when the input in is not correct
+  if (+val > tours.length) {
+    console.log(`invalid id input from URL: ${val}`);
+
+    return res.status(404).json({
+      status: "fail",
+      message: "Invalid id",
+      incorrect_input: req.params,
+    });
+  }
+
+  next();
+};
+
 
 // 2) ============== ROUTE-HANDLERS
 // // ===> get all data
@@ -40,17 +59,6 @@ exports.getTour = (req, res) => {
 
   //在tours Array 裡面搜尋有key: id跟req.params相符內容，並透過find傳回整個符合條件的 Array
   const tour = tours.find(el => el.id === +req.params.id); //req.params.id前的+號是coersion為數值
-  console.log(tour === undefined ? ` (from ${scriptName}:)  invalid id input from URL: ${req.params.id}` : tour); // is a obj
-
-  //to make sure user entered the correct id
-  if (+req.params.id > tours.length || !tour) {
-    //when can't find the correct id
-    return res.status(404).json({
-      status: "fail",
-      message: "Invalid id",
-      incorrect_input: req.params,
-    });
-  }
 
   res.status(200).json({
     status: 'success',
@@ -67,6 +75,7 @@ exports.createTour = (req, res) => {
   //middleware
   console.log(`\n===  (from ${scriptName}:) POST request received! The req.body is:`);
   console.log(req.body);
+  //to give this new input a new id
   const newID = tours[tours.length - 1].id + 1;
 
   //透過Object.assign將req.body的內容(POST method)存到變數newTour
@@ -104,16 +113,6 @@ exports.createTour = (req, res) => {
 exports.updateTour = (req, res) => {
   //在tours Array 裡面搜尋有key: id跟req.params相符內容，並透過find傳回整個符合條件的 Array
   exports.tour = tours.find(el => el.id === +req.params.id); //req.params.id前的+號是coersion為數值
-  console.log(tour === undefined ? `%c invalid id input from URL: ${req.params.id}` : tour); // is a obj
-
-  // 如果傳入的id數值大於資料Array的長度，或是找不到資料
-  if (+req.params.id > tours.length || !tour) {
-    return res.status(404).json({
-      status: "fail",
-      message: "Invalid id",
-      incorrect_input: req.params,
-    });
-  }
 
   // 如果傳入資料正確 (無上列的if狀況發生)
   res.status(200).json({
@@ -135,17 +134,6 @@ exports.deleteTour = (req, res) => {
 
   //在tours Array 裡面搜尋有key: id跟req.params相符內容，並透過find傳回整個符合條件的 Array
   exports.tour = tours.find(el => el.id === +req.params.id); //req.params.id前的+號是coersion為數值
-  console.log(tour === undefined ? `%c invalid id input from URL: ${req.params.id}` : tour); // is a obj
-
-  // to make sure user entered the correct id
-  if (+req.params.id > tours.length || !tour) {
-    //when can't find the correct id
-    return res.status(404).json({
-      status: "fail",
-      message: "Invalid id",
-      incorrect_input: req.params,
-    });
-  }
 
   // status 204 will not send out data to browser , only the status code 204
   res.status(204).json({

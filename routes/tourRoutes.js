@@ -10,13 +10,11 @@ const express = require('express');
 // Router 部分
 const router = express.Router(); //原本是 const tourRouter = express.Router(); 因為需要按照convention去export router的關係就改掉
 
-//router.param middleware will be triggered by the setup of other middleware router.route()
-router.param('id', (req, res, next, val) => {
-  console.log(`(from router.param middleware function in tourRoutes.js) \nthe Tour id is: ${val}`);
-  next();
-  //ref:  https://expressjs.com/en/api.html#router.param
-});
+// ==== 使用 papram (':/id') 的 middleware，檢查id內容是否正確
+// router.param middleware will be triggered by the setup of other middleware router.route()
+router.param('id', tourController.checkID);
 
+//在 app.js裡面，使用app.use('/api/v1/tours', tourRouter); 來指定 router.route 使用哪一段網址為 router param ex: '/:id'
 router.route('/').get(tourController.getAllTours).post(tourController.createTour);
 router.route('/:id').get(tourController.getTour).patch(tourController.updateTour).delete(tourController.deleteTour);
 
