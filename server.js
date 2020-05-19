@@ -59,7 +59,7 @@ const testTour = new Tour({
   rating: 4.7,
   price: 999,
 });
-
+/*  see Git commit comments for MVC models
 //save() ref:  https://mongoosejs.com/docs/api.html#document_Document-save
 testTour.save(
   //.save() will return a promise
@@ -70,7 +70,7 @@ testTour.save(
   console.log("\nOops there's an error!: \n");
   console.log(err);
 });
-
+*/
 
 
 //=======================================================
