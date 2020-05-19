@@ -1,33 +1,18 @@
 /*jshint esversion: 6 */
 /*jshint esversion: 8 */
-const fs = require('fs');
 const path = require('path');
 const scriptName = path.basename(__filename);
+const Tour = require('./../models/tourModel');
 
+/* for testing purpose
 // 1) ============== middleware functions
 //// 將JSON檔案轉成物件(Obj)檔案格式
 const tours = JSON.parse(
   // fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
 );
+*/
 
-//// Check id middleware :  to make sure user entered the correct id. Export this function
-exports.checkID = (req, res, next, val) => {
-  console.log(`\n(From tourControllers.js, checkID middleware.) \nthe param for 'id' is: ${val}`);
-
-  //when the input in is not correct
-  if (+val > tours.length) {
-    console.log(`invalid id input from URL: ${val}`);
-
-    return res.status(404).json({
-      status: "fail",
-      message: "Invalid id",
-      incorrect_input: req.params,
-    });
-  }
-
-  next();
-};
 
 //// Check req body middleware :  to make sure user entered the name and price property
 exports.checkReqBody = (req, res, next) => {
@@ -47,8 +32,8 @@ exports.checkReqBody = (req, res, next) => {
 
 
 // 2) ============== ROUTE-HANDLERS
-// // ===> get all data
-// exports.getAllTours = (req, res) => { 將 宣告變數的 const 改為 exports.
+// ---> use this "getAllTours" to get all data
+// (req, res) => { 將 宣告變數的 const 改為 exports.
 exports.getAllTours = (req, res) => {
   //using newly create middleware function to log time
   console.log(`(from ${scriptName}: ) The requested was made at ${req.requestTime}`);
@@ -57,9 +42,9 @@ exports.getAllTours = (req, res) => {
     status: 'success',
     requestedAt: req.requestTime,
     results: tours.length,
-    data: {
-      tours: tours,
-    }
+    // data: {
+    //   tours: tours,
+    // }
   });
 };
 
@@ -74,14 +59,14 @@ exports.getTour = (req, res) => {
 
 
   //在tours Array 裡面搜尋有key: id跟req.params相符內容，並透過find傳回整個符合條件的 Array
-  const tour = tours.find(el => el.id === +req.params.id); //req.params.id前的+號是coersion為數值
+  // const tour = tours.find(el => el.id === +req.params.id); //req.params.id前的+號是coersion為數值
 
   res.status(200).json({
     status: 'success',
     inputs: {
       'req.params': req.params,
       'numberOfResults': "1",
-      'tour': tour,
+      // 'tour': tour,
     }
   });
 };
@@ -92,43 +77,14 @@ exports.createTour = (req, res) => {
   console.log(`\n=== (from ${scriptName}: ) POST request received!The req.body have the value as below: `);
   console.log(req.body);
   //to give this new input a new id
-  const newID = tours[tours.length - 1].id + 1;
+  // const newID = tours[tours.length - 1].id + 1;
 
-  //透過Object.assign將req.body的內容(POST method)存到變數newTour
-  const newTour = Object.assign({
-    id: newID
-  }, req.body);
-  /*
-  {
-  	"name" : "Test tour",
-  	"duration" : 10,
-  	"difficulty" : "easy"
-  }
-  */
-
-  //將新的newTour資料存入現有的 tours Array 資料中
-  tours.push(newTour);
-
-  //Asyncronous file writing method
-  //fs.writeFile(file, data[, options], callback)
-  fs.writeFile(`${__dirname}/dev-data/data/tours-simple.json`, JSON.stringify(tours), err => {
-    // 201 = created
-    res.status(201).json({
-      // then show created tour results from the POST request
-      status: 'success',
-      data: {
-        tour: newTour,
-      }
-    });
-  });
-
-  console.log(`...New obj created via method: app.post('/api/v1/tours', createTour);`);
 };
 
 // ===> updateTour
 exports.updateTour = (req, res) => {
   //在tours Array 裡面搜尋有key: id跟req.params相符內容，並透過find傳回整個符合條件的 Array
-  exports.tour = tours.find(el => el.id === +req.params.id); //req.params.id前的+號是coersion為數值
+  // exports.tour = tours.find(el => el.id === +req.params.id); //req.params.id前的+號是coersion為數值
 
   // 如果傳入資料正確 (無上列的if狀況發生)
   res.status(200).json({
@@ -149,7 +105,7 @@ exports.deleteTour = (req, res) => {
   console.log(req.params);
 
   //在tours Array 裡面搜尋有key: id跟req.params相符內容，並透過find傳回整個符合條件的 Array
-  exports.tour = tours.find(el => el.id === +req.params.id); //req.params.id前的+號是coersion為數值
+  // exports.tour = tours.find(el => el.id === +req.params.id); //req.params.id前的+號是coersion為數值
 
   // status 204 will not send out data to browser , only the status code 204
   res.status(204).json({
@@ -157,3 +113,22 @@ exports.deleteTour = (req, res) => {
     data: null,
   });
 };
+
+
+////// Check id middleware :  to make sure user entered the correct id. Export this function
+// exports.checkID = (req, res, next, val) => {
+//   console.log(`\n(From tourControllers.js, checkID middleware.) \nthe param for 'id' is: ${val}`);
+//
+//   //when the input in is not correct
+//   if (+val > tours.length) {
+//     console.log(`invalid id input from URL: ${val}`);
+//
+//     return res.status(404).json({
+//       status: "fail",
+//       message: "Invalid id",
+//       incorrect_input: req.params,
+//     });
+//   }
+//
+//   next();
+// };
