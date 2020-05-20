@@ -14,22 +14,6 @@ const tours = JSON.parse(
 */
 
 
-//// Check req body middleware :  to make sure user entered the name and price property
-exports.checkReqBody = (req, res, next) => {
-  console.log(`\n(From tourControllers.js  <=== checkReqBody middleware.) \nThe req.body input has an error\n`);
-
-  if (!req.body.name || !req.body.price) {
-    // 400: Bad(invalid) request
-    return res.status(400).json({
-      status: "fail",
-      message: "Invalid input",
-      incorrect_input: 'Missing name or price property',
-    });
-  }
-
-  next();
-};
-
 
 // 2) ============== ROUTE-HANDLERS
 // ---> use this "getAllTours" to get all data
@@ -71,13 +55,52 @@ exports.getTour = (req, res) => {
   });
 };
 
-// ===> create new data from POST request and assign it to current data obj
-exports.createTour = (req, res) => {
-  //middleware
+// ===> create new data from POST request
+exports.createTour = async (req, res) => {
+  //因為下面新增方法二的 Tour(model).create() function會傳回Promise，所以就要改用 async .. await funtion 的方式來使用 createTour function
+
   console.log(`\n=== (from ${scriptName}: ) POST request received!The req.body have the value as below: `);
   console.log(req.body);
-  //to give this new input a new id
-  // const newID = tours[tours.length - 1].id + 1;
+
+  // ===建立資料的方法一 : new Model() & save()
+  // // create new data from "document" class
+  // const newTour = new Tour({});
+  // newTour.save();
+  /*  https://mongoosejs.com/docs/api.html#document_Document-save
+  If save is successful, the returned promise will fulfill with the document saved.
+*/
+
+  // ===建立資料的方法二  await model.create(req.body)
+  // create new data from "model" class
+  // ref: https://mongoosejs.com/docs/models.html
+  // Models are fancy constructors compiled from Schema definitions. An instance of a model is called a document. Models are responsible for creating and reading documents from the underlying MongoDB database.
+
+  try {
+    const newTour = await Tour.create(req.body);
+    //model.create() is a Shortcut for saving one or more documents to the database. MyModel.create(docs) does new MyModel(doc).save() for every doc in docs.
+    //Returns:  «Promise»
+
+
+    //ref:  https://mongoosejs.com/docs/api.html#model_Model.create
+
+    res.status(201).json({
+      status: 'successfully added new data to DB',
+      data: {
+        tour: newTour, //send back the successfully created data to browser
+      }
+    });
+
+  } catch (error) {
+    console.log("\nThere's an error in createTour() after POST request!: \n");
+    console.log(error);
+    //send error response with status code 400
+    res.status(400).json({
+      status: 'adding new data failed!',
+      errorMessage: error,
+    });
+  }
+
+
 
 };
 

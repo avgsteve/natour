@@ -27,7 +27,9 @@ const tourSchema = new Schema({
   },
 });
 
-// // make a collection based on the tourSchema by using model constructors function
+// // make a collection based on the tourSchema by using model constructors function.
+// // // Ex: mongoose.model('collectionName', SchemaName) will be "collectionNames" shown on database collection
+//
 // ref:  https://mongoosejs.com/docs/models.html#compiling
 const Tour = mongoose.model('Tour', tourSchema);
 

@@ -13,7 +13,7 @@ const router = express.Router(); //原本是 const tourRouter = express.Router()
 // router.param('id',tourController.checkID); //checkID位於 tourController裡面，未用到所以先被comment掉
 
 //在 app.js裡面，使用app.use('/api/v1/tours', tourRouter); 來指定 router.route 使用哪一段網址為 router param ex: '/:id'
-router.route('/').get(tourController.getAllTours).post(tourController.checkReqBody, tourController.createTour); // post request 要先使用 checkReqBody middleware method
+router.route('/').get(tourController.getAllTours).post(tourController.createTour); // post request 要先使用 checkReqBody middleware method
 router.route('/:id').get(tourController.getTour).patch(tourController.updateTour).delete(tourController.deleteTour);
 
 // 以下是從app.js移過來，原本的的內容，改成以上方式 (by convention)
