@@ -137,18 +137,44 @@ exports.createTour = async (req, res) => {
 };
 
 // ===> updateTour
-exports.updateTour = (req, res) => {
+exports.updateTour = async (req, res) => {
   //在tours Array 裡面搜尋有key: id跟req.params相符內容，並透過find傳回整個符合條件的 Array
   // exports.tour = tours.find(el => el.id === +req.params.id); //req.params.id前的+號是coersion為數值
 
-  // 如果傳入資料正確 (無上列的if狀況發生)
-  res.status(200).json({
-    status: "success",
-    message: "data patched!",
-    data: {
-      tour: 'updated content here...',
-    }
-  });
+  try {
+
+    console.log(`\nupdating data with the id "${req.params.id}" & req body:`);
+    console.log(req.body);
+
+    const updatedData = await Tour.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true, //if true, runs update validators on this command. Update validators validate the update operation against the model's schema.
+
+    });
+    //ref:  https://mongoosejs.com/docs/api.html#model_Model.findByIdAndUpdate  --> Model.findByIdAndUpdate('id', UpdateContentObj, optionsObj)
+
+    res.status(200).json({
+      status: "success",
+      message: "data is successfully updated!",
+      data: {
+        // tour: 'updated content here...',
+        tour: updatedData,
+      }
+    });
+
+
+  } catch (error) {
+    console.log("\nThere's an error in updateTour() after PATCH request!: \n");
+    console.log(error);
+    //send error response with status code 400
+    res.status(404).json({
+      status: 'Updating the data has failed!',
+      errorMessage: error,
+    });
+
+  }
+
+
 
 };
 
