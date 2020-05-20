@@ -16,43 +16,75 @@ const tours = JSON.parse(
 
 
 // 2) ============== ROUTE-HANDLERS
-// ---> use this "getAllTours" to get all data
-// (req, res) => { 將 宣告變數的 const 改為 exports.
-exports.getAllTours = (req, res) => {
+
+exports.getAllTours = async (req, res) => {
+
   //using newly create middleware function to log time
   console.log(`(from ${scriptName}: ) The requested was made at ${req.requestTime}`);
   // console.log('typeof(tours): ' + typeof(tours));
-  res.status(200).json({
-    status: 'success',
-    requestedAt: req.requestTime,
-    results: tours.length,
-    // data: {
-    //   tours: tours,
-    // }
-  });
+
+  try {
+    // get all current data from DB
+    const tours = await Tour.find(); //ref:  https://mongoosejs.com/docs/api.html#model_Model.find
+
+    res.status(200).json({
+      status: 'success',
+      requestedAt: req.requestTime,
+      results: tours.length,
+      data: {
+        tours: tours,
+      }
+
+    });
+  } catch (error) {
+    console.log("\nThere's an error in getAllTours() after GET request!: \n");
+    console.log(error);
+    //send error response with status code 400
+    res.status(404).json({
+      status: 'getting all data failed!',
+      errorMessage: error,
+    });
+  }
+
 };
 
 // 2-1) ROUTE-HANDLERS with " params from router.route('/:id') "
 // ===> get only one result from Obj's "tours" array
-exports.getTour = (req, res) => {
+exports.getTour = async (req, res) => {
   // req來自於 router.route('/:id').get(getTour)，params property key為 :id
   // to log the current req params from URI
   console.log(`\n(from ${scriptName}: ) The req.param is: `);
   console.log(req.params);
   //ex: 127.0.0.1:3000/api/v1/tours/5 的GET request 會顯示  "req.params": {"id": "5"}
 
+  try {
+    // get all current data from DB
+    const tour = await Tour.findById(req.params.id); //ref:  https://mongoosejs.com/docs/api.html#model_Model.find
+    // Tour.findById(req.params.id) equals to the function Tour.findOne( {_id: req.param.id} )
+
+    res.status(200).json({
+      status: 'success',
+      inputs: {
+        'req.params': req.params,
+        'numberOfResults': "1",
+        // 'tour': tour,
+      },
+      data: tour,
+    });
+  } catch (error) {
+    console.log("\nThere's an error in getTour() after GET request!: \n");
+    console.log(error);
+    //send error response with status code 400
+    res.status(404).json({
+      status: 'getting the required data failed!',
+      errorMessage: error,
+    });
+  }
 
   //在tours Array 裡面搜尋有key: id跟req.params相符內容，並透過find傳回整個符合條件的 Array
   // const tour = tours.find(el => el.id === +req.params.id); //req.params.id前的+號是coersion為數值
 
-  res.status(200).json({
-    status: 'success',
-    inputs: {
-      'req.params': req.params,
-      'numberOfResults': "1",
-      // 'tour': tour,
-    }
-  });
+
 };
 
 // ===> create new data from POST request
