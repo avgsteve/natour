@@ -146,6 +146,8 @@ exports.updateTour = async (req, res) => {
     console.log(`\nupdating data with the id "${req.params.id}" & req body:`);
     console.log(req.body);
 
+
+
     const updatedData = await Tour.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true, //if true, runs update validators on this command. Update validators validate the update operation against the model's schema.
@@ -179,20 +181,31 @@ exports.updateTour = async (req, res) => {
 };
 
 //// ===> deleteTour
-exports.deleteTour = (req, res) => {
-  //ex: 127.0.0.1:3000/api/v1/tours/5 的GET request 會顯示  "req.params": {"id": "5"}
+exports.deleteTour = async (req, res) => {
+  try {
 
-  console.log('\n===== req.param for DELETE request is:');
-  console.log(req.params);
+    console.log('\n===== req.param for DELETE request is:');
+    console.log(req.params);
 
-  //在tours Array 裡面搜尋有key: id跟req.params相符內容，並透過find傳回整個符合條件的 Array
-  // exports.tour = tours.find(el => el.id === +req.params.id); //req.params.id前的+號是coersion為數值
+    await Tour.findByIdAndDelete(req.params.id);
+    //https://mongoosejs.com/docs/api.html#model_Model.findByIdAndDelete
 
-  // status 204 will not send out data to browser , only the status code 204
-  res.status(204).json({
-    status: 'success',
-    data: null,
-  });
+    // status 204 will not send out data to browser , only the status code 204
+    res.status(204).json({
+      status: 'success',
+      data: null,
+    });
+
+  } catch (err) {
+    console.log("\nThere's an error in deleteTour() after DELETE request!: \n");
+    console.log(error);
+    //send error response with status code 400
+    res.status(404).json({
+      status: 'delete new data failed!',
+      errorMessage: error,
+    });
+
+  }
 };
 
 
