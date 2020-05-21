@@ -10,21 +10,60 @@ const Schema = mongoose.Schema;
 //mongoosejs.com/docs/guide.html#models
 
 const tourSchema = new Schema({
-  //schema options ref:  https://mongoosejs.com/docs/guide.html#definition
+  // schema options ref:
+  // https://mongoosejs.com/docs/guide.html#definition
   name: {
-    //this type of obj prop is the "schema type option"
     type: String,
     required: [true, "A tour must have a name"],
     unique: true,
+    // "require" and "unique" properties are the type of obj prop is the "schema type option"
+    // ref:  https://mongoosejs.com/docs/schematypes.html#schematype-options
+    trim: true
   },
-  rating: {
+  duration: {
+    type: Number,
+    required: [true, "A tour must have a duration"],
+  },
+  maxGroupSize: {
+    type: Number,
+    required: [true, "A tour must have a group size (maxGroupSize)"],
+  },
+  difficulty: {
+    type: String,
+    required: [true, "A tour must have a difficulty level"],
+  },
+  ratingAverage: {
+    type: Number,
+    default: 4.5,
+  },
+  ratingQuantity: {
     type: Number,
     default: 4.5,
   },
   price: {
-    type: String,
-    required: [true, "A tour  must have a price"],
+    type: Number,
+    required: [true, "A tour must have a price"],
   },
+  priceDiscount: Number,
+  summary: {
+    type: String,
+    trim: true, //trim: boolean, whether to always call .trim() on the value  ref:  https://mongoosejs.com/docs/schematypes.html#schematype-options
+    required: [true, "A tour must have a price"],
+  },
+  description: {
+    type: String,
+    trim: true
+  },
+  imageCover: {
+    type: String,
+    required: [true, "A tour must have a price"],
+  },
+  images: [String],
+  createdAt: {
+    type: Date,
+    default: Date.now(),
+  },
+  startDates: [Date]
 });
 
 // // make a collection based on the tourSchema by using model constructors function.
