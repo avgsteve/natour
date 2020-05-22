@@ -14,19 +14,21 @@ const tours = JSON.parse(
 );
 */
 
-
-
 // 2) ============== ROUTE-HANDLERS
 
 exports.getAllTours = async (req, res) => {
   //using newly create middleware function to log time
   console.log(`\n(from ${scriptName}: ) The requested was made at ${req.requestTime}`);
 
-  console.log("\nThe query obj from the GET request: ");
+  console.log("\nThe req.query obj from the GET request: ");
   console.log(req.query);
+  // { difficulty: 'easy', duration: { gte: '5' } }
 
   try {
+
     // #1 BUILD THE QUERY
+
+    // // 1) Filtering
     //make a shallow copy of req.query
     const queryObj = {
       ...req.query
@@ -36,8 +38,26 @@ exports.getAllTours = async (req, res) => {
     //deleting the excluded fields (properties) from the queryObj and makes queryObj a new one
     excludedFields.forEach(propertyItem => delete queryObj[propertyItem]);
 
-    console.log('\nThe processed req.query (queryObj)');
-    console.log(queryObj);
+    // // 2) Advanced Filtering
+
+    // // 將 URL query ，ex:
+    // http://127.0.0.1:3000/api/v1/tours?duration[gte]=5 傳入的物件 value  { duration: { 'gte': '6' } } 改寫為  { '$gte': '6' }  來作為傳入 .find() method 的 argument
+
+
+    //convert js object to string as JSON(both key and value)
+    let queryStr = JSON.stringify(queryObj);
+    console.log('\nJSON.stringify(queryObj);');
+    console.log(queryStr);
+
+    // gte, gt, lte, lt ==> $gte, $gt, $lte, $lt
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
+    //
+    console.log('\nreplaced string (queryStr):');
+    console.log(queryStr);
+
+    queryStr = JSON.parse(queryStr);
+    console.log('\nafter JSON.parse(queryStr)');
+    console.log(queryStr);
 
     // #2 EXECUTE QUERY
 
@@ -52,7 +72,7 @@ exports.getAllTours = async (req, res) => {
     // });
 
     // this method has the same result as #1 monogoDB way
-    const queryWith_queryObj = await Tour.find(queryObj);
+    const queryWith_queryStr = await Tour.find(queryStr);
 
     // // // 2. mongooseB way
     // const tours = await Tour.find().where('duration').equals(5).where('difficulty').equals('easy');
@@ -62,9 +82,9 @@ exports.getAllTours = async (req, res) => {
     res.status(200).json({
       status: 'success',
       requestedAt: req.requestTime,
-      results: queryWith_queryObj.length,
+      results: queryWith_queryStr.length,
       data: {
-        tours: queryWith_queryObj,
+        tours: queryWith_queryStr,
       }
 
     });
