@@ -112,9 +112,7 @@ exports.createTour = async (req, res) => {
     //model.create() is a Shortcut for saving one or more documents to the database. MyModel.create(docs) does new MyModel(doc).save() for every doc in docs.
     //Returns:  «Promise»
 
-
     //ref:  https://mongoosejs.com/docs/api.html#model_Model.create
-
     res.status(201).json({
       status: 'successfully added new data to DB',
       data: {

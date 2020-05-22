@@ -48,7 +48,7 @@ const tourSchema = new Schema({
   summary: {
     type: String,
     trim: true, //trim: boolean, whether to always call .trim() on the value  ref:  https://mongoosejs.com/docs/schematypes.html#schematype-options
-    required: [true, "A tour must have a price"],
+    required: [true, "A tour must have a summary"],
   },
   description: {
     type: String,
@@ -56,7 +56,7 @@ const tourSchema = new Schema({
   },
   imageCover: {
     type: String,
-    required: [true, "A tour must have a price"],
+    required: [true, "A tour must have a imageCover"],
   },
   images: [String],
   createdAt: {
