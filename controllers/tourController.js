@@ -1,5 +1,6 @@
 /*jshint esversion: 6 */
 /*jshint esversion: 8 */
+/*jshint esversion: 9 */
 const path = require('path');
 const scriptName = path.basename(__filename);
 const Tour = require('./../models/tourModel');
@@ -18,21 +19,52 @@ const tours = JSON.parse(
 // 2) ============== ROUTE-HANDLERS
 
 exports.getAllTours = async (req, res) => {
-
   //using newly create middleware function to log time
-  console.log(`(from ${scriptName}: ) The requested was made at ${req.requestTime}`);
-  // console.log('typeof(tours): ' + typeof(tours));
+  console.log(`\n(from ${scriptName}: ) The requested was made at ${req.requestTime}`);
+
+  console.log("\nThe query obj from the GET request: ");
+  console.log(req.query);
 
   try {
+    // #1 BUILD THE QUERY
+    //make a shallow copy of req.query
+    const queryObj = {
+      ...req.query
+    };
+
+    const excludedFields = ['page', 'sort', 'limit', 'fields'];
+    //deleting the excluded fields (properties) from the queryObj and makes queryObj a new one
+    excludedFields.forEach(propertyItem => delete queryObj[propertyItem]);
+
+    console.log('\nThe processed req.query (queryObj)');
+    console.log(queryObj);
+
+    // #2 EXECUTE QUERY
+
     // get all current data from DB
-    const tours = await Tour.find(); //ref:  https://mongoosejs.com/docs/api.html#model_Model.find
+    // const tours = await Tour.find(); //ref:  https://mongoosejs.com/docs/api.html#model_Model.find
+
+    // // --- different ways of querying data
+    // // // 1. monogoDB way
+    // const tours = await Tour.find({
+    //   duration: 5,
+    //   difficulty: "easy",
+    // });
+
+    // this method has the same result as #1 monogoDB way
+    const queryWith_queryObj = await Tour.find(queryObj);
+
+    // // // 2. mongooseB way
+    // const tours = await Tour.find().where('duration').equals(5).where('difficulty').equals('easy');
+    // ref: https://mongoosejs.com/docs/api/query.html#query_Query-where
+
 
     res.status(200).json({
       status: 'success',
       requestedAt: req.requestTime,
-      results: tours.length,
+      results: queryWith_queryObj.length,
       data: {
-        tours: tours,
+        tours: queryWith_queryObj,
       }
 
     });
