@@ -10,3 +10,4 @@ after-section-13/
 after-section-14/
 starter/
 .env
+config.env
