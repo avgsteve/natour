@@ -62,6 +62,7 @@ const tourSchema = new Schema({
   createdAt: {
     type: Date,
     default: Date.now(),
+    select: false, //won't be exported to the query result. ref:  https://mongoosejs.com/docs/api.html#schematype_SchemaType-select
   },
   startDates: [Date]
 });

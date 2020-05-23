@@ -87,6 +87,21 @@ exports.getAllTours = async (req, res) => {
       newQuery = newQuery.sort('price');
     }
 
+    // 3) Field limiting (projecting)
+    // (to send back only required key-value to reduce the size of requested data)
+    if (req.query.fields) {
+
+      const selectedFields = req.query.fields.split(",").join(" ");
+
+      console.log('\nString from req.query.fields: \n  ==>' + req.query.fields + "\n reformated to :  \n --->" + selectedFields + "\n");
+
+      newQuery = newQuery.select(selectedFields);
+
+      //ref:  https://mongoosejs.com/docs/api/query.html#query_Query-select
+    } else {
+      newQuery = newQuery.select('-__v');
+    }
+
 
     // #2 EXECUTE QUERY
     const tourResults = await newQuery;

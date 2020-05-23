@@ -3,13 +3,14 @@
 const express = require('express');
 const morgan = require('morgan'); // https://www.npmjs.com/package/morgan
 const dotenv = require('dotenv'); // ref:  https://www.npmjs.com/package/dotenv
+const responseSize = require('express-response-size');
 
 // for reading Environment Variables from config.env file
 dotenv.config({
   path: './config.env'
 });
 
-console.log(process.env.NODE_ENV); //若只有process.env 則會列出所有property
+// console.log(process.env.NODE_ENV); //若只有process.env 則會列出所有property
 
 //import the relocated codes for route-handlers and router from corresponding files
 const tourRouter = require('./routes/tourRoutes'); // tourRoutes.js
@@ -33,9 +34,21 @@ app.use(express.static(`${__dirname}/public`)); //https://expressjs.com/en/start
 
 //for testing middleware
 app.use((req, res, next) => {
-  console.log('\n=== this is a middleware log from app.js\n');
+  console.log('\n\n=== this is a middleware log from app.js\n');
   next();
 });
+
+app.use(responseSize((req, res, size) => {
+  const stat = `${req.method} - ${req.url.replace(/[:.]/g, '')}`;
+  const convertedSize = Math.round(size / 1024);
+  const outputSize = `${convertedSize}kb`;
+
+  console.log(`\nSize of current reponse: ${outputSize} (${size}bytes)`);
+
+  // fs.appendFile(path.join(__dirname, '..', 'logs', 'benchmark-size.csv'), `${stat},${outputSize}\n`);
+  // IE: shove into a database for further analysis, wait, spreadsheets are databases, right?
+}));
+
 //to show WHEN a request happened
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString(); // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString

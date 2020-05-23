@@ -24,8 +24,8 @@ mongoose.connect(DB, {
   useUnifiedTopology: true // to hide deprication error warning message in terminal
 }).then(connection => {
   //to show connections properties
-  console.log(connection.connections);
-  console.log("\nDB connections successful!  (●'◡'●)");
+  // console.log(connection.connections);
+  console.log("\n\nConnection is successful!  (●'◡'●)\n\n");
 });
 
 
@@ -38,5 +38,16 @@ const app = require("./app"); // getting all config from app.js , so use nodemon
 const port = process.env.PORT || 3000; // the port to be used for the localhost page
 
 app.listen(port, () => {
-  console.log(`(from ${scriptName}:) === App running on port ${port}...\nThe address is: http://127.0.0.1:${port}  (✿◠‿◠) (●'◡'●) \n`);
+  console.log(`\n\n(from ${scriptName}:) === App running on port:
+${port}... \nThe full address is: http://127.0.0.1:${port}\n`);
+
+  //IIFE with a IIFE has a delayed log
+  (
+    () => {
+      setTimeout(() => {
+        console.log("Establishing connection to database ...");
+      }, 1000);
+    }
+  )();
+
 });
