@@ -28,7 +28,7 @@ exports.getAllTours = async (req, res) => {
 
     // #1 BUILD THE QUERY
 
-    // // 1) Filtering
+    // // 1A) Filtering
     //make a shallow copy of req.query
     const queryObj = {
       ...req.query
@@ -38,7 +38,7 @@ exports.getAllTours = async (req, res) => {
     //deleting the excluded fields (properties) from the queryObj and makes queryObj a new one
     excludedFields.forEach(propertyItem => delete queryObj[propertyItem]);
 
-    // // 2) Advanced Filtering
+    // // 1B) Advanced Filtering
 
     // // 將 URL query ，ex:
     // http://127.0.0.1:3000/api/v1/tours?duration[gte]=5 傳入的物件 value  { duration: { 'gte': '6' } } 改寫為  { '$gte': '6' }  來作為傳入 .find() method 的 argument
@@ -55,11 +55,42 @@ exports.getAllTours = async (req, res) => {
     console.log('\nreplaced string (queryStr):');
     console.log(queryStr);
 
-    queryStr = JSON.parse(queryStr);
-    console.log('\nafter JSON.parse(queryStr)');
-    console.log(queryStr);
+    queryStrReplaced = JSON.parse(queryStr);
+    console.log('\nafter JSON.parse(queryStrReplaced)');
+    console.log(queryStrReplaced);
+
+
+    let newQuery = Tour.find(queryStrReplaced);
+
+    // // 2) SORTING ( with mongoose Model.find().sort() )
+    if (req.query.sort) {
+      /*  req.query.sort obj examples
+      //ex: http://127.0.0.1:3000/api/v1/tours?sort=-price
+      //then the sorting string of req.query.sort will be : { sort: '-price' }
+      //ex: http://127.0.0.1:3000/api/v1/tours?sort=-price,ratingsAverage
+      //then the sorting string of req.query.sort will be : { sort: '-price,ratingsAverage' }
+      */
+
+      // reformat the sorting string from sort: "x,y" to "x y" to match the format of arguments for .sort()
+      const newSortingQuery = req.query.sort.split(",").join(" ");
+      console.log('\nReformated sorting string from "req.query.sort"is :  ' + newSortingQuery + '\n');
+      /* sorting method examples :
+      //  **** sort by "field" ascending and "test" descending
+      query.sort({ field: 'asc', test: -1 });
+      //  **** equivalent
+      query.sort('field -test');
+      //ref:  https://mongoosejs.com/docs/api/query.html#query_Query-sort
+*/
+      newQuery = newQuery.sort(newSortingQuery);
+    } else {
+      //provide a default sorting string
+      newQuery = newQuery.sort('price');
+    }
+
 
     // #2 EXECUTE QUERY
+    const tourResults = await newQuery;
+
 
     // get all current data from DB
     // const tours = await Tour.find(); //ref:  https://mongoosejs.com/docs/api.html#model_Model.find
@@ -72,7 +103,9 @@ exports.getAllTours = async (req, res) => {
     // });
 
     // this method has the same result as #1 monogoDB way
-    const queryWith_queryStr = await Tour.find(queryStr);
+
+
+    // const queryWith_queryStr = await Tour.find(newQuery);
 
     // // // 2. mongooseB way
     // const tours = await Tour.find().where('duration').equals(5).where('difficulty').equals('easy');
@@ -82,9 +115,9 @@ exports.getAllTours = async (req, res) => {
     res.status(200).json({
       status: 'success',
       requestedAt: req.requestTime,
-      results: queryWith_queryStr.length,
+      results: tourResults.length,
       data: {
-        tours: queryWith_queryStr,
+        tours: tourResults,
       }
 
     });
