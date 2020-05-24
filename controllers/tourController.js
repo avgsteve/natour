@@ -16,6 +16,18 @@ const tours = JSON.parse(
 
 // 2) ============== ROUTE-HANDLERS
 
+
+// pre-filling the query objs before using next middleware (getAllTours)
+exports.aliasTopTours = async (req, res, next) => {
+  // for touRoutes.js => router.route('/top-5-cheap').get(tourController.aliasTopTours, tourController.getAllTours);
+  req.query.limit = '5';
+  req.query.sort = '-ratingsAverage,price';
+  //{ sort: '-ratingsAverage,price' }
+  req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
+  next(); // which is tourController.getAllTours
+};
+
+
 exports.getAllTours = async (req, res) => {
   //using newly create middleware function to log time
   console.log(`\n(from ${scriptName}: ) The requested was made at ${req.requestTime}`);
