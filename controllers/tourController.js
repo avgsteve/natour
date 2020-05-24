@@ -20,7 +20,7 @@ exports.getAllTours = async (req, res) => {
   //using newly create middleware function to log time
   console.log(`\n(from ${scriptName}: ) The requested was made at ${req.requestTime}`);
 
-  console.log("\x1b[93m", "\nThe req.query obj from the GET request:", "\x1b[0m");
+  console.log("\x1b[93m", "\nThe req.query obj from the GET request:", "\x1b[0m\n");
 
   console.log(req.query);
 
@@ -28,7 +28,7 @@ exports.getAllTours = async (req, res) => {
 
   try {
 
-    // #1 BUILD THE QUERY
+    // ============ #1 BUILD THE QUERY ============
 
     // // 1A) Filtering
     //make a shallow copy of req.query
@@ -89,7 +89,7 @@ exports.getAllTours = async (req, res) => {
       newQuery = newQuery.sort('price');
     }
 
-    // 3) Field limiting (projecting)
+    // 3) Field limiting (projecting) by using .select() method
     // (to send back only required key-value to reduce the size of requested data)
     if (req.query.fields) {
 
@@ -104,12 +104,37 @@ exports.getAllTours = async (req, res) => {
       newQuery = newQuery.select('-__v');
     }
 
-    // 4) Pagination
 
-    //page=2&limit=10
-    newQuery = newQuery.skip(2).limit(10);
+    // 4) Pagination (by using .skip() and .limit() methods )
 
-    // #2 EXECUTE QUERY
+    // Set default value of page from the .page property
+    const page = +req.query.page || 1;
+    // To pre-define the limit of maximun number of results to be returned
+    const limit = +req.query.limit || 100;
+    // how many documents to skip in the result, page 2 will skip the number of limit multiplied by the page before (which is page - 1)
+    const skip = (page - 1) * limit;
+
+    console.log(`\x1b[31m\nCurrent query output limit is : ${limit}\x1b[0m,\nCurrent page is #${page} and there are ${skip} of the results have been skipped`);
+
+    // Decide how many results to skip and the maximun number of results
+    // ex: page 2 is result #11 to #20 -->
+    newQuery = newQuery.skip(skip).limit(limit);
+    /* ref:
+    //page=2&limit=10, 1-10 is page 1, 11-20 is page 2,
+    // .skip:  https://mongoosejs.com/docs/api/query.html#query_Query-skip
+    // .limit:  https://mongoosejs.com/docs/api/query.html#query_Query-limit
+*/
+
+
+    if (req.query.page) {
+      // .countDocuments() will return how many results from the query
+      const numOfTourResults = await Tour.countDocuments(); //will return a query Promise obj
+      // ref:  https://mongoosejs.com/docs/api/model.html#model_Model.countDocuments
+
+      if (skip >= numOfTourResults) throw new Error('The number of skip is greater than query numbers'); // the new Error message in try { ... } method will be moved on to catch { } block as error message and trigger status 404 content immediately
+    }
+
+    // #2 ============  EXECUTE QUERY  ============
     const tourResults = await newQuery;
 
 
@@ -200,25 +225,29 @@ exports.createTour = async (req, res) => {
   console.log(`\n=== (from ${scriptName}: ) POST request received!The req.body have the value as below: `);
   console.log(req.body);
 
-  // ===建立資料的方法一 : new Model() & save()
+  /* // ===建立資料的方法一 : new Model() & save()
   // // create new data from "document" class
   // const newTour = new Tour({});
   // newTour.save();
-  /*  https://mongoosejs.com/docs/api.html#document_Document-save
+ https://mongoosejs.com/docs/api.html#document_Document-save
   If save is successful, the returned promise will fulfill with the document saved.
 */
 
-  // ===建立資料的方法二  await model.create(req.body)
+  /* // ===建立資料的方法二  await model.create(req.body)
   // create new data from "model" class
   // ref: https://mongoosejs.com/docs/models.html
   // Models are fancy constructors compiled from Schema definitions. An instance of a model is called a document. Models are responsible for creating and reading documents from the underlying MongoDB database.
+*/
 
   try {
     const newTour = await Tour.create(req.body);
-    //model.create() is a Shortcut for saving one or more documents to the database. MyModel.create(docs) does new MyModel(doc).save() for every doc in docs.
+    /* //model.create() is a Shortcut for saving one or more documents to the database.
+    //MyModel.create(docs) does new MyModel(doc).save() for every doc in docs.
     //Returns:  «Promise»
-
     //ref:  https://mongoosejs.com/docs/api.html#model_Model.create
+*/
+
+
     res.status(201).json({
       status: 'successfully added new data to DB',
       data: {

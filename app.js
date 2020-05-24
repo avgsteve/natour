@@ -43,7 +43,7 @@ app.use(responseSize((req, res, size) => {
   const convertedSize = Math.round(size / 1024);
   const outputSize = `${convertedSize}kb`;
 
-  console.log(`\nSize of current reponse: ${outputSize} (${size}bytes)`);
+  console.log("\nSize of current reponse:" + "\x1b[33m" + ` ${outputSize} (${size}bytes)` + "\x1b[0m");
 
   // fs.appendFile(path.join(__dirname, '..', 'logs', 'benchmark-size.csv'), `${stat},${outputSize}\n`);
   // IE: shove into a database for further analysis, wait, spreadsheets are databases, right?
