@@ -20,8 +20,10 @@ exports.getAllTours = async (req, res) => {
   //using newly create middleware function to log time
   console.log(`\n(from ${scriptName}: ) The requested was made at ${req.requestTime}`);
 
-  console.log("\nThe req.query obj from the GET request: ");
+  console.log("\x1b[93m", "\nThe req.query obj from the GET request:", "\x1b[0m");
+
   console.log(req.query);
+
   // { difficulty: 'easy', duration: { gte: '5' } }
 
   try {
@@ -102,6 +104,10 @@ exports.getAllTours = async (req, res) => {
       newQuery = newQuery.select('-__v');
     }
 
+    // 4) Pagination
+
+    //page=2&limit=10
+    newQuery = newQuery.skip(2).limit(10);
 
     // #2 EXECUTE QUERY
     const tourResults = await newQuery;
