@@ -248,6 +248,82 @@ exports.deleteTour = async (req, res) => {
   }
 };
 
+//101. Aggregation Pipeline: Matching and Grouping
+exports.getTourStats = async (req, res) => {
+
+  try {
+
+    const stats = await Tour.aggregate([
+      // First Stage: The $match stage filters the documents by the status field and passes to the next stage those documents that have ratingAverage greater than 4.5
+      {
+        $match: {
+          ratingAverage: {
+            $gte: 4.5
+          }
+        }
+      },
+      // Second Stage: The $group stage groups the documents by the cust_id field to calculate the sum of the amount for each unique cust_id.
+
+      {
+        $group: {
+          //accumalator
+          // _id: null,
+          // _id: '$ratingAverage', // will seperate the results into 3 difficulty groups
+
+          // _id: '$difficulty', // will seperate the results into 3 difficulty groups
+          _id: {
+            $toUpper: '$difficulty'
+          }, // will uppercase the title of 3 difficulty groups
+
+          //calculate average rating
+          aveRating: {
+            $avg: '$ratingAverage' //ratingsAverage is the prop key
+          },
+          avePrice: {
+            $avg: '$price' //price is the prop key
+          },
+          minPrice: {
+            $min: '$price' //ratingsAverage is the prop key
+          },
+          maxPrice: {
+            $max: '$price' //ratingsAverage is the prop key
+          }
+        }
+      },
+      {
+        $sort: {
+          //use field name from $group
+          avgPrice: 1 // 1 means ascending
+        }
+      },
+      {
+        $match: {
+          _id: {
+            //$ne: not equal to. To exclude the results with the field _id: EASY
+            $ne: 'EASY'
+          }
+        }
+      },
+    ]);
+
+    //ref:  https://mongoosejs.com/docs/api/model.html#model_Model.aggregate
+    //      https://docs.mongodb.com/manual/aggregation/
+
+    res.status(200).json({
+      status: 'getTourStats() is successful',
+      requestedAt: req.requestTime, //from app.js => req.requestTime = new Date().toISOString();
+      data: {
+        aggregatedStats: stats,
+      }
+
+    });
+
+
+  } catch (errorMessage) {
+    console.log(errorMessage);
+  }
+};
+
 
 ////// Check id middleware :  to make sure user entered the correct id. Export this function
 // exports.checkID = (req, res, next, val) => {

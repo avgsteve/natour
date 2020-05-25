@@ -15,6 +15,10 @@ const router = express.Router(); //原本是 const tourRouter = express.Router()
 // http://127.0.0.1:3000/api/v1/tours/top-5-cheap/
 router.route('/top-5-cheap').get(tourController.aliasTopTours, tourController.getAllTours);
 
+
+router.route('/tours-stats').get(tourController.getTourStats);
+
+
 //在 app.js裡面，使用app.use('/api/v1/tours', tourRouter); 來指定 router.route 使用哪一段網址為 router param ex: '/:id'
 router.route('/').get(tourController.getAllTours).post(tourController.createTour); // post request 要先使用 checkReqBody middleware method
 router.route('/:id').get(tourController.getTour).patch(tourController.updateTour).delete(tourController.deleteTour);
