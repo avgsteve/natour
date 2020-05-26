@@ -18,6 +18,8 @@ router.route('/top-5-cheap').get(tourController.aliasTopTours, tourController.ge
 
 router.route('/tours-stats').get(tourController.getTourStats);
 
+router.route('/monthly-plan/:year').get(tourController.getMonthlyPlan);
+
 
 //在 app.js裡面，使用app.use('/api/v1/tours', tourRouter); 來指定 router.route 使用哪一段網址為 router param ex: '/:id'
 router.route('/').get(tourController.getAllTours).post(tourController.createTour); // post request 要先使用 checkReqBody middleware method

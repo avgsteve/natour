@@ -7,7 +7,7 @@ const Tour = require('./../models/tourModel');
 const APIFeatures = require('./../utils/apiFeatures'); // using class APIFeatures
 
 /* for testing purpose
-// 1) ============== middleware functions
+// 1) ===== middleware functions
 //// 將JSON檔案轉成物件(Obj)檔案格式
 const tours = JSON.parse(
   // fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
@@ -15,7 +15,7 @@ const tours = JSON.parse(
 );
 */
 
-// 2) ============== ROUTE-HANDLERS
+// 2) ===== ROUTE-HANDLERS
 // pre-filling the query objs before using next middleware (getAllTours)
 exports.aliasTopTours = (req, res, next) => {
   // for touRoutes.js => router.route('/top-5-cheap').get(tourController.aliasTopTours, tourController.getAllTours);
@@ -254,7 +254,7 @@ exports.getTourStats = async (req, res) => {
   try {
 
     const stats = await Tour.aggregate([
-      // First Stage: The $match stage filters the documents by the status field and passes to the next stage those documents that have ratingAverage greater than 4.5
+      // First Stage: The "$match stage" filters the documents by the status field and passes to the next stage those documents that have ratingAverage greater than 4.5
       {
         $match: {
           ratingAverage: {
@@ -262,7 +262,7 @@ exports.getTourStats = async (req, res) => {
           }
         }
       },
-      // Second Stage: The $group stage groups the documents by the cust_id field to calculate the sum of the amount for each unique cust_id.
+      // Second Stage: The "$group stage" groups the documents by the cust_id field to calculate the sum of the amount for each unique cust_id.
 
       {
         $group: {
@@ -321,6 +321,90 @@ exports.getTourStats = async (req, res) => {
 
   } catch (errorMessage) {
     console.log(errorMessage);
+  }
+};
+
+
+exports.getMonthlyPlan = async (req, res) => {
+  try {
+
+    console.log(`From req.params.year in exports.getMonthlyPlan:\n${req.params.year}`);
+
+    const year = +req.params.year;
+
+    const plan = await Tour.aggregate([{
+        $unwind: '$startDates',
+      }, { // ==== stage #1
+        $match: { //set time period
+          startDates: {
+            $gte: new Date(`${year}-01-01`),
+            $lte: new Date(`${year}-12-31`),
+          }
+        }
+      },
+      { // ==== stage #2
+        $group: {
+          //set time period
+          _id: // use expression. It's the '$startDates' used
+          //  Pipeline Operators and Indexes
+          //  https://docs.mongodb.com/manual/core/aggregation-pipeline/#pipeline-operators-and-indexes
+          {
+            $month: '$startDates' //then the _id will take on the number of each month
+          },
+          // field1
+          numTourStarts: {
+            $sum: 1
+          },
+          tour: {
+            $push: '$name' // push name fields into the array
+          }
+        }
+      },
+      { // ==== #3 add customized fields
+        $addFields: {
+          month: '$_id'
+        }
+      },
+      { // ==== stage #4 project to designated fields
+        $project: {
+          _id: 0, // zero value will hide the field from results
+        }
+      },
+      { // ==== stage #5 sorting
+        $sort: {
+          // sort the results according to the designated field
+          //
+          numTourStarts: -1, // -1 value will sort results in descending order (start with highest number)
+          // ------------
+          // month: 1, // -1 value will sort results in descending order (start with highest number)
+
+        }
+      },
+      { //==== stage #6 "limit" the number of results
+        $limit: 12,
+      },
+
+    ]);
+
+    var stats;
+
+    res.status(200).json({
+      status: 'getMonthlyPlan() is successful',
+      requestedAt: req.requestTime, //from app.js => req.requestTime = new Date().toISOString();
+      resultsCount: plan.length,
+      data: {
+        aggregatedMonthlyPlan: plan,
+      }
+
+    });
+  } catch (error) {
+    console.log(`There's an error in exports.getMonthlyPlan:\n`);
+    console.log(error);
+
+    res.status(404).json({
+      status: 'fail',
+      errorMessage: error,
+    });
   }
 };
 
