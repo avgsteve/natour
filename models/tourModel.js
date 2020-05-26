@@ -4,6 +4,7 @@ const path = require('path');
 const scriptName = path.basename(__filename);
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
+const slugify = require('slugify');
 
 //Create a class-like "Schema" to descript the data
 const Schema = mongoose.Schema;
@@ -19,6 +20,9 @@ const tourSchema = new Schema({
       // "require" and "unique" properties are the type of obj prop is the "schema type option"
       // ref:  https://mongoosejs.com/docs/schematypes.html#schematype-options
       trim: true
+    },
+    slug: {
+      type: String,
     },
     duration: {
       type: Number,
@@ -81,6 +85,37 @@ const tourSchema = new Schema({
 tourSchema.virtual('durationWeeks').get(function() {
   return this.duration / 7; // ex: seven day is one week
 });
+
+//pre-middleware (or pre-save hook) runs before .save() , create() command
+tourSchema.pre('save',
+  //the second parameter is a function and its  parameter "next" is for the default next() function
+  function(next) {
+    //
+    console.log(`\n=== log for tourSchema.pre('save',...) middleware:\nDisplaying current processed document before .save() :\n`);
+    console.log(this);
+    console.log('\n');
+    //create slug based on tour name using slugify
+    this.slug = slugify(this.name, {
+      lower: true
+    });
+
+    next();
+  });
+
+//second .pre middleware
+tourSchema.pre('save', function(next) {
+  console.log(`\nNow save document...\n`);
+  next();
+});
+
+//post-middleware runs after .save() , create() command
+tourSchema.post('save', function(doc, next) {
+  console.log("\nThe post-middleware for doc after the pre-middleware\n");
+  console.log(doc);
+  console.log('\n');
+  next();
+});
+
 
 // // make a collection based on the tourSchema by using model constructors function.
 // // // Ex: mongoose.model('collectionName', SchemaName) will be "collectionNames" shown on database collection
