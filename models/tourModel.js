@@ -19,7 +19,9 @@ const tourSchema = new Schema({
       unique: true,
       // "require" and "unique" properties are the type of obj prop is the "schema type option"
       // ref:  https://mongoosejs.com/docs/schematypes.html#schematype-options
-      trim: true
+      trim: true,
+      maxlength: [40, 'A tour name must be less or equal to then 40 characters'],
+      minlength: [10, 'A tour name must be higher or equal to then 40 characters'],
     },
     slug: {
       type: String,
@@ -35,10 +37,19 @@ const tourSchema = new Schema({
     difficulty: {
       type: String,
       required: [true, "A tour must have a difficulty level"],
+      //enum: limit the input options
+      enum: {
+        values: ['easy', 'medium', 'difficult'],
+        //可以將enum傳出的props for error當作錯誤內容作運用
+        message: props => `The input value: "${props.value}" is invalid. The difficulty must be easy, medium or difficult`,
+      }
     },
     ratingAverage: {
       type: Number,
       default: 4.5,
+      min: [1, 'Rating must be higher than or equal to 1'],
+      max: [5, 'Rating must be higher than or equal to 5'],
+
     },
     ratingQuantity: {
       type: Number,
