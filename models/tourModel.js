@@ -5,6 +5,7 @@ const scriptName = path.basename(__filename);
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const slugify = require('slugify');
+const validator = require('validator');
 
 //Create a class-like "Schema" to descript the data
 const Schema = mongoose.Schema;
@@ -22,6 +23,8 @@ const tourSchema = new Schema({
       trim: true,
       maxlength: [40, 'A tour name must be less or equal to then 40 characters'],
       minlength: [10, 'A tour name must be higher or equal to then 40 characters'],
+      //using validator package to perform validation. Use it in array index [0] for the returning Boolean value
+      validate: [validator.isAlpha, "Tour name must container only regular alphabet."]
     },
     slug: {
       type: String,
