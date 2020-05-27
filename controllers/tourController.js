@@ -269,8 +269,12 @@ exports.getTourStats = async (req, res) => {
           //accumalator
           // _id: null,
           // _id: '$ratingAverage', // will seperate the results into 3 difficulty groups
-
+          //
           // _id: '$difficulty', // will seperate the results into 3 difficulty groups
+          //
+          numTours: {
+            $sum: 1
+          },
           _id: {
             $toUpper: '$difficulty'
           }, // will uppercase the title of 3 difficulty groups
@@ -313,6 +317,7 @@ exports.getTourStats = async (req, res) => {
       status: 'getTourStats() is successful',
       requestedAt: req.requestTime, //from app.js => req.requestTime = new Date().toISOString();
       data: {
+        dataLength: stats.length,
         aggregatedStats: stats,
       }
 

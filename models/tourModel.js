@@ -145,8 +145,25 @@ tourSchema.pre(/^find/, function(next) {
 tourSchema.post(/^find/, function(docs, next) {
   //culcalate and show how much time passed from creating a .pre middleware to finish
   console.log(`\nThe Query took ${Date.now() - this.start} milliseconds!\nThe content of Query obj:\n`);
+  // console.log(docs);
+  next();
+});
 
-  console.log(docs);
+//AGGREGATION PRE-MIDDLEWARE
+tourSchema.pre('aggregate', function(next) {
+
+  // 將 pipeline method (Array)的內容加入 篩選的 $match 物件， 限制輸出特定內容
+  // 效果同等於 tourSchema.pre(/^find
+  this.pipeline().unshift({
+    $match: {
+      secretTour: {
+        $ne: true
+      }
+    }
+  });
+  // console.log(this); //show the aggregation's pipeline property
+  console.log(`\nThe .pre of aggregation's method .pipeline() : \n`);
+  console.log(this.pipeline()); //show the aggregation's pipeline property
 
   next();
 });
