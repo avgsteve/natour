@@ -68,7 +68,11 @@ const tourSchema = new Schema({
       default: Date.now(),
       select: false, //won't be exported to the query result. ref:  https://mongoosejs.com/docs/api.html#schematype_SchemaType-select
     },
-    startDates: [Date]
+    startDates: [Date],
+    secretTour: {
+      type: Boolean, //if true , this data doesn't show
+      default: false,
+    }
   },
   //the second parameter (obj) is schema options
   {
@@ -102,20 +106,36 @@ tourSchema.pre('save',
     next();
   });
 
-//second .pre middleware
-tourSchema.pre('save', function(next) {
-  console.log(`\nNow save document...\n`);
+// //second .pre middleware
+// tourSchema.pre('save', function(next) {
+//   console.log(`\nNow save document...\n`);
+//   next();
+// });
+
+// //post-middleware runs after .save() , create() command
+// tourSchema.post('save', function(doc, next) {
+//   console.log("\nThe post-middleware for doc after the pre-middleware\n");
+//   console.log(doc);
+//   console.log('\n');
+//   next();
+// });
+
+
+// Query Middleware : before send data to client
+//ref:  https://mongoosejs.com/docs/middleware.html#post
+
+// 原本的方式 tourSchema.pre('find', function(next) {
+// RegExp /^find/ 執行任何 含有開頭字串 'find' 的method ex: findOne ref: https://mongoosejs.com/docs/api/query.html
+tourSchema.pre(/^find/, function(next) {
+  //this. points to the Query obj
+  this.find({
+    //限制資料範圍，secretTour的等於true的話就不顯示(excluded)
+    secretTour: {
+      $ne: true
+    }
+  });
   next();
 });
-
-//post-middleware runs after .save() , create() command
-tourSchema.post('save', function(doc, next) {
-  console.log("\nThe post-middleware for doc after the pre-middleware\n");
-  console.log(doc);
-  console.log('\n');
-  next();
-});
-
 
 // // make a collection based on the tourSchema by using model constructors function.
 // // // Ex: mongoose.model('collectionName', SchemaName) will be "collectionNames" shown on database collection
