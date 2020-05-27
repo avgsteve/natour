@@ -121,19 +121,33 @@ tourSchema.pre('save',
 // });
 
 
-// Query Middleware : before send data to client
+// Query Middleware : process Query data "BEFORE" send data to client
 //ref:  https://mongoosejs.com/docs/middleware.html#post
 
 // 原本的方式 tourSchema.pre('find', function(next) {
 // RegExp /^find/ 執行任何 含有開頭字串 'find' 的method ex: findOne ref: https://mongoosejs.com/docs/api/query.html
 tourSchema.pre(/^find/, function(next) {
-  //this. points to the Query obj
+  //限制資料範圍，secretTour的等於true的話就不顯示(excluded)
   this.find({
-    //限制資料範圍，secretTour的等於true的話就不顯示(excluded)
+    //this. points to the Query obj
     secretTour: {
       $ne: true
     }
   });
+
+  //add start time stamp to measure request time
+  this.start = Date.now(); // created a .start property to this.
+  next();
+});
+
+
+// Query Middleware : process Query data "AFTER" send data to client
+tourSchema.post(/^find/, function(docs, next) {
+  //culcalate and show how much time passed from creating a .pre middleware to finish
+  console.log(`\nThe Query took ${Date.now() - this.start} milliseconds!\nThe content of Query obj:\n`);
+
+  console.log(docs);
+
   next();
 });
 
