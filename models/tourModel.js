@@ -59,7 +59,21 @@ const tourSchema = new Schema({
       type: Number,
       required: [true, "A tour must have a price"],
     },
-    priceDiscount: Number,
+    priceDiscount: {
+      type: Number,
+      validate: {
+        //#1 the function used as validator
+        validator: function(value) {
+          return value < this.price; //#1 make sure the discount price is not higher than regular price. If true will return the true Boolean value to the validate'property. Otherwise this customized validate won't be passed coz this value is false.
+          //#2 "this" keyword points to ONLY the document that is being created from POST request
+        },
+        //#2 The error message
+        // message: props => `Discount price ($${props.value}) must below regular price`,
+        // // Mongoose internal access的寫法
+        message: "Discount price ({VALUE}) must below regular price",
+
+      }
+    },
     summary: {
       type: String,
       trim: true, //trim: boolean, whether to always call .trim() on the value  ref:  https://mongoosejs.com/docs/schematypes.html#schematype-options
