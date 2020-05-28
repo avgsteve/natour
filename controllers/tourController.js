@@ -37,7 +37,11 @@ exports.getAllTours = async (req, res) => {
     // #2 ============  processing QUERY  ============
 
     //將URL 所傳入的不同的 req.query 次一層物件屬性，例如: req.query.duration , req.query.sort, req.query.fields , req.query.page, req.query.limit 所相對應的mongoose Query methods 改寫進 Class constructor 裡面的 method，
-    const features = new APIFeatures(Tour.find(), req.query).filter().sort().limitFields().paginate(); //To use APIfeatures. filter method
+    const features = new APIFeatures(Tour.find(), req.query)
+    .filter()
+    .sort()
+    .limitFields()
+    .paginate(); //To use APIfeatures. filter method
 
     // #2 ============  EXECUTE QUERY  ============
 

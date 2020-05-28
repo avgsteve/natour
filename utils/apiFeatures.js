@@ -74,11 +74,17 @@ class APIFeatures {
 
       const selectedFields = this.queryString.fields.split(",").join(" ");
 
-      console.log('\nString from req.query.fields: \n  ==>' + this.queryString.fields + "\n reformated to :  \n --->" + selectedFields + "\n");
+//       console.log('\nString from req.query.fields: \n  ==>' + this.queryString.fields + "\n reformated to :  \n --->" + selectedFields + "\n");
 
-      this.query = this.query.select(selectedFields);
+      this.query = this.query.select(selectedFields); // selectedFields = "fieldA fieldB"
 
-      //ref:  https://mongoosejs.com/docs/api/query.html#query_Query-select
+      // ex:
+      // include a and b, exclude other fields
+      // query.select('a b');
+      // exclude c and d, include other fields
+      // query.select('-c -d');
+      // ref:  https://mongoosejs.com/docs/api/query.html#query_Query-select
+
     } else {
       this.query = this.query.select('-__v');
     }
