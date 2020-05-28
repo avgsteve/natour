@@ -32,12 +32,12 @@ app.use(express.json()); //middleware的使用解說參照git commit 54-1 Node.j
 app.use(express.static(`${__dirname}/public`)); //https://expressjs.com/en/starter/static-files.html
 //the URL for page is http://127.0.0.1:3000/overview.html as the app.use doesn't set any router
 
-//for testing middleware
-app.use((req, res, next) => {
-  console.log('\n\n=== this is a middleware log from app.js\n');
-  next();
-});
-
+// //for testing middleware
+// app.use((req, res, next) => {
+//   console.log('\n\n=== this is a middleware log from app.js\n');
+//   next();
+// });
+//
 app.use(responseSize((req, res, size) => {
   const stat = `${req.method} - ${req.url.replace(/[:.]/g, '')}`;
   const convertedSize = Math.round(size / 1024);
@@ -67,6 +67,14 @@ app.use('/api/v1/tours', tourRouter);
 
 // --->>> 3-3) 將 route actions for users  //移到 tourRouter.js，針對此URI '/api/v1/users'  改為使用 middleware的方式作為 router
 app.use('/api/v1/users', userRouter);
+
+//handles all the other routes besides above
+app.all('*', (req, res, next) => {
+  res.status(404).json({
+    status: 'fail',
+    message: `Can't find the route ${req.originalUrl} on this server !!`,
+  });
+});
 
 /*
 git commit records of how to refactor routes into concise code
