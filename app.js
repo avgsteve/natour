@@ -70,11 +70,36 @@ app.use('/api/v1/users', userRouter);
 
 //handles all the other routes besides above
 app.all('*', (req, res, next) => {
-  res.status(404).json({
-    status: 'fail',
-    message: `Can't find the route ${req.originalUrl} on this server !!`,
-  });
+  //
+  // res.status(404).json({
+  //   status: 'fail',
+  //   message: `Can't find the route ${req.originalUrl} on this server !!`,
+  // });
+
+
+  // =============== GLOBAL ERROR HANDLING MIDDLEWARE ===============
+  // Sending customized error method to next() function ( by passing new Error to next() )
+  const err = new Error(`Can't find the route ${req.originalUrl} on this server !!`);
+  err.status = 'fail';
+  err.statusCode = 404;
+
+  // By using err as argument, the middleware stack will skip to app.use((err))
+  next(err);
 });
+
+// error-first function
+app.use((err, req, res, next) => {
+  //to process income error code by express.js
+  err.statusCode = err.statusCode || 500; // 500 is external server error
+  err.status = err.status || 'error'; //err.status is 'fail' from the passed-in Error obj
+
+  res.status(err.statusCode).json({
+    status: err.status,
+    message: err.message
+  });
+
+});
+// =============== GLOBAL ERROR HANDLING MIDDLEWARE ===============
 
 /*
 git commit records of how to refactor routes into concise code
