@@ -13,6 +13,7 @@ dotenv.config({
 // console.log(process.env.NODE_ENV); //若只有process.env 則會列出所有property
 
 //import the relocated codes for route-handlers and router from corresponding files
+const AppError = require('./utils/appError'); // appError.js
 const tourRouter = require('./routes/tourRoutes'); // tourRoutes.js
 const userRouter = require('./routes/userRoutes'); // userRoutes.js
 const startServer = require('./server'); // server.js
@@ -76,7 +77,6 @@ app.all('*', (req, res, next) => {
   //   message: `Can't find the route ${req.originalUrl} on this server !!`,
   // });
 
-
   // =============== GLOBAL ERROR HANDLING MIDDLEWARE ===============
   // Sending customized error method to next() function ( by passing new Error to next() )
   const err = new Error(`Can't find the route ${req.originalUrl} on this server !!`);
@@ -89,6 +89,11 @@ app.all('*', (req, res, next) => {
 
 // error-first function
 app.use((err, req, res, next) => {
+  // use err.stack to show the trace of error log and which app or function throws the error.
+  // Ex: from the const err = new Error(`Can't find ...) inside the function app.all('*', (req, res, next) => {
+  console.log(`\n=== Error log track from app.use((err, req, res, next) => { ... ===`);
+  console.log(err.stack);
+
   //to process income error code by express.js
   err.statusCode = err.statusCode || 500; // 500 is external server error
   err.status = err.status || 'error'; //err.status is 'fail' from the passed-in Error obj
