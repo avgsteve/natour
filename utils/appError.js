@@ -6,7 +6,10 @@ const scriptName = path.basename(__filename);
 const Tour = require('./../models/tourModel');
 
 
-//use built-in Error class as new error-handling function
+//  use built-in Error class as new error-handling Object which has certain property containing specific error information
+//  Will be used in next() is app.js and inside the function app.all("*", .... )  like:
+//  next( new AppError(`Can't find ${req.orinalUrl} on this server!`,   404)    );
+
 class AppError extends Error {
   //ref:  https://nodejs.org/api/errors.html#errors_class_error
 

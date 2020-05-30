@@ -14,6 +14,7 @@ dotenv.config({
 
 //import the relocated codes for route-handlers and router from corresponding files
 const AppError = require('./utils/appError'); // appError.js
+const globalErrorHandler = require('./controllers/errorController'); // appError.js
 const tourRouter = require('./routes/tourRoutes'); // tourRoutes.js
 const userRouter = require('./routes/userRoutes'); // userRoutes.js
 const startServer = require('./server'); // server.js
@@ -69,41 +70,22 @@ app.use('/api/v1/tours', tourRouter);
 // --->>> 3-3) 將 route actions for users  //移到 tourRouter.js，針對此URI '/api/v1/users'  改為使用 middleware的方式作為 router
 app.use('/api/v1/users', userRouter);
 
+
+// =============== GLOBAL ERROR HANDLING MIDDLEWARE ===============
 //handles all the other routes besides above
 app.all('*', (req, res, next) => {
+
+  // Use AppError as the object to pass into the next() as argument
+  // (ref: By using err as argument, the middleware stack will skip to app.use((err))  )
   //
-  // res.status(404).json({
-  //   status: 'fail',
-  //   message: `Can't find the route ${req.originalUrl} on this server !!`,
-  // });
-
-  // =============== GLOBAL ERROR HANDLING MIDDLEWARE ===============
-  // Sending customized error method to next() function ( by passing new Error to next() )
-  const err = new Error(`Can't find the route ${req.originalUrl} on this server !!`);
-  err.status = 'fail';
-  err.statusCode = 404;
-
-  // By using err as argument, the middleware stack will skip to app.use((err))
-  next(err);
+  next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
 
-// error-first function
-app.use((err, req, res, next) => {
-  // use err.stack to show the trace of error log and which app or function throws the error.
-  // Ex: from the const err = new Error(`Can't find ...) inside the function app.all('*', (req, res, next) => {
-  console.log(`\n=== Error log track from app.use((err, req, res, next) => { ... ===`);
-  console.log(err.stack);
 
-  //to process income error code by express.js
-  err.statusCode = err.statusCode || 500; // 500 is external server error
-  err.status = err.status || 'error'; //err.status is 'fail' from the passed-in Error obj
+// error-first function which its main taks is to handle errors only and is the next() function called by app.all
 
-  res.status(err.statusCode).json({
-    status: err.status,
-    message: err.message
-  });
+app.use(globalErrorHandler); // the module from errorController.js
 
-});
 // =============== GLOBAL ERROR HANDLING MIDDLEWARE ===============
 
 /*
