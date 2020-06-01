@@ -1,6 +1,14 @@
 /*jshint esversion: 6 */
 /*jshint esversion: 8 */
 /*jshint esversion: 9 */
+const AppError = require('./../utils/appError');
+
+//transform the mongoose err obj to easy-to-ready AppError obj
+const handleCastErrorDB = err => {
+  const message = `Invalid ${err.path}: ${err.value}.}`;
+  return new AppError(message, 400);
+
+};
 
 const sendErrorDev = (err, res) => {
   res.status(err.statusCode).json({
@@ -49,9 +57,38 @@ module.exports = (err, req, res, next) => {
 
   //use environment variable to send dev or production error
   if (process.env.NODE_ENV === 'development') {
+
+    //send Error info for dev mode
     sendErrorDev(err, res);
+
   } else if (process.env.NODE_ENV === 'production') {
-    sendErrorProd(err, res);
+
+    //make a hard-copy of err by destructuring (as it's better not to modify the parameter of the function)
+    let error = {
+      ...err
+      /* sample data of error log
+      "error": {
+              "message": "Cast to ObjectId failed for value \"asdasda\" at path \"_id\" for model \"Tour\"",
+              "name": "CastError",
+              "stringValue": "\"asdasda\"",
+              "kind": "ObjectId",
+              "value": "asdasda",
+              "path": "_id",
+              "reason": {},
+              "statusCode": 500,
+              "status": "error"
+          },
+      */
+    };
+
+    //'CastError' is from  res.status(err.statusCode).json({  error: err, when the data id doesn't match
+    if (err.name === 'CastError') {
+
+      //transform the mongoose err obj to easy-to-ready AppError obj
+      error = handleCastErrorDB(error);
+    }
+
+    sendErrorProd(error, res);
   }
 
 
