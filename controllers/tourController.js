@@ -6,6 +6,8 @@ const scriptName = path.basename(__filename);
 const Tour = require('./../models/tourModel');
 const APIFeatures = require('./../utils/apiFeatures'); // using class APIFeatures
 const catchAsync = require('./../utils/catchAsync'); // using function catchAsync
+const AppError = require('./../utils/appError'); // using function catchAsync
+
 
 
 /* for testing purpose
@@ -108,6 +110,12 @@ exports.getTour = catchAsync(async (req, res, next) => {
   const tour = await Tour.findById(req.params.id); //ref:  https://mongoosejs.com/docs/api.html#model_Model.find
   // Tour.findById(req.params.id) equals to the function Tour.findOne( {_id: req.param.id} )
 
+  if (!tour) {
+    //return new AppError for customized Error and terminate function right
+    return next(new AppError(`No tour found with this tour id: ${req.params.id}`, 404));
+  }
+
+
   res.status(200).json({
     status: 'success',
     inputs: {
@@ -207,14 +215,18 @@ exports.updateTour = catchAsync(async (req, res, next) => {
   console.log(`\nupdating data with the id "${req.params.id}" & req body:`);
   console.log(req.body);
 
-
-
   const updatedData = await Tour.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true, //if true, runs update validators on this command. Update validators validate the update operation against the model's schema.
-
   });
   //ref:  https://mongoosejs.com/docs/api.html#model_Model.findByIdAndUpdate  --> Model.findByIdAndUpdate('id', UpdateContentObj, optionsObj)
+
+  if (!updatedData) {
+    //return new AppError for customized Error and terminate function right
+    return next(new AppError(`No tour found with this tour id: ${req.params.id}`, 404));
+  }
+
+
 
   res.status(200).json({
     status: "success",
@@ -244,8 +256,15 @@ exports.deleteTour = catchAsync(async (req, res, next) => {
   console.log('\n===== req.param for DELETE request is:');
   console.log(req.params);
 
-  await Tour.findByIdAndDelete(req.params.id);
+  const deleteTour = await Tour.findByIdAndDelete(req.params.id);
   //https://mongoosejs.com/docs/api.html#model_Model.findByIdAndDelete
+
+  //If used invalid id, then will get null from deleteTour
+  if (!deleteTour) {
+    //return new AppError for customized Error and terminate function right
+    return next(new AppError(`No tour found with this tour id: ${req.params.id}`, 404));
+  }
+
 
   // status 204 will not send out data to browser , only the status code 204
   res.status(204).json({
