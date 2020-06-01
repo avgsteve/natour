@@ -7,8 +7,20 @@ const AppError = require('./../utils/appError');
 const handleCastErrorDB = err => {
   const message = `Invalid ${err.path}: ${err.value}.}`;
   return new AppError(message, 400);
-
 };
+
+//
+const handleDuplicateFieldsDB = err => {
+  //err.msg is from err obj's property from mongoose
+  const value = err.errmsg.match(/(["'])(?:(?=(\\?))\2.)*?\1/)[0];
+  console.log('\n');
+  console.log(value);
+
+  const message = `Duplicate field value: ${value}. Please use another value!`;
+
+  return new AppError(message, 400);
+};
+
 
 const sendErrorDev = (err, res) => {
   res.status(err.statusCode).json({
@@ -81,12 +93,35 @@ module.exports = (err, req, res, next) => {
       */
     };
 
-    //'CastError' is from  res.status(err.statusCode).json({  error: err, when the data id doesn't match
+    //'CastError' is from  res.status(err.statusCode).json({  error: err, when the data id doesn't match (wrong id)
     if (err.name === 'CastError') {
-
       //transform the mongoose err obj to easy-to-ready AppError obj
       error = handleCastErrorDB(error);
     }
+
+    //When have the same (duplicated) data name
+    if (error.code === 11000) error = handleDuplicateFieldsDB(error); //transform the mongoose err obj to customized error message
+    /* error obj before being modified:
+    Error! {
+      driver: true,
+      name: 'MongoError',
+      index: 0,
+      code: 11000,
+      keyPattern: { name: 1 },
+      keyValue: { name: 'Test tour data duplicate' },
+      errmsg: 'E11000 duplicate key error collection: natours.tours index: name_1 dup key: { name: "Test tour data duplicate" }',
+      statusCode: 500,
+      status: 'error',
+      [Symbol(mongoErrorContextSymbol)]: {}
+    }
+
+after:
+{
+    "status": "fail",
+    "message": "Duplicate field value: \"Test tour data duplicate\". Please use another value!"
+}
+    */
+
 
     sendErrorProd(error, res);
   }
