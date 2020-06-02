@@ -11,6 +11,9 @@ const handleCastErrorDB = err => {
 
 //
 const handleDuplicateFieldsDB = err => {
+
+  const errors = Object.values(err.errors).map();
+
   //err.msg is from err obj's property from mongoose
   const value = err.errmsg.match(/(["'])(?:(?=(\\?))\2.)*?\1/)[0];
   console.log('\n');
@@ -21,6 +24,21 @@ const handleDuplicateFieldsDB = err => {
   return new AppError(message, 400);
 };
 
+
+const handelValidationErrorDB = err => {
+
+  //To get all values (error log) from element's any property has 'errors property'
+  // Different validation error will create different names which has their own individual property
+  const errors = Object.values(err.errors).map(el => el.message);
+
+  console.log('The modified error:\n');
+  console.log(errors);
+
+  const message = `Invalid input data: ${errors.join(". ")}.`;
+
+  return new AppError(message, 400);
+
+};
 
 const sendErrorDev = (err, res) => {
   res.status(err.statusCode).json({
@@ -93,7 +111,8 @@ module.exports = (err, req, res, next) => {
       */
     };
 
-    //'CastError' is from  res.status(err.statusCode).json({  error: err, when the data id doesn't match (wrong id)
+    //
+    // 'CastError' is from res.status(err.statusCode).json({  error: err, when the data id doesn't match (wrong id)
     if (err.name === 'CastError') {
       //transform the mongoose err obj to easy-to-ready AppError obj
       error = handleCastErrorDB(error);
@@ -101,7 +120,9 @@ module.exports = (err, req, res, next) => {
 
     //When have the same (duplicated) data name
     if (error.code === 11000) error = handleDuplicateFieldsDB(error); //transform the mongoose err obj to customized error message
+
     /* error obj before being modified:
+
     Error! {
       driver: true,
       name: 'MongoError',
@@ -115,13 +136,16 @@ module.exports = (err, req, res, next) => {
       [Symbol(mongoErrorContextSymbol)]: {}
     }
 
-after:
-{
-    "status": "fail",
-    "message": "Duplicate field value: \"Test tour data duplicate\". Please use another value!"
-}
+
+    error obj after being modified :
+    {
+        "status": "fail",
+        "message": "Duplicate field value: \"Test tour data duplicate\". Please use another value!"
+    }
+
     */
 
+    if (error.name === "ValidationError") error = handelValidationErrorDB(error);
 
     sendErrorProd(error, res);
   }
