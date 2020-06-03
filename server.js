@@ -8,61 +8,61 @@ const mongoose = require('mongoose');
 // ==================================
 //process.on ==> event listener
 //global error handling - Stops the server from accepting new connections and keeps existing connections
-process.on('unhandledRejection', err => {
-  // https://nodejs.org/api/process.html#process_event_unhandledrejection
+// process.on('unhandledRejection', err => {
+//   // https://nodejs.org/api/process.html#process_event_unhandledrejection
+//
+//   console.log('\n\n=== global error handling ===\n');
+//   console.log(err.name, err.message); //see below for full error log
+//
+//   console.log("UNHANDLED REJECTION! 🤔 And shutting down now...");
+//
+//   server.close(() => {
+//     //ref: https://nodejs.org/api/net.html#net_server_close_callback
+//     process.exit(1);
+//   });
 
-  console.log('\n\n=== global error handling ===\n');
-  console.log(err.name, err.message); //see below for full error log
 
-  console.log("UNHANDLED REJECTION! 🤔 And shutting down now...");
+// console.log('\n\n=== global error handling ===\n\n');
+// console.log(err); //see below for full error log
 
-  server.close(() => {
-    //ref: https://nodejs.org/api/net.html#net_server_close_callback
-    process.exit(1);
-  });
+/* === global error handling log ===
 
-
-  // console.log('\n\n=== global error handling ===\n\n');
-  // console.log(err); //see below for full error log
-
-  /* === global error handling log ===
-
-  MongooseError [MongooseServerSelectionError]: Could not connect to any servers in your MongoDB Atlas cluster. Make sure your current IP address is on your Atlas cluster's IP whitelist: https://docs.atlas.mongodb.com/security-whitelist/.
-      at new MongooseServerSelectionError (D:\Dropbox\Udemy\JavaScript\complete-node-bootcamp\4-natours\node_modules\mongoose\lib\error\serverSelection.js:24:11)
-      at NativeConnection.Connection.openUri (D:\Dropbox\Udemy\JavaScript\complete-node-bootcamp\4-natours\node_modules\mongoose\lib\connection.js:823:32)
-      at Mongoose.connect (D:\Dropbox\Udemy\JavaScript\complete-node-bootcamp\4-natours\node_modules\mongoose\lib\index.js:333:15)
-      at Object.<anonymous> (D:\Dropbox\Udemy\JavaScript\complete-node-bootcamp\4-natours\server.js:20:10)
-      at Module._compile (internal/modules/cjs/loader.js:1158:30)
-      at Object.Module._extensions..js (internal/modules/cjs/loader.js:1178:10)
-      at Module.load (internal/modules/cjs/loader.js:1002:32)
-      at Function.Module._load (internal/modules/cjs/loader.js:901:14)
-      at Function.executeUserEntryPoint [as runMain] (internal/modules/run_main.js:74:12)
-      at internal/main/run_main_module.js:18:47 {
-    message: "Could not connect to any servers in your MongoDB Atlas cluster. Make sure your current IP address is on your Atlas cluster's IP whitelist: https://docs.atlas.mongodb.com/security-whitelist/.",
-    name: 'MongooseServerSelectionError',
-    reason: TopologyDescription {
-      type: 'ReplicaSetNoPrimary',
-      setName: null,
-      maxSetVersion: null,
-      maxElectionId: null,
-      servers: Map {
-        'cluster0-shard-00-00-pjopu.mongodb.net:27017' => [ServerDescription],
-        'cluster0-shard-00-01-pjopu.mongodb.net:27017' => [ServerDescription],
-        'cluster0-shard-00-02-pjopu.mongodb.net:27017' => [ServerDescription]
-      },
-      stale: false,
-      compatible: true,
-      compatibilityError: null,
-      logicalSessionTimeoutMinutes: null,
-      heartbeatFrequencyMS: 10000,
-      localThresholdMS: 15,
-      commonWireVersion: null
+MongooseError [MongooseServerSelectionError]: Could not connect to any servers in your MongoDB Atlas cluster. Make sure your current IP address is on your Atlas cluster's IP whitelist: https://docs.atlas.mongodb.com/security-whitelist/.
+    at new MongooseServerSelectionError (D:\Dropbox\Udemy\JavaScript\complete-node-bootcamp\4-natours\node_modules\mongoose\lib\error\serverSelection.js:24:11)
+    at NativeConnection.Connection.openUri (D:\Dropbox\Udemy\JavaScript\complete-node-bootcamp\4-natours\node_modules\mongoose\lib\connection.js:823:32)
+    at Mongoose.connect (D:\Dropbox\Udemy\JavaScript\complete-node-bootcamp\4-natours\node_modules\mongoose\lib\index.js:333:15)
+    at Object.<anonymous> (D:\Dropbox\Udemy\JavaScript\complete-node-bootcamp\4-natours\server.js:20:10)
+    at Module._compile (internal/modules/cjs/loader.js:1158:30)
+    at Object.Module._extensions..js (internal/modules/cjs/loader.js:1178:10)
+    at Module.load (internal/modules/cjs/loader.js:1002:32)
+    at Function.Module._load (internal/modules/cjs/loader.js:901:14)
+    at Function.executeUserEntryPoint [as runMain] (internal/modules/run_main.js:74:12)
+    at internal/main/run_main_module.js:18:47 {
+  message: "Could not connect to any servers in your MongoDB Atlas cluster. Make sure your current IP address is on your Atlas cluster's IP whitelist: https://docs.atlas.mongodb.com/security-whitelist/.",
+  name: 'MongooseServerSelectionError',
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    setName: null,
+    maxSetVersion: null,
+    maxElectionId: null,
+    servers: Map {
+      'cluster0-shard-00-00-pjopu.mongodb.net:27017' => [ServerDescription],
+      'cluster0-shard-00-01-pjopu.mongodb.net:27017' => [ServerDescription],
+      'cluster0-shard-00-02-pjopu.mongodb.net:27017' => [ServerDescription]
     },
-    [Symbol(mongoErrorContextSymbol)]: {}
-  }
-  */
+    stale: false,
+    compatible: true,
+    compatibilityError: null,
+    logicalSessionTimeoutMinutes: null,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    commonWireVersion: null
+  },
+  [Symbol(mongoErrorContextSymbol)]: {}
+}
+*/
 
-});
+// });
 
 process.on('uncaughtException', err => {
 
