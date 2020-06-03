@@ -5,59 +5,11 @@ const scriptName = path.basename(__filename);
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 
-dotenv.config({
-  path: './config.env'
-});
-
-//==============  DATABASE RELATED SECTION  ================
-
-//use DB and replace password string with env
-const DB = process.env.DATABASE.replace("<PASSWORD>", process.env.DATABASE_PASSWORD);
-
-// ------- Mongoose ------------
-
-// will return a promise obj with using Mongoose
-mongoose.connect(DB, {
-  useNewUrlParser: true,
-  useCreateIndex: true,
-  useFindAndModify: false,
-  useUnifiedTopology: true // to hide deprication error warning message in terminal
-}).then(connection => {
-  //to show connections properties
-  // console.log(connection.connections);
-  console.log("\n\nConnection is successful!  (●'◡'●)\n\n");
-});
-// .catch(
-//   err => console.log(err)
-// );
-
-
-
-//=======================================================
-
-
-const app = require("./app"); // getting all config from app.js , so use nodemon server.js to start server
-
-const port = process.env.PORT || 3000; // the port to be used for the localhost page
-
-const server = app.listen(port, () => {
-  console.log("\x1b[31m",
-    `\n\n(from ${scriptName}:) =>> App running on port: ${port}...` + "\x1b[0m" + `\n\nThe full address is: ${'\x1b[4m'}http://127.0.0.1:${port}` +
-    "\x1b[0m" + "\n\n");
-
-  //IIFE with a IIFE has a delayed log
-  (
-    () => {
-      setTimeout(() => {
-        console.log("Establishing connection to database ...");
-      }, 1000);
-    }
-  )();
-
-});
-
+// ==================================
+//process.on ==> event listener
 //global error handling - Stops the server from accepting new connections and keeps existing connections
-process.on('unhandledRejection', (err) => {
+process.on('unhandledRejection', err => {
+  // https://nodejs.org/api/process.html#process_event_unhandledrejection
 
   console.log('\n\n=== global error handling ===\n');
   console.log(err.name, err.message); //see below for full error log
@@ -109,5 +61,70 @@ process.on('unhandledRejection', (err) => {
     [Symbol(mongoErrorContextSymbol)]: {}
   }
   */
+
+});
+
+process.on('uncaughtException', err => {
+
+  console.log("uncaught exception! 🤔 And shutting down now...");
+  console.log('\n\n=== uncaughtException error log ===\n');
+  console.log(err.name, err.message); //see below for full error log
+
+  server.close(() => {
+    process.exit(1);
+  });
+
+});
+
+
+//==============  DATABASE RELATED SECTION  ================
+
+dotenv.config({
+  path: './config.env'
+});
+
+
+//use DB and replace password string with env
+const DB = process.env.DATABASE.replace("<PASSWORD>", process.env.DATABASE_PASSWORD);
+
+// ------- Mongoose ------------
+
+// will return a promise obj with using Mongoose
+mongoose.connect(DB, {
+  useNewUrlParser: true,
+  useCreateIndex: true,
+  useFindAndModify: false,
+  useUnifiedTopology: true // to hide deprication error warning message in terminal
+}).then(connection => {
+  //to show connections properties
+  // console.log(connection.connections);
+  console.log("\n\nConnection is successful!  (●'◡'●)\n\n");
+});
+// .catch(
+//   err => console.log(err)
+// );
+
+
+
+//=======================================================
+
+
+const app = require("./app"); // getting all config from app.js , so use nodemon server.js to start server
+
+const port = process.env.PORT || 3000; // the port to be used for the localhost page
+
+const server = app.listen(port, () => {
+  console.log("\x1b[31m",
+    `\n\n(from ${scriptName}:) =>> App running on port: ${port}...` + "\x1b[0m" + `\n\nThe full address is: ${'\x1b[4m'}http://127.0.0.1:${port}` +
+    "\x1b[0m" + "\n\n");
+
+  //IIFE with a IIFE has a delayed log
+  (
+    () => {
+      setTimeout(() => {
+        console.log("Establishing connection to database ...");
+      }, 1000);
+    }
+  )();
 
 });

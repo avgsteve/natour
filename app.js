@@ -54,6 +54,7 @@ app.use(responseSize((req, res, size) => {
 //to show WHEN a request happened
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString(); // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
+  // console.log("Test error for undefined ' x':" + x); //D:\\Dropbox\\Udemy\\JavaScript\\complete-node-bootcamp\\4-natours\\app.js:58:49\n    at Layer.handle [as handle_request]
   next();
 });
 
