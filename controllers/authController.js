@@ -4,6 +4,9 @@ const User = require('./../models/userModel');
 const catchAsync = require('./../utils/catchAsync');
 const jwt = require('jsonwebtoken');
 const AppError = require('./../utils/appError');
+const {
+  promisify
+} = require('util');
 
 //getting token with jwt.sign method by passing in the id as argument
 const signToken = id => {
@@ -125,7 +128,7 @@ exports.protect = catchAsync(async (req, res, next) => {
   console.log(req.headers);
   /* headers example:
     {
-      authorization: 'Bearer 123',
+      authorization: 'Bearer  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlZDdjZWU1NTlkOTQwNzI1MDY2OWQ2ZSJ9.E5PwSCrEy5UIZP4L7xuJdVFT-qTJG2OyzyMZMSBQGWw',
       'user-agent': 'PostmanRuntime/7.25.0',
       'accept-encoding': 'gzip, deflate, br',
       // ...
@@ -134,8 +137,11 @@ exports.protect = catchAsync(async (req, res, next) => {
   let token;
 
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-    token = req.headers.authorization.split(' ')[1]; // ['Bearer', '123'][1]
+    token = req.headers.authorization.split(' ')[1];
+    // ex:  ['Bearer', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlZDdjZWU1NTlkOTQwNzI1MDY2OWQ2ZSJ9.E5PwSCrEy5UIZP4L7xuJdVFT-qTJG2OyzyMZMSBQGWw'][1]
+
   }
+
 
   if (!token) {
     return next(new AppError('You are not logged in! Please log in to get access',
@@ -143,8 +149,34 @@ exports.protect = catchAsync(async (req, res, next) => {
     ));
   }
 
-  // 2) Verification token
+  // 2)
+  // Verififying token (and promisify jwt.verify function) with jwt.verify
+  // usage:  jwt.verify(token, secretOrPublicKey, [options, callback])
+  // 2-1) will return a Promise after being 'promisified'
+  // 2-2) jwt.verify will throw an error if the the token has been tampered with
+  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+  console.log(`The decoded result from \nawait promisify(jwt.verify)(token, process.env.JWT_SECRET); : \n`);
+  console.log(decoded); // { id: '5ed7cee559d9407250669d6e' }
+  /* how jwt.verify() works:
 
+    original payload: {
+    "id": "5ed7cee559d9407250669d6e"
+    }
+
+    Token generated (ref:  https://jwt.io/): eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlZDdjZWU1NTlkOTQwNzI1MDY2OWQ2ZSJ9.E5PwSCrEy5UIZP4L7xuJdVFT-qTJG2OyzyMZMSBQGWw
+
+    if Token was tampered (ex: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlZDdjZWU1NTlkOTQwNzI1MDY2OWQ2ZSJ9.E5PwSCrEy5UIZP4L7xuJdVFT-qTJG2OyzyMZMSBQGWW), will throw an error:
+    {
+    "status": "error",
+    "error": {
+        "name": "JsonWebTokenError",
+        "message": "invalid signature",
+        "statusCode": 500,
+        "status": "error"
+    },
+    "message": "invalid signature",
+    "stack": "JsonWebTokenError: invalid signature\n    at
+  */
 
   // 3) Check if user still exists
 
