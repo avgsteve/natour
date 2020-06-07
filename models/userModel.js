@@ -80,6 +80,21 @@ userSchema.pre('save', async function(next) {
 
 });
 
+//
+userSchema.methods.correctPassword = async function(candidatePassword, userPassword) {
+
+  //candidatePassword is the raw password (not signed or not encrypted) from req.body
+  //userPassword is the encrypted password from query (query.findOne) result
+  return await bcrypt.compare(candidatePassword, userPassword); //will return boolean
+
+  //Due to the field
+
+  // ref for creating new prototype method:
+  // https://mongoosejs.com/docs/api/schema.html#schema_Schema-method
+};
+
+
+
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;
