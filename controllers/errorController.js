@@ -73,9 +73,11 @@ const sendErrorProd = (err, res) => {
   }
 };
 
-
+//a middleware to show the trace of error log and which app or function throws the error.
 module.exports = (err, req, res, next) => {
-  // use err.stack to show the trace of error log and which app or function throws the error.
+  // used by app.use(globalErrorHandler; in app.js
+
+  // use err.stack to
   // Ex: from the const err = new Error(`Can't find ...) inside the function app.all('*', (req, res, next) => {
   console.log(`\n=== Error log track from errorController.js ( (err, req, res, next) => { ... ===\n`);
   console.log(err.stack);

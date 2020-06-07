@@ -74,7 +74,7 @@ class APIFeatures {
 
       const selectedFields = this.queryString.fields.split(",").join(" ");
 
-//       console.log('\nString from req.query.fields: \n  ==>' + this.queryString.fields + "\n reformated to :  \n --->" + selectedFields + "\n");
+      //       console.log('\nString from req.query.fields: \n  ==>' + this.queryString.fields + "\n reformated to :  \n --->" + selectedFields + "\n");
 
       this.query = this.query.select(selectedFields); // selectedFields = "fieldA fieldB"
 

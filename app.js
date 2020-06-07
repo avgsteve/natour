@@ -85,7 +85,7 @@ app.all('*', (req, res, next) => {
 
 // error-first function which its main taks is to handle errors only and is the next() function called by app.all
 
-app.use(globalErrorHandler); // the module from errorController.js
+app.use(globalErrorHandler); // the module from errorController.js. will be the next() from app.all
 
 // =============== GLOBAL ERROR HANDLING MIDDLEWARE ===============
 
