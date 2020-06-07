@@ -150,7 +150,7 @@ exports.protect = catchAsync(async (req, res, next) => {
   }
 
   // 2)
-  // Verififying token (and promisify jwt.verify function) with jwt.verify
+  // Decoding and verififying  token (and promisify jwt.verify function) with jwt.verify
   // usage:  jwt.verify(token, secretOrPublicKey, [options, callback])
   // 2-1) will return a Promise after being 'promisified'
   // 2-2) jwt.verify will throw an error if the the token has been tampered with
