@@ -26,7 +26,9 @@ const signToken = id => {
       expiresIn: process.env.JWT_EXPIRES_IN
     });
 };
-//
+
+
+// ========== SIGN UP ===========
 exports.signup = catchAsync(async (req, res, next) => {
   //
   // const newUser = await User.create(req.body);
@@ -35,18 +37,23 @@ exports.signup = catchAsync(async (req, res, next) => {
     email: req.body.email,
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
+    passwordChangedAt: req.body.passwordChangedAt
   });
 
   //get a token from signed data by passing in the newUser's _id (automtically generated upon creation)
-  const token = signToken(newUser._id);
+  const token = signToken(newUser._id); //._id is automtically added by mongoose Model
 
-  /*
+  /*  ex:
+  the value of property: _id from a newly created user: 5ede44f1202c03583865838d
+
+  the generated token is:  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlZGU0NGYxMjAyYzAzNTgzODY1ODM4ZCIsImlhdCI6MTU5MTYyNDk0NiwiZXhwIjoxNTk5NDAwOTQ2fQ.gFsObPwhN8K3aoJKRvipluEgl67dIHR78FrlAaDajpA
+
+  the decoded token is:
   {
-  	"name": "Test",
-  	"email": "123@test.com",
-  	"password": "pass123",
-  	"passwordConfirm": "pass123"
-  }
+  "id": "5ede44f1202c03583865838d",
+  "iat": 1591624946,
+  "exp": 1599400946
+}
   */
   //
   res.status(201).json({ // 201 Created
@@ -68,7 +75,7 @@ exports.signup = catchAsync(async (req, res, next) => {
 
 });
 
-
+// ========== LOGIN ===========
 exports.login = catchAsync(async (req, res, next) => {
   //deconstruct key's value and save to variable
   const {
@@ -121,14 +128,15 @@ exports.login = catchAsync(async (req, res, next) => {
 
 });
 
-
+// ========== PROTECTion for routes from accessing with tampered or invalid token ===========
 exports.protect = catchAsync(async (req, res, next) => {
-  // 1) Getting token and check if it's there
+
+  // 1) Getting token from header and check if token exists
   req.requestTime = new Date().toISOString();
   console.log(req.headers);
   /* headers example:
     {
-      authorization: 'Bearer  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlZDdjZWU1NTlkOTQwNzI1MDY2OWQ2ZSJ9.E5PwSCrEy5UIZP4L7xuJdVFT-qTJG2OyzyMZMSBQGWw',
+      authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlZDdjZWU1NTlkOTQwNzI1MDY2OWQ2ZSJ9.E5PwSCrEy5UIZP4L7xuJdVFT-qTJG2OyzyMZMSBQGWw',
       'user-agent': 'PostmanRuntime/7.25.0',
       'accept-encoding': 'gzip, deflate, br',
       // ...
@@ -142,7 +150,6 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   }
 
-
   if (!token) {
     return next(new AppError('You are not logged in! Please log in to get access',
       401 //unauthorized
@@ -150,20 +157,21 @@ exports.protect = catchAsync(async (req, res, next) => {
   }
 
   // 2)
-  // Decoding and verififying  token (and promisify jwt.verify function) with jwt.verify
+  // Decoding and verififying token (and promisify jwt.verify function) with jwt.verify
   // usage:  jwt.verify(token, secretOrPublicKey, [options, callback])
   // 2-1) will return a Promise after being 'promisified'
   // 2-2) jwt.verify will throw an error if the the token has been tampered with
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
   console.log(`The decoded result from \nawait promisify(jwt.verify)(token, process.env.JWT_SECRET); : \n`);
-  console.log(decoded); // { id: '5ed7cee559d9407250669d6e' }
+  console.log(decoded); // { id: '5ede44f1202c03583865838d', iat: 1591624946, exp: 1599400946 }
+
   /* how jwt.verify() works:
 
-    original payload: {
+    #1. original payload: {
     "id": "5ed7cee559d9407250669d6e"
     }
 
-    Token generated (ref:  https://jwt.io/): eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlZDdjZWU1NTlkOTQwNzI1MDY2OWQ2ZSJ9.E5PwSCrEy5UIZP4L7xuJdVFT-qTJG2OyzyMZMSBQGWw
+    #2. Token generated (ref:  https://jwt.io/): eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlZDdjZWU1NTlkOTQwNzI1MDY2OWQ2ZSJ9.E5PwSCrEy5UIZP4L7xuJdVFT-qTJG2OyzyMZMSBQGWw
 
     if Token was tampered (ex: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlZDdjZWU1NTlkOTQwNzI1MDY2OWQ2ZSJ9.E5PwSCrEy5UIZP4L7xuJdVFT-qTJG2OyzyMZMSBQGWW), will throw an error:
     {
@@ -178,10 +186,53 @@ exports.protect = catchAsync(async (req, res, next) => {
     "stack": "JsonWebTokenError: invalid signature\n    at
   */
 
-  // 3) Check if user still exists
+  // 3) Check if user still exists (in case the user is deleted after token is created)
+  const freshUser = await User.findById(decoded.id); //Based on the success of decoding token, we can verify the authentication of the User data
+  /*
+  {
+      "status": "fail",
+      "error": {
+          "statusCode": 401,
+          "status": "fail",
+          "isOperational": true
+      },
+      "message": "The user belonging to this token doesn't exist",
+      "stack": "Error: The user belonging to this token doesn't exist\n    at D:\\Dropbox\\Udemy\\JavaScript\\complete-node-bootcamp\\4-natours\\controllers\\authController.js:186:17\n    at processTicksAndRejections (internal/process/task_queues.js:97:5)"
+  }
+  */
 
+  //To
+  if (!freshUser) {
+    return next(new AppError('The user belonging to this token doesn\'t exist', 401));
+  }
 
-  // 4) Check if user changed password after the token was issued
+  // 4) Check if user changed password after the token was issued by calling method:
+  // (in userModel.js) userSchema.methods.changedPasswordAfter = function(JWTTimestamp) {
 
+  // if changedPasswordAfter() returns true
+  if (freshUser.changedPasswordAfter(decoded.iat)) {
+    return next(new AppError('User recently changed password! Please log in again!', 401));
+  }
+
+  //if all above 4 test are passed, then the login process is cleared to move on to next function middleware
+  console.log('\nLog-In process cleared! Move on to next route middleware:\n');
+
+  req.user = freshUser;
+
+  console.log('\nThe req.user:\n');
+  console.log(req.user);
+  /* req.user will be the result obj from the code:
+
+  const freshUser = await User.findById(decoded.id);
+
+  result:
+  {
+    _id: 5ede44f1202c03583865838d,
+    name: 'Test112',
+    email: 'test112@test.com',
+    passwordChangedAt: 2020-04-30T00:00:00.000Z,
+    __v: 0
+  }
+  */
   next();
 });

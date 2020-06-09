@@ -48,6 +48,7 @@ const userSchema = new Schema({
         message: 'Passwords are not the same!',
       }
     },
+    passwordChangedAt: Date,
   },
   // //the second parameter (obj) is schema options
   // {
@@ -91,6 +92,27 @@ userSchema.methods.correctPassword = async function(candidatePassword, userPassw
 
   // ref for creating new prototype method:
   // https://mongoosejs.com/docs/api/schema.html#schema_Schema-method
+};
+
+//
+userSchema.methods.changedPasswordAfter = function(JWTTimestamp) {
+
+  // if the property passwordChangedAt: Date exists, then do the comparison
+  if (this.passwordChangedAt) {
+
+    //changedTimeStamp is created or updated after password is changed
+    const changedTimeStamp = parseInt(this.passwordChangedAt.getTime() / 1000,
+      10 //base10 number
+    );
+
+    console.log('\nThe log in changedPasswordAfter\n');
+    console.log(changedTimeStamp, JWTTimestamp);
+
+    //if the JWTTimestamp (time stamp when token is created) is earlier than changedTimeStamp means password is changed
+    return JWTTimestamp < changedTimeStamp;
+  }
+
+  return false; // means password is not changed
 };
 
 
