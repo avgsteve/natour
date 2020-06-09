@@ -37,7 +37,8 @@ exports.signup = catchAsync(async (req, res, next) => {
     email: req.body.email,
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
-    passwordChangedAt: req.body.passwordChangedAt
+    passwordChangedAt: req.body.passwordChangedAt,
+    role: req.body.role,
   });
 
   //get a token from signed data by passing in the newUser's _id (automtically generated upon creation)
@@ -217,9 +218,9 @@ exports.protect = catchAsync(async (req, res, next) => {
   //if all above 4 test are passed, then the login process is cleared to move on to next function middleware
   console.log('\nLog-In process cleared! Move on to next route middleware:\n');
 
-  req.user = freshUser;
+  req.user = freshUser; // assign to fresh user data to req.user property and make it used by next middleware function
 
-  console.log('\nThe req.user:\n');
+  console.log('\n=== The req.user === :\n');
   console.log(req.user);
   /* req.user will be the result obj from the code:
 
@@ -236,3 +237,22 @@ exports.protect = catchAsync(async (req, res, next) => {
   */
   next();
 });
+
+
+// verify user's role based on his role property
+// In authController.js,  delete(authController.protect, authController.restrictTo('admin', 'lead-guide'),
+exports.restrictTo = (...roles) => {
+  //the passed in ...roles will be array containing ['admin', 'lead-guide']
+
+  return (req, res, next) => {
+    // roles ['admin', 'lead-guide'] role =  'user'
+
+    // if the passed-in roles array does not include any .role property
+    if (!roles.includes(req.user.role)) {
+      return next(new AppError('You do not have permission to perform this action', 403 // forbidden
+      ));
+    }
+
+    next();
+  };
+};

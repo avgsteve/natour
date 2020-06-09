@@ -30,6 +30,11 @@ const userSchema = new Schema({
       validate: [validator.isEmail],
     },
     photo: String, // path
+    role: {
+      type: String,
+      enum: ['user', 'guide', 'lead-guide', 'admin'],
+      default: 'user'
+    },
     password: {
       type: String,
       required: [true, 'Please provide a password'],
