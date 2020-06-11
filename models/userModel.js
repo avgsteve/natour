@@ -187,10 +187,6 @@ userSchema.methods.createPasswordResetToken = function() {
   // return the reset token to the middleware function such as "forgotPassword"
   return resetToken;
 
-
-
-
-
 };
 
 

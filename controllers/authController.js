@@ -7,6 +7,8 @@ const AppError = require('./../utils/appError');
 const {
   promisify
 } = require('util');
+const sendEmail = require('./../utils/email');
+
 
 //getting token with jwt.sign method by passing in the id as argument
 const signToken = id => {
@@ -270,13 +272,42 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 
   // 2) Generate the random reset token with method createPasswordResetToken inherited from prototype chain in User schema
   const resetToken = user.createPasswordResetToken();
+  // await user.save({ validateBeforeSave: false });
 
-  //update the document with the updated value in certain fields in data base via .save method from document instance ()
+  // 3) Send URL with reset token suffix to user's email //req.protocol is current http or https protocol
+  const resetURL = `${req.protocol}://${req.get('host')}/api/va/users/resetPassword/${resetToken}`;
+
+  const message = `Forgot your password? Submit a Patch request with your newpassword and passwordConfirm to: ${resetURL}.\nIf you didn't forget your password, please ingore this email!`;
+
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: 'Your password reset token (valid for 10 min)',
+      message: message,
+    });
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Token sent to email!',
+    });
+
+  } catch (error) {
+    console.log('\n\nerror log in send email:\n');
+    console.log(error);
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    //update the document with the updated value in certain fields in data base via .save method from document instance ()
+    await user.save({
+      validateBeforeSave: false
+    });
+
+    return next(new AppError('There was an error sending the email. Try again later', 500));
+  }
+
   await user.save({
     validateBeforeSave: false
   });
 
-  // 3) Send it to user's email
 });
 
 exports.resetPassword = (req, res, next) => {
