@@ -256,3 +256,29 @@ exports.restrictTo = (...roles) => {
     next();
   };
 };
+
+//
+exports.forgotPassword = catchAsync(async (req, res, next) => {
+  // 1) When forget password, use registered email to get user based on POSTed email
+  const user = await User.findOne({
+    email: req.body.email
+  });
+  // 1-1) if there's no result matched with query, then return an error
+  if (!user) {
+    return next(new AppError('There is no user with this email address.', 404));
+  }
+
+  // 2) Generate the random reset token with method createPasswordResetToken inherited from prototype chain in User schema
+  const resetToken = user.createPasswordResetToken();
+
+  //update the document with the updated value in certain fields in data base via .save method from document instance ()
+  await user.save({
+    validateBeforeSave: false
+  });
+
+  // 3) Send it to user's email
+});
+
+exports.resetPassword = (req, res, next) => {
+
+};
