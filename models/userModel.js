@@ -69,6 +69,7 @@ const userSchema = new Schema({
   // }
 );
 
+// HASHING ALL CHANGED PASSWORD with .pre save middleware & bcryptjs if the change of password is detect
 // https://mongoosejs.com/docs/middleware.html#pre
 userSchema.pre('save', async function(next) {
 
@@ -86,6 +87,27 @@ userSchema.pre('save', async function(next) {
   this.passwordConfirm = undefined;
 
   next();
+
+});
+
+
+userSchema.pre('save', function(next) {
+
+  /*
+  // Use this.isModified() with argument as the field names to get boolean value which shows if the field has been updated or not
+  // ref: https://mongoosejs.com/docs/api.html#document_Document-isModified
+
+  // Use Document.prototype.isNew, the "isNew" property which its value is true when the document is new
+  // https://mongoosejs.com/docs/api.html#document_Document-isNew
+  */
+  if (!this.isModified('password') || this.isNew) {
+    return next();
+  }
+
+  // deduct 1 second from Date.now() to make sure the recored time of new token is always before new password is created
+  this.passwordChangedAt = Date.now() - 1000; //ex: passwordChangedAt:  2020-06-12T05:30:12.163+00:00
+  next();
+
 
 });
 
