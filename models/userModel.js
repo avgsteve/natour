@@ -47,7 +47,7 @@ const userSchema = new Schema({
       type: String,
       required: [true, 'Please confirm your password'],
       validate: {
-        //This works only on create and save
+        //This works only on create and save ( .()save ),
         validator: function(el) {
           return this.password === el;
         },

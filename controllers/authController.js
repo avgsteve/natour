@@ -30,6 +30,20 @@ const signToken = id => {
 };
 
 
+const createSendToken = (user, statusCode, res) => {
+
+  const token = signToken(user._id);
+
+  res.status(statusCode).json({
+    status: 'success',
+    token: token,
+    data: {
+      user: user,
+    },
+  });
+
+};
+
 // ========== SIGN UP ===========
 exports.signup = catchAsync(async (req, res, next) => {
   //
@@ -43,9 +57,6 @@ exports.signup = catchAsync(async (req, res, next) => {
     role: req.body.role,
   });
 
-  //get a token from signed data by passing in the newUser's _id (automtically generated upon creation)
-  const token = signToken(newUser._id); //._id is automtically added by mongoose Model
-
   /*  ex:
   the value of property: _id from a newly created user: 5ede44f1202c03583865838d
 
@@ -58,14 +69,15 @@ exports.signup = catchAsync(async (req, res, next) => {
   "exp": 1599400946
 }
   */
-  //
-  res.status(201).json({ // 201 Created
-    status: 'success',
-    token: token,
-    data: {
-      user: newUser,
-    },
-  });
+  // res.status(201).json({ // 201 Created
+  //   status: 'success',
+  //   token: token,
+  //   data: {
+  //     user: newUser,
+  //   },
+  // });
+  // === replace above code with below: ==
+  createSendToken(newUser, 201, res);
 
   /*result:
   _id : 5ed84b10cc2af35554aac39f
@@ -121,15 +133,18 @@ exports.login = catchAsync(async (req, res, next) => {
   */
 
   // 3) If everything ok, send token to client
-  const token = signToken(user._id);
+  /*
+  // const token = signToken(user._id);
+  // res.status(200).json({
+  //   status: 'success',
+  //   token: token,
+  //   data: {
+  //     user: user,
+  //   },
+  // });
+  // === replace above code with below: == */
+  createSendToken(user, 200, res);
 
-  res.status(200).json({
-    status: 'success',
-    token: token,
-    data: {
-      user: user,
-    },
-  });
 
 });
 
@@ -205,6 +220,10 @@ exports.protect = catchAsync(async (req, res, next) => {
       "stack": "Error: The user belonging to this token doesn't exist\n    at D:\\Dropbox\\Udemy\\JavaScript\\complete-node-bootcamp\\4-natours\\controllers\\authController.js:186:17\n    at processTicksAndRejections (internal/process/task_queues.js:97:5)"
   }
   */
+  //
+  // console.log("\nfreshUser:\n");
+  // console.log(freshUser);
+
 
   //To
   if (!freshUser) {
@@ -381,11 +400,949 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
 */
   // 4) Log the user in, send JWT
+  /*
   const token = signToken(user._id);
 
   res.status(200).json({
     status: 'success',
     token: token,
   });
+  // === replace above code with below: == */
+  createSendToken(user, 200, res);
+
+
 
 });
+
+//will received document and ._id property from req.user passed-in from protect middlware
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  // 1) Get user from collection (.select password field and use the password for verification)
+  const user = await User.findById(req.user.id).select('+password'); //takes 1.27 second
+
+  /* // log req.user.id
+    console.log(`\nreq.user.id : ${req.user.id}\n`);
+    console.log(`\nreq.user._id : ${req.user._id}\n`);
+    console.log(`\nreq : ${req.body}\n`);
+    console.log(req.body);
+    */
+  // const user = await User.findOne(req.user._id).select('+password'); // takes 22 seconds
+
+  // const user = await User.findOne({
+  //   _id: req.user._id
+  // }).select('+password'); // takes 23 seconds
+
+
+  // 2) Check if the password from POSTed req is correct (matched with the password currently stored in database)
+  // Via bcrypt.compare() in schema's user.correctPassword() , will get boolean value
+  if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
+    return next(new AppError('Your current password is incorrect', 401));
+  }
+
+  // 3) If so, updatePassword
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  // (Also, the .save() function will trigger the validator in schema to see if the value in .password field matches the value in .passwordConfirm field, if not matched , will throw an validation error)
+
+  await user.save(); // ref: https://mongoosejs.com/docs/api.html#model_Model-save
+
+  // 4) Log user in, send JWT
+  createSendToken(user, 200, res);
+
+});
+
+// IncomingMessage {
+//   _readableState: ReadableState {
+//     objectMode: false,
+//     highWaterMark: 16384,
+//     buffer: BufferList { head: null, tail: null, length: 0 },
+//     length: 0,
+//     pipes: null,
+//     pipesCount: 0,
+//     flowing: true,
+//     ended: true,
+//     endEmitted: true,
+//     reading: false,
+//     sync: false,
+//     needReadable: false,
+//     emittedReadable: false,
+//     readableListening: false,
+//     resumeScheduled: false,
+//     emitClose: true,
+//     autoDestroy: false,
+//     destroyed: false,
+//     defaultEncoding: 'utf8',
+//     awaitDrain: 0,
+//     readingMore: false,
+//     decoder: null,
+//     encoding: null,
+//     [Symbol(kPaused)]: false
+//   },
+//   readable: false,
+//   _events: [Object: null prototype] {
+//     end: [Function: resetHeadersTimeoutOnReqEnd]
+//   },
+//   _eventsCount: 1,
+//   _maxListeners: undefined,
+//   socket: Socket {
+//     connecting: false,
+//     _hadError: false,
+//     _parent: null,
+//     _host: null,
+//     _readableState: ReadableState {
+//       objectMode: false,
+//       highWaterMark: 16384,
+//       buffer: BufferList { head: null, tail: null, length: 0 },
+//       length: 0,
+//       pipes: null,
+//       pipesCount: 0,
+//       flowing: true,
+//       ended: false,
+//       endEmitted: false,
+//       reading: true,
+//       sync: false,
+//       needReadable: true,
+//       emittedReadable: false,
+//       readableListening: false,
+//       resumeScheduled: false,
+//       emitClose: false,
+//       autoDestroy: false,
+//       destroyed: false,
+//       defaultEncoding: 'utf8',
+//       awaitDrain: 0,
+//       readingMore: false,
+//       decoder: null,
+//       encoding: null,
+//       [Symbol(kPaused)]: false
+//     },
+//     readable: true,
+//     _events: [Object: null prototype] {
+//       end: [Array],
+//       timeout: [Function: socketOnTimeout],
+//       data: [Function: bound socketOnData],
+//       error: [Array],
+//       close: [Array],
+//       drain: [Function: bound socketOnDrain],
+//       resume: [Function: onSocketResume],
+//       pause: [Function: onSocketPause]
+//     },
+//     _eventsCount: 8,
+//     _maxListeners: undefined,
+//     _writableState: WritableState {
+//       objectMode: false,
+//       highWaterMark: 16384,
+//       finalCalled: false,
+//       needDrain: false,
+//       ending: false,
+//       ended: false,
+//       finished: false,
+//       destroyed: false,
+//       decodeStrings: false,
+//       defaultEncoding: 'utf8',
+//       length: 0,
+//       writing: false,
+//       corked: 0,
+//       sync: true,
+//       bufferProcessing: false,
+//       onwrite: [Function: bound onwrite],
+//       writecb: null,
+//       writelen: 0,
+//       afterWriteTickInfo: null,
+//       bufferedRequest: null,
+//       lastBufferedRequest: null,
+//       pendingcb: 0,
+//       prefinished: false,
+//       errorEmitted: false,
+//       emitClose: false,
+//       autoDestroy: false,
+//       bufferedRequestCount: 0,
+//       corkedRequestsFree: [Object]
+//     },
+//     writable: true,
+//     allowHalfOpen: true,
+//     _sockname: null,
+//     _pendingData: null,
+//     _pendingEncoding: '',
+//     server: Server {
+//       insecureHTTPParser: undefined,
+//       _events: [Object: null prototype],
+//       _eventsCount: 2,
+//       _maxListeners: undefined,
+//       _connections: 1,
+//       _handle: [TCP],
+//       _usingWorkers: false,
+//       _workers: [],
+//       _unref: false,
+//       allowHalfOpen: true,
+//       pauseOnConnect: false,
+//       httpAllowHalfOpen: false,
+//       timeout: 120000,
+//       keepAliveTimeout: 5000,
+//       maxHeadersCount: null,
+//       headersTimeout: 40000,
+//       _connectionKey: '6::::3000',
+//       [Symbol(IncomingMessage)]: [Function: IncomingMessage],
+//       [Symbol(ServerResponse)]: [Function: ServerResponse],
+//       [Symbol(kCapture)]: false,
+//       [Symbol(asyncId)]: 11
+//     },
+//     _server: Server {
+//       insecureHTTPParser: undefined,
+//       _events: [Object: null prototype],
+//       _eventsCount: 2,
+//       _maxListeners: undefined,
+//       _connections: 1,
+//       _handle: [TCP],
+//       _usingWorkers: false,
+//       _workers: [],
+//       _unref: false,
+//       allowHalfOpen: true,
+//       pauseOnConnect: false,
+//       httpAllowHalfOpen: false,
+//       timeout: 120000,
+//       keepAliveTimeout: 5000,
+//       maxHeadersCount: null,
+//       headersTimeout: 40000,
+//       _connectionKey: '6::::3000',
+//       [Symbol(IncomingMessage)]: [Function: IncomingMessage],
+//       [Symbol(ServerResponse)]: [Function: ServerResponse],
+//       [Symbol(kCapture)]: false,
+//       [Symbol(asyncId)]: 11
+//     },
+//     timeout: 120000,
+//     parser: HTTPParser {
+//       '0': [Function: parserOnHeaders],
+//       '1': [Function: parserOnHeadersComplete],
+//       '2': [Function: parserOnBody],
+//       '3': [Function: parserOnMessageComplete],
+//       '4': [Function: bound onParserExecute],
+//       _headers: [],
+//       _url: '',
+//       socket: [Circular],
+//       incoming: [Circular],
+//       outgoing: null,
+//       maxHeaderPairs: 2000,
+//       _consumed: true,
+//       onIncoming: [Function: bound parserOnIncoming],
+//       parsingHeadersStart: 1591970312557
+//     },
+//     on: [Function: socketListenerWrap],
+//     addListener: [Function: socketListenerWrap],
+//     prependListener: [Function: socketListenerWrap],
+//     _paused: false,
+//     _httpMessage: ServerResponse {
+//       _events: [Object: null prototype],
+//       _eventsCount: 2,
+//       _maxListeners: undefined,
+//       outputData: [],
+//       outputSize: 0,
+//       writable: true,
+//       _last: false,
+//       chunkedEncoding: false,
+//       shouldKeepAlive: true,
+//       useChunkedEncodingByDefault: true,
+//       sendDate: true,
+//       _removedConnection: false,
+//       _removedContLen: false,
+//       _removedTE: false,
+//       _contentLength: null,
+//       _hasBody: true,
+//       _trailer: '',
+//       finished: false,
+//       _headerSent: false,
+//       socket: [Circular],
+//       connection: [Circular],
+//       _header: null,
+//       _onPendingData: [Function: bound updateOutgoingData],
+//       _sent100: false,
+//       _expect_continue: false,
+//       req: [Circular],
+//       locals: [Object: null prototype] {},
+//       _startAt: undefined,
+//       _startTime: undefined,
+//       writeHead: [Function: writeHead],
+//       __onFinished: [Function],
+//       [Symbol(kCapture)]: false,
+//       [Symbol(kNeedDrain)]: false,
+//       [Symbol(corked)]: 0,
+//       [Symbol(kOutHeaders)]: [Object: null prototype]
+//     },
+//     _peername: { address: '::ffff:127.0.0.1', family: 'IPv6', port: 5572 },
+//     [Symbol(asyncId)]: 215,
+//     [Symbol(kHandle)]: TCP {
+//       reading: true,
+//       onconnection: null,
+//       _consumed: true,
+//       [Symbol(owner)]: [Circular]
+//     },
+//     [Symbol(lastWriteQueueSize)]: 0,
+//     [Symbol(timeout)]: Timeout {
+//       _idleTimeout: 120000,
+//       _idlePrev: [TimersList],
+//       _idleNext: [TimersList],
+//       _idleStart: 13708,
+//       _onTimeout: [Function: bound ],
+//       _timerArgs: undefined,
+//       _repeat: null,
+//       _destroyed: false,
+//       [Symbol(refed)]: false,
+//       [Symbol(asyncId)]: 216,
+//       [Symbol(triggerId)]: 215
+//     },
+//     [Symbol(kBuffer)]: null,
+//     [Symbol(kBufferCb)]: null,
+//     [Symbol(kBufferGen)]: null,
+//     [Symbol(kCapture)]: false,
+//     [Symbol(kBytesRead)]: 0,
+//     [Symbol(kBytesWritten)]: 0
+//   },
+//   connection: Socket {
+//     connecting: false,
+//     _hadError: false,
+//     _parent: null,
+//     _host: null,
+//     _readableState: ReadableState {
+//       objectMode: false,
+//       highWaterMark: 16384,
+//       buffer: BufferList { head: null, tail: null, length: 0 },
+//       length: 0,
+//       pipes: null,
+//       pipesCount: 0,
+//       flowing: true,
+//       ended: false,
+//       endEmitted: false,
+//       reading: true,
+//       sync: false,
+//       needReadable: true,
+//       emittedReadable: false,
+//       readableListening: false,
+//       resumeScheduled: false,
+//       emitClose: false,
+//       autoDestroy: false,
+//       destroyed: false,
+//       defaultEncoding: 'utf8',
+//       awaitDrain: 0,
+//       readingMore: false,
+//       decoder: null,
+//       encoding: null,
+//       [Symbol(kPaused)]: false
+//     },
+//     readable: true,
+//     _events: [Object: null prototype] {
+//       end: [Array],
+//       timeout: [Function: socketOnTimeout],
+//       data: [Function: bound socketOnData],
+//       error: [Array],
+//       close: [Array],
+//       drain: [Function: bound socketOnDrain],
+//       resume: [Function: onSocketResume],
+//       pause: [Function: onSocketPause]
+//     },
+//     _eventsCount: 8,
+//     _maxListeners: undefined,
+//     _writableState: WritableState {
+//       objectMode: false,
+//       highWaterMark: 16384,
+//       finalCalled: false,
+//       needDrain: false,
+//       ending: false,
+//       ended: false,
+//       finished: false,
+//       destroyed: false,
+//       decodeStrings: false,
+//       defaultEncoding: 'utf8',
+//       length: 0,
+//       writing: false,
+//       corked: 0,
+//       sync: true,
+//       bufferProcessing: false,
+//       onwrite: [Function: bound onwrite],
+//       writecb: null,
+//       writelen: 0,
+//       afterWriteTickInfo: null,
+//       bufferedRequest: null,
+//       lastBufferedRequest: null,
+//       pendingcb: 0,
+//       prefinished: false,
+//       errorEmitted: false,
+//       emitClose: false,
+//       autoDestroy: false,
+//       bufferedRequestCount: 0,
+//       corkedRequestsFree: [Object]
+//     },
+//     writable: true,
+//     allowHalfOpen: true,
+//     _sockname: null,
+//     _pendingData: null,
+//     _pendingEncoding: '',
+//     server: Server {
+//       insecureHTTPParser: undefined,
+//       _events: [Object: null prototype],
+//       _eventsCount: 2,
+//       _maxListeners: undefined,
+//       _connections: 1,
+//       _handle: [TCP],
+//       _usingWorkers: false,
+//       _workers: [],
+//       _unref: false,
+//       allowHalfOpen: true,
+//       pauseOnConnect: false,
+//       httpAllowHalfOpen: false,
+//       timeout: 120000,
+//       keepAliveTimeout: 5000,
+//       maxHeadersCount: null,
+//       headersTimeout: 40000,
+//       _connectionKey: '6::::3000',
+//       [Symbol(IncomingMessage)]: [Function: IncomingMessage],
+//       [Symbol(ServerResponse)]: [Function: ServerResponse],
+//       [Symbol(kCapture)]: false,
+//       [Symbol(asyncId)]: 11
+//     },
+//     _server: Server {
+//       insecureHTTPParser: undefined,
+//       _events: [Object: null prototype],
+//       _eventsCount: 2,
+//       _maxListeners: undefined,
+//       _connections: 1,
+//       _handle: [TCP],
+//       _usingWorkers: false,
+//       _workers: [],
+//       _unref: false,
+//       allowHalfOpen: true,
+//       pauseOnConnect: false,
+//       httpAllowHalfOpen: false,
+//       timeout: 120000,
+//       keepAliveTimeout: 5000,
+//       maxHeadersCount: null,
+//       headersTimeout: 40000,
+//       _connectionKey: '6::::3000',
+//       [Symbol(IncomingMessage)]: [Function: IncomingMessage],
+//       [Symbol(ServerResponse)]: [Function: ServerResponse],
+//       [Symbol(kCapture)]: false,
+//       [Symbol(asyncId)]: 11
+//     },
+//     timeout: 120000,
+//     parser: HTTPParser {
+//       '0': [Function: parserOnHeaders],
+//       '1': [Function: parserOnHeadersComplete],
+//       '2': [Function: parserOnBody],
+//       '3': [Function: parserOnMessageComplete],
+//       '4': [Function: bound onParserExecute],
+//       _headers: [],
+//       _url: '',
+//       socket: [Circular],
+//       incoming: [Circular],
+//       outgoing: null,
+//       maxHeaderPairs: 2000,
+//       _consumed: true,
+//       onIncoming: [Function: bound parserOnIncoming],
+//       parsingHeadersStart: 1591970312557
+//     },
+//     on: [Function: socketListenerWrap],
+//     addListener: [Function: socketListenerWrap],
+//     prependListener: [Function: socketListenerWrap],
+//     _paused: false,
+//     _httpMessage: ServerResponse {
+//       _events: [Object: null prototype],
+//       _eventsCount: 2,
+//       _maxListeners: undefined,
+//       outputData: [],
+//       outputSize: 0,
+//       writable: true,
+//       _last: false,
+//       chunkedEncoding: false,
+//       shouldKeepAlive: true,
+//       useChunkedEncodingByDefault: true,
+//       sendDate: true,
+//       _removedConnection: false,
+//       _removedContLen: false,
+//       _removedTE: false,
+//       _contentLength: null,
+//       _hasBody: true,
+//       _trailer: '',
+//       finished: false,
+//       _headerSent: false,
+//       socket: [Circular],
+//       connection: [Circular],
+//       _header: null,
+//       _onPendingData: [Function: bound updateOutgoingData],
+//       _sent100: false,
+//       _expect_continue: false,
+//       req: [Circular],
+//       locals: [Object: null prototype] {},
+//       _startAt: undefined,
+//       _startTime: undefined,
+//       writeHead: [Function: writeHead],
+//       __onFinished: [Function],
+//       [Symbol(kCapture)]: false,
+//       [Symbol(kNeedDrain)]: false,
+//       [Symbol(corked)]: 0,
+//       [Symbol(kOutHeaders)]: [Object: null prototype]
+//     },
+//     _peername: { address: '::ffff:127.0.0.1', family: 'IPv6', port: 5572 },
+//     [Symbol(asyncId)]: 215,
+//     [Symbol(kHandle)]: TCP {
+//       reading: true,
+//       onconnection: null,
+//       _consumed: true,
+//       [Symbol(owner)]: [Circular]
+//     },
+//     [Symbol(lastWriteQueueSize)]: 0,
+//     [Symbol(timeout)]: Timeout {
+//       _idleTimeout: 120000,
+//       _idlePrev: [TimersList],
+//       _idleNext: [TimersList],
+//       _idleStart: 13708,
+//       _onTimeout: [Function: bound ],
+//       _timerArgs: undefined,
+//       _repeat: null,
+//       _destroyed: false,
+//       [Symbol(refed)]: false,
+//       [Symbol(asyncId)]: 216,
+//       [Symbol(triggerId)]: 215
+//     },
+//     [Symbol(kBuffer)]: null,
+//     [Symbol(kBufferCb)]: null,
+//     [Symbol(kBufferGen)]: null,
+//     [Symbol(kCapture)]: false,
+//     [Symbol(kBytesRead)]: 0,
+//     [Symbol(kBytesWritten)]: 0
+//   },
+//   httpVersionMajor: 1,
+//   httpVersionMinor: 1,
+//   httpVersion: '1.1',
+//   complete: true,
+//   headers: {
+//     authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlZTM2MzM2N2JiOGM3NjU0NDI4NjJjMyIsImlhdCI6MTU5MTk3MDI4NSwiZXhwIjoxNTk5NzQ2Mjg1fQ.ZXS102-Mq6M1vyhXeOncK8LY7ZgZ5qkDw6a0VrBO4wo',
+//     'content-type': 'application/json',
+//     'user-agent': 'PostmanRuntime/7.25.0',
+//     accept: '*/*',
+//     'postman-token': '39f3d567-79a2-4c40-bea9-62a142a259bc',
+//     host: '127.0.0.1:3000',
+//     'accept-encoding': 'gzip, deflate, br',
+//     connection: 'keep-alive',
+//     'content-length': '98'
+//   },
+//   rawHeaders: [
+//     'Authorization',
+//     'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlZTM2MzM2N2JiOGM3NjU0NDI4NjJjMyIsImlhdCI6MTU5MTk3MDI4NSwiZXhwIjoxNTk5NzQ2Mjg1fQ.ZXS102-Mq6M1vyhXeOncK8LY7ZgZ5qkDw6a0VrBO4wo',
+//     'Content-Type',
+//     'application/json',
+//     'User-Agent',
+//     'PostmanRuntime/7.25.0',
+//     'Accept',
+//     '*/*',
+//     'Postman-Token',
+//     '39f3d567-79a2-4c40-bea9-62a142a259bc',
+//     'Host',
+//     '127.0.0.1:3000',
+//     'Accept-Encoding',
+//     'gzip, deflate, br',
+//     'Connection',
+//     'keep-alive',
+//     'Content-Length',
+//     '98'
+//   ],
+//   trailers: {},
+//   rawTrailers: [],
+//   aborted: false,
+//   upgrade: false,
+//   url: '/updateMyPassword/',
+//   method: 'PATCH',
+//   statusCode: null,
+//   statusMessage: null,
+//   client: Socket {
+//     connecting: false,
+//     _hadError: false,
+//     _parent: null,
+//     _host: null,
+//     _readableState: ReadableState {
+//       objectMode: false,
+//       highWaterMark: 16384,
+//       buffer: BufferList { head: null, tail: null, length: 0 },
+//       length: 0,
+//       pipes: null,
+//       pipesCount: 0,
+//       flowing: true,
+//       ended: false,
+//       endEmitted: false,
+//       reading: true,
+//       sync: false,
+//       needReadable: true,
+//       emittedReadable: false,
+//       readableListening: false,
+//       resumeScheduled: false,
+//       emitClose: false,
+//       autoDestroy: false,
+//       destroyed: false,
+//       defaultEncoding: 'utf8',
+//       awaitDrain: 0,
+//       readingMore: false,
+//       decoder: null,
+//       encoding: null,
+//       [Symbol(kPaused)]: false
+//     },
+//     readable: true,
+//     _events: [Object: null prototype] {
+//       end: [Array],
+//       timeout: [Function: socketOnTimeout],
+//       data: [Function: bound socketOnData],
+//       error: [Array],
+//       close: [Array],
+//       drain: [Function: bound socketOnDrain],
+//       resume: [Function: onSocketResume],
+//       pause: [Function: onSocketPause]
+//     },
+//     _eventsCount: 8,
+//     _maxListeners: undefined,
+//     _writableState: WritableState {
+//       objectMode: false,
+//       highWaterMark: 16384,
+//       finalCalled: false,
+//       needDrain: false,
+//       ending: false,
+//       ended: false,
+//       finished: false,
+//       destroyed: false,
+//       decodeStrings: false,
+//       defaultEncoding: 'utf8',
+//       length: 0,
+//       writing: false,
+//       corked: 0,
+//       sync: true,
+//       bufferProcessing: false,
+//       onwrite: [Function: bound onwrite],
+//       writecb: null,
+//       writelen: 0,
+//       afterWriteTickInfo: null,
+//       bufferedRequest: null,
+//       lastBufferedRequest: null,
+//       pendingcb: 0,
+//       prefinished: false,
+//       errorEmitted: false,
+//       emitClose: false,
+//       autoDestroy: false,
+//       bufferedRequestCount: 0,
+//       corkedRequestsFree: [Object]
+//     },
+//     writable: true,
+//     allowHalfOpen: true,
+//     _sockname: null,
+//     _pendingData: null,
+//     _pendingEncoding: '',
+//     server: Server {
+//       insecureHTTPParser: undefined,
+//       _events: [Object: null prototype],
+//       _eventsCount: 2,
+//       _maxListeners: undefined,
+//       _connections: 1,
+//       _handle: [TCP],
+//       _usingWorkers: false,
+//       _workers: [],
+//       _unref: false,
+//       allowHalfOpen: true,
+//       pauseOnConnect: false,
+//       httpAllowHalfOpen: false,
+//       timeout: 120000,
+//       keepAliveTimeout: 5000,
+//       maxHeadersCount: null,
+//       headersTimeout: 40000,
+//       _connectionKey: '6::::3000',
+//       [Symbol(IncomingMessage)]: [Function: IncomingMessage],
+//       [Symbol(ServerResponse)]: [Function: ServerResponse],
+//       [Symbol(kCapture)]: false,
+//       [Symbol(asyncId)]: 11
+//     },
+//     _server: Server {
+//       insecureHTTPParser: undefined,
+//       _events: [Object: null prototype],
+//       _eventsCount: 2,
+//       _maxListeners: undefined,
+//       _connections: 1,
+//       _handle: [TCP],
+//       _usingWorkers: false,
+//       _workers: [],
+//       _unref: false,
+//       allowHalfOpen: true,
+//       pauseOnConnect: false,
+//       httpAllowHalfOpen: false,
+//       timeout: 120000,
+//       keepAliveTimeout: 5000,
+//       maxHeadersCount: null,
+//       headersTimeout: 40000,
+//       _connectionKey: '6::::3000',
+//       [Symbol(IncomingMessage)]: [Function: IncomingMessage],
+//       [Symbol(ServerResponse)]: [Function: ServerResponse],
+//       [Symbol(kCapture)]: false,
+//       [Symbol(asyncId)]: 11
+//     },
+//     timeout: 120000,
+//     parser: HTTPParser {
+//       '0': [Function: parserOnHeaders],
+//       '1': [Function: parserOnHeadersComplete],
+//       '2': [Function: parserOnBody],
+//       '3': [Function: parserOnMessageComplete],
+//       '4': [Function: bound onParserExecute],
+//       _headers: [],
+//       _url: '',
+//       socket: [Circular],
+//       incoming: [Circular],
+//       outgoing: null,
+//       maxHeaderPairs: 2000,
+//       _consumed: true,
+//       onIncoming: [Function: bound parserOnIncoming],
+//       parsingHeadersStart: 1591970312557
+//     },
+//     on: [Function: socketListenerWrap],
+//     addListener: [Function: socketListenerWrap],
+//     prependListener: [Function: socketListenerWrap],
+//     _paused: false,
+//     _httpMessage: ServerResponse {
+//       _events: [Object: null prototype],
+//       _eventsCount: 2,
+//       _maxListeners: undefined,
+//       outputData: [],
+//       outputSize: 0,
+//       writable: true,
+//       _last: false,
+//       chunkedEncoding: false,
+//       shouldKeepAlive: true,
+//       useChunkedEncodingByDefault: true,
+//       sendDate: true,
+//       _removedConnection: false,
+//       _removedContLen: false,
+//       _removedTE: false,
+//       _contentLength: null,
+//       _hasBody: true,
+//       _trailer: '',
+//       finished: false,
+//       _headerSent: false,
+//       socket: [Circular],
+//       connection: [Circular],
+//       _header: null,
+//       _onPendingData: [Function: bound updateOutgoingData],
+//       _sent100: false,
+//       _expect_continue: false,
+//       req: [Circular],
+//       locals: [Object: null prototype] {},
+//       _startAt: undefined,
+//       _startTime: undefined,
+//       writeHead: [Function: writeHead],
+//       __onFinished: [Function],
+//       [Symbol(kCapture)]: false,
+//       [Symbol(kNeedDrain)]: false,
+//       [Symbol(corked)]: 0,
+//       [Symbol(kOutHeaders)]: [Object: null prototype]
+//     },
+//     _peername: { address: '::ffff:127.0.0.1', family: 'IPv6', port: 5572 },
+//     [Symbol(asyncId)]: 215,
+//     [Symbol(kHandle)]: TCP {
+//       reading: true,
+//       onconnection: null,
+//       _consumed: true,
+//       [Symbol(owner)]: [Circular]
+//     },
+//     [Symbol(lastWriteQueueSize)]: 0,
+//     [Symbol(timeout)]: Timeout {
+//       _idleTimeout: 120000,
+//       _idlePrev: [TimersList],
+//       _idleNext: [TimersList],
+//       _idleStart: 13708,
+//       _onTimeout: [Function: bound ],
+//       _timerArgs: undefined,
+//       _repeat: null,
+//       _destroyed: false,
+//       [Symbol(refed)]: false,
+//       [Symbol(asyncId)]: 216,
+//       [Symbol(triggerId)]: 215
+//     },
+//     [Symbol(kBuffer)]: null,
+//     [Symbol(kBufferCb)]: null,
+//     [Symbol(kBufferGen)]: null,
+//     [Symbol(kCapture)]: false,
+//     [Symbol(kBytesRead)]: 0,
+//     [Symbol(kBytesWritten)]: 0
+//   },
+//   _consuming: true,
+//   _dumped: false,
+//   next: [Function: next],
+//   baseUrl: '/api/v1/users',
+//   originalUrl: '/api/v1/users/updateMyPassword/',
+//   _parsedUrl: Url {
+//     protocol: null,
+//     slashes: null,
+//     auth: null,
+//     host: null,
+//     port: null,
+//     hostname: null,
+//     hash: null,
+//     search: null,
+//     query: null,
+//     pathname: '/updateMyPassword/',
+//     path: '/updateMyPassword/',
+//     href: '/updateMyPassword/',
+//     _raw: '/updateMyPassword/'
+//   },
+//   params: {},
+//   query: {},
+//   res: ServerResponse {
+//     _events: [Object: null prototype] {
+//       finish: [Array],
+//       end: [Function: onevent]
+//     },
+//     _eventsCount: 2,
+//     _maxListeners: undefined,
+//     outputData: [],
+//     outputSize: 0,
+//     writable: true,
+//     _last: false,
+//     chunkedEncoding: false,
+//     shouldKeepAlive: true,
+//     useChunkedEncodingByDefault: true,
+//     sendDate: true,
+//     _removedConnection: false,
+//     _removedContLen: false,
+//     _removedTE: false,
+//     _contentLength: null,
+//     _hasBody: true,
+//     _trailer: '',
+//     finished: false,
+//     _headerSent: false,
+//     socket: Socket {
+//       connecting: false,
+//       _hadError: false,
+//       _parent: null,
+//       _host: null,
+//       _readableState: [ReadableState],
+//       readable: true,
+//       _events: [Object: null prototype],
+//       _eventsCount: 8,
+//       _maxListeners: undefined,
+//       _writableState: [WritableState],
+//       writable: true,
+//       allowHalfOpen: true,
+//       _sockname: null,
+//       _pendingData: null,
+//       _pendingEncoding: '',
+//       server: [Server],
+//       _server: [Server],
+//       timeout: 120000,
+//       parser: [HTTPParser],
+//       on: [Function: socketListenerWrap],
+//       addListener: [Function: socketListenerWrap],
+//       prependListener: [Function: socketListenerWrap],
+//       _paused: false,
+//       _httpMessage: [Circular],
+//       _peername: [Object],
+//       [Symbol(asyncId)]: 215,
+//       [Symbol(kHandle)]: [TCP],
+//       [Symbol(lastWriteQueueSize)]: 0,
+//       [Symbol(timeout)]: Timeout {
+//         _idleTimeout: 120000,
+//         _idlePrev: [TimersList],
+//         _idleNext: [TimersList],
+//         _idleStart: 13708,
+//         _onTimeout: [Function: bound ],
+//         _timerArgs: undefined,
+//         _repeat: null,
+//         _destroyed: false,
+//         [Symbol(refed)]: false,
+//         [Symbol(asyncId)]: 216,
+//         [Symbol(triggerId)]: 215
+//       },
+//       [Symbol(kBuffer)]: null,
+//       [Symbol(kBufferCb)]: null,
+//       [Symbol(kBufferGen)]: null,
+//       [Symbol(kCapture)]: false,
+//       [Symbol(kBytesRead)]: 0,
+//       [Symbol(kBytesWritten)]: 0
+//     },
+//     connection: Socket {
+//       connecting: false,
+//       _hadError: false,
+//       _parent: null,
+//       _host: null,
+//       _readableState: [ReadableState],
+//       readable: true,
+//       _events: [Object: null prototype],
+//       _eventsCount: 8,
+//       _maxListeners: undefined,
+//       _writableState: [WritableState],
+//       writable: true,
+//       allowHalfOpen: true,
+//       _sockname: null,
+//       _pendingData: null,
+//       _pendingEncoding: '',
+//       server: [Server],
+//       _server: [Server],
+//       timeout: 120000,
+//       parser: [HTTPParser],
+//       on: [Function: socketListenerWrap],
+//       addListener: [Function: socketListenerWrap],
+//       prependListener: [Function: socketListenerWrap],
+//       _paused: false,
+//       _httpMessage: [Circular],
+//       _peername: [Object],
+//       [Symbol(asyncId)]: 215,
+//       [Symbol(kHandle)]: [TCP],
+//       [Symbol(lastWriteQueueSize)]: 0,
+//       [Symbol(timeout)]: Timeout {
+//         _idleTimeout: 120000,
+//         _idlePrev: [TimersList],
+//         _idleNext: [TimersList],
+//         _idleStart: 13708,
+//         _onTimeout: [Function: bound ],
+//         _timerArgs: undefined,
+//         _repeat: null,
+//         _destroyed: false,
+//         [Symbol(refed)]: false,
+//         [Symbol(asyncId)]: 216,
+//         [Symbol(triggerId)]: 215
+//       },
+//       [Symbol(kBuffer)]: null,
+//       [Symbol(kBufferCb)]: null,
+//       [Symbol(kBufferGen)]: null,
+//       [Symbol(kCapture)]: false,
+//       [Symbol(kBytesRead)]: 0,
+//       [Symbol(kBytesWritten)]: 0
+//     },
+//     _header: null,
+//     _onPendingData: [Function: bound updateOutgoingData],
+//     _sent100: false,
+//     _expect_continue: false,
+//     req: [Circular],
+//     locals: [Object: null prototype] {},
+//     _startAt: undefined,
+//     _startTime: undefined,
+//     writeHead: [Function: writeHead],
+//     __onFinished: [Function: listener] { queue: [Array] },
+//     [Symbol(kCapture)]: false,
+//     [Symbol(kNeedDrain)]: false,
+//     [Symbol(corked)]: 0,
+//     [Symbol(kOutHeaders)]: [Object: null prototype] { 'x-powered-by': [Array] }
+//   },
+//   _startAt: [ 129780, 827209300 ],
+//   _startTime: 2020-06-12T13:58:32.561Z,
+//   _remoteAddress: '::ffff:127.0.0.1',
+//   body: {
+//     passwordCurrent: 'admin003',
+//     password: 'admin001',
+//     passwordConfirm: 'admin001'
+//   },
+//   _body: true,
+//   length: undefined,
+//   requestTime: '2020-06-12T13:58:32.573Z',
+//   route: Route {
+//     path: '/updateMyPassword',
+//     stack: [ [Layer], [Layer] ],
+//     methods: { patch: true }
+//   },
+//   user: {
+//     role: 'admin',
+//     _id: 5ee363367bb8c765442862c3,
+//     name: 'admin001',
+//     email: 'admin001@test.com',
+//     __v: 0,
+//     passwordChangedAt: 2020-06-12T13:58:04.108Z
+//   },
+//   [Symbol(kCapture)]: false
+// }

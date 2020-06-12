@@ -16,6 +16,8 @@ router.post('/forgotPassword', authController.forgotPassword);
 // router.post('/resetPassword', authController.resetPassword);
 router.patch('/resetPassword/:token', authController.resetPassword);
 
+router.patch('/updateMyPassword', authController.protect, authController.updatePassword);
+
 // 3-3) route actions for users
 router.route('/').get(authController.protect, userController.getAllUsers).post(userController.createUser); //從 app.route('/api/v1/users').get 換成 router.route('/').get
 // route actions for SINGLE user

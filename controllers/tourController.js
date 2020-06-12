@@ -37,6 +37,7 @@ exports.getAllTours = catchAsync(async (req, res, next) => {
   console.log(`\n(from ${scriptName}: ) The requested was made at ${req.requestTime}`);
   console.log("\x1b[93m", "\nThe req.query obj from the GET request:", "\x1b[0m\n");
   console.log(req.query);
+
   // ex: { difficulty: 'easy', duration: { gte: '5' } }
 
   // #2 ============  processing QUERY  ============
