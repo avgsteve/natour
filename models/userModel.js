@@ -59,7 +59,7 @@ const userSchema = new Schema({
     passwordResetExpires: Date,
     active: {
       type: Boolean,
-      dafault: true,
+      default: true,
       select: false // the active field  won't be shown is query results
     }
   },

@@ -34,6 +34,30 @@ const createSendToken = (user, statusCode, res) => {
 
   const token = signToken(user._id);
 
+  //cookieOptions is used in res.cookie as a setting option for res.cookie which can save cookie for client
+  const cookieOptions = {
+    // Option: expires .  Expiry date of the cookie in GMT. If not specified or set to 0, creates a session cookie.
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000 // * 24 * 60 * 60 * 1000 => one day
+    ),
+
+    // secure: true, // via https only (switching this value with below code)
+    httpOnly: true // Flags the cookie to be accessible only by the web server to preven cross site scripting attack
+  };
+
+  if (process.env.NODE_ENV === 'production') {
+    // set secure option to true when in production mode
+    cookieOptions.secure = true;
+  }
+
+  //res.cookie(name, value [, options Obj])
+  res.cookie('jwt', token, cookieOptions
+    //ref for res.cookie & CookieOptions:  https://expressjs.com/en/api.html#res.cookie
+  );
+
+  // temperarily set user.password to undefined which will not actually save it to document. Doing so , we can hide the password field from the user results
+  user.password = "not to be shown";
+
   res.status(statusCode).json({
     status: 'success',
     token: token,
@@ -41,7 +65,6 @@ const createSendToken = (user, statusCode, res) => {
       user: user,
     },
   });
-
 };
 
 // ========== SIGN UP ===========
@@ -167,8 +190,8 @@ exports.protect = catchAsync(async (req, res, next) => {
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     token = req.headers.authorization.split(' ')[1];
     // ex:  ['Bearer', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlZDdjZWU1NTlkOTQwNzI1MDY2OWQ2ZSJ9.E5PwSCrEy5UIZP4L7xuJdVFT-qTJG2OyzyMZMSBQGWw'][1]
-
   }
+
 
   if (!token) {
     return next(new AppError('You are not logged in! Please log in to get access',
