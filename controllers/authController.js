@@ -113,10 +113,10 @@ exports.login = catchAsync(async (req, res, next) => {
 
   // In userModel.js,  use schema's prototype method "correctPassword" to compare input password and the password from database
   // correctPassword() is an async function so use await here
-  const correct = await user.correctPassword(password, user.password);
 
-  //
-  if (!user || !correct) {
+  // if user is false or correctPassword is false, return an new Error
+  if (!user || !(await user.correctPassword(password, user.password)) //
+  ) {
     return next(new AppError('Incorrect email or password', 401));
   }
 

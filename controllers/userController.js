@@ -88,6 +88,20 @@ exports.updateMe = catchAsync(async (req, res, next) => {
 
 });
 
+exports.deleteMe = catchAsync(async (req, res, next) => {
+  //find a user by id and set field: active to false
+  await User.findByIdAndUpdate(req.user.id, {
+    active: false
+  });
+
+  res.status(204).json({
+    status: 'success',
+    data: null
+  });
+
+
+});
+
 exports.getUser = (req, res) => {
   // 500 Internal Server Error
   res.status(500).json({
