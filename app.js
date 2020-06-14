@@ -5,6 +5,7 @@ const morgan = require('morgan'); // https://www.npmjs.com/package/morgan
 const dotenv = require('dotenv'); // ref:  https://www.npmjs.com/package/dotenv
 const responseSize = require('express-response-size');
 const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 
 // for reading Environment Variables from config.env file
 dotenv.config({
@@ -23,13 +24,22 @@ const startServer = require('./server'); // server.js
 
 const app = express();
 
-// 1) ============== MIDDLE-WARES
+// 1) ============== MIDDLE-WARES ==============
 
+// ===== SECURING http header ======
+// Helmet helps you set and secure your Express apps by setting various HTTP headers.
+app.use(helmet()); //https://www.npmjs.com/package/helmet
+
+// ===== HTTP request logger middleware for node.js ======
 // 67. Environment Variables: 透過 env variable 來控制 development 或是 production stage 的某些 middleware是否要啟用
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev')); // https://www.npmjs.com/package/morgan#dev
 }
-app.use(express.json()); //middleware的使用解說參照git commit 54-1 Node.js Express 的 Middleware的使用 &解說
+
+// === req.body parser . Reading data from body into req.body===
+app.use(express.json({
+  limit: '10kb',
+})); //middleware的使用解說參照git commit 54-1 Node.js Express 的 Middleware的使用 &解說
 
 
 // ===== REQUEST Limiter for IP ======
@@ -43,7 +53,7 @@ const limiter = rateLimit({
 app.use('/api', limiter);
 
 
-
+// === SERVING STATIC FILES ===
 // build-in middleware "express.static" for serving static file like .html
 app.use(express.static(`${__dirname}/public`)); //https://expressjs.com/en/starter/static-files.html
 //the URL for page is http://127.0.0.1:3000/overview.html as the app.use doesn't set any router
@@ -65,7 +75,8 @@ app.use(responseSize((req, res, size) => {
   // IE: shove into a database for further analysis, wait, spreadsheets are databases, right?
 }));
 
-//to show WHEN a request happened
+// === Test middleware ===
+// to show WHEN a request happened
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString(); // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
   // console.log("Test error for undefined ' x':" + x); //D:\\Dropbox\\Udemy\\JavaScript\\complete-node-bootcamp\\4-natours\\app.js:58:49\n    at Layer.handle [as handle_request]
