@@ -8,6 +8,8 @@ const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
+const hpp = require('hpp');
+
 
 // for reading Environment Variables from config.env file
 dotenv.config({
@@ -49,6 +51,11 @@ app.use(mongoSanitize()); //https://www.npmjs.com/package/express-mongo-sanitize
 
 // === Data sanitization against Cross-Site Scripting (XSS) attacks ===
 app.use(xss()); //https://www.npmjs.com/package/xss-clean
+
+// Prevent parameter pollution
+app.use(hpp({
+  whitelist: ['duration', 'ratingsQuantity', 'ratingsAverage', 'maxGroupSize', 'difficulty', 'price'],
+}));
 
 
 // ===== REQUEST Limiter for IP ======
@@ -104,6 +111,7 @@ app.use('/api/v1/tours', tourRouter);
 
 // --->>> 3-3) 將 route actions for users  //移到 tourRouter.js，針對此URI '/api/v1/users'  改為使用 middleware的方式作為 router
 app.use('/api/v1/users', userRouter);
+
 
 
 // =============== GLOBAL ERROR HANDLING MIDDLEWARE ===============
