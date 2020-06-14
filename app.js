@@ -4,6 +4,7 @@ const express = require('express');
 const morgan = require('morgan'); // https://www.npmjs.com/package/morgan
 const dotenv = require('dotenv'); // ref:  https://www.npmjs.com/package/dotenv
 const responseSize = require('express-response-size');
+const rateLimit = require('express-rate-limit');
 
 // for reading Environment Variables from config.env file
 dotenv.config({
@@ -29,6 +30,19 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev')); // https://www.npmjs.com/package/morgan#dev
 }
 app.use(express.json()); //middleware的使用解說參照git commit 54-1 Node.js Express 的 Middleware的使用 &解說
+
+
+// ===== REQUEST Limiter for IP ======
+const limiter = rateLimit({
+  max: 100,
+  windowMs: 60 * 60 * 1000,
+  message: 'Too many request from this IP, please try again in an hour.',
+  //ref:  https://www.npmjs.com/package/express-rate-limit
+});
+
+app.use('/api', limiter);
+
+
 
 // build-in middleware "express.static" for serving static file like .html
 app.use(express.static(`${__dirname}/public`)); //https://expressjs.com/en/starter/static-files.html
