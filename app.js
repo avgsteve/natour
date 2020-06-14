@@ -6,6 +6,8 @@ const dotenv = require('dotenv'); // ref:  https://www.npmjs.com/package/dotenv
 const responseSize = require('express-response-size');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean');
 
 // for reading Environment Variables from config.env file
 dotenv.config({
@@ -40,6 +42,13 @@ if (process.env.NODE_ENV === 'development') {
 app.use(express.json({
   limit: '10kb',
 })); //middleware的使用解說參照git commit 54-1 Node.js Express 的 Middleware的使用 &解說
+
+
+// === Data sanitization against NoSQL query injection attack ===
+app.use(mongoSanitize()); //https://www.npmjs.com/package/express-mongo-sanitize
+
+// === Data sanitization against Cross-Site Scripting (XSS) attacks ===
+app.use(xss()); //https://www.npmjs.com/package/xss-clean
 
 
 // ===== REQUEST Limiter for IP ======
