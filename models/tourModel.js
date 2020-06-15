@@ -6,6 +6,7 @@ const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const slugify = require('slugify');
 const validator = require('validator');
+const User = require('./userModel');
 
 //Create a class-like "Schema" to descript the data
 const Schema = mongoose.Schema;
@@ -123,8 +124,9 @@ const tourSchema = new Schema({
       address: String,
       description: String,
       day: Number, //the day people will go to the tour
-    }
-
+    },
+    // embedded data
+    guides: Array,
   },
   //the second parameter (obj) is schema options
   {
@@ -142,7 +144,9 @@ tourSchema.virtual('durationWeeks').get(function() {
   return this.duration / 7; // ex: seven day is one week
 });
 
-//pre-middleware (or pre-save hook) runs before .save() , create() command
+// ====  pre-middleware (or pre-save hook) runs before .save() , create() command ===
+
+// = create slug for data from its data name property =
 tourSchema.pre('save',
   //the second parameter is a function and its  parameter "next" is for the default next() function
   function(next) {
@@ -157,6 +161,26 @@ tourSchema.pre('save',
 
     next();
   });
+
+
+// = create embedded data for guides =
+tourSchema.pre('save',
+  //the second parameter is a function and its  parameter "next" is for the default next() function
+  async function(next) {
+
+    // const guides = this.guides.map(id => User.findById(id));
+    // rewrite this to async/await Function as beloiw
+
+    // async/await function will be returned as element for the Array
+    const guidesPromises = this.guides.map(async id => await User.findById(id));
+
+    //this.guides is Array based on the schema
+    this.guides = await Promise.all(guidesPromises);
+
+    next();
+  });
+
+
 
 // //second .pre middleware
 // tourSchema.pre('save', function(next) {
