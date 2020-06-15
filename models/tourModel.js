@@ -100,7 +100,31 @@ const tourSchema = new Schema({
     secretTour: {
       type: Boolean, //if true , this data doesn't show
       default: false,
+    },
+    startLocation: {
+      //GeoJSON
+      type: {
+        type: String,
+        default: 'Point',
+        enum: ['Point']
+      },
+      coordinates: [Number],
+      address: String,
+      description: String,
+    },
+    locations: {
+      //GeoJSON
+      type: {
+        type: String,
+        default: 'Point',
+        enum: ['Point']
+      },
+      coordinates: [Number],
+      address: String,
+      description: String,
+      day: Number, //the day people will go to the tour
     }
+
   },
   //the second parameter (obj) is schema options
   {

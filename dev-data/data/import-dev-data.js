@@ -10,7 +10,7 @@ const Tour = require('./../../models/tourModel'); // in tourModel.js , const Tou
 console.log(`\nExecuting ${scriptName}... \n`);
 
 dotenv.config({
-  path: `./../../config.env`
+  path: `./config.env`
 
   // path: `/../../config.env`
   // // /data/ -> dev-data -> natours
@@ -36,7 +36,8 @@ mongoose.connect(DB, {
 });
 
 //Read json file and convert it javascript obj format
-const tours = JSON.parse(fs.readFileSync(`${__dirname}/tours-simple.json`, 'utf-8'));
+// const tours = JSON.parse(fs.readFileSync(`${__dirname}/tours-simple.json`, 'utf-8'));
+const tours = JSON.parse(fs.readFileSync(`${__dirname}/tours.json`, 'utf-8'));
 
 
 //create data based on the Schema of Tour
@@ -159,3 +160,7 @@ if (process.argv[2] === '--import') {
 } else if (process.argv[2] === '--delete') {
   deleteData();
 }
+
+//type the commnands: (cli at 4-natours folder)
+//node ./dev-data/data/import-dev-data.js --delete
+//node ./dev-data/data/import-dev-data.js --import
