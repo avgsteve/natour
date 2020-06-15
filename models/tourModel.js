@@ -126,7 +126,13 @@ const tourSchema = new Schema({
       day: Number, //the day people will go to the tour
     },
     // embedded data
-    guides: Array,
+    // guides: Array,
+    guides: [{
+      //another way of embedding data
+      // type: Schema.Types.ObjectId, //this way works too
+      type: mongoose.Schema.ObjectId,
+      ref: 'User',
+    }]
   },
   //the second parameter (obj) is schema options
   {
@@ -171,7 +177,9 @@ tourSchema.pre('save',
     // const guides = this.guides.map(id => User.findById(id));
     // rewrite this to async/await Function as beloiw
 
-    // async/await function will be returned as element for the Array
+    // #1 async/await function will be returned as element for the Array
+    // #2 read IDs from guides Array and pass the ID to User.findById(id) qeuery
+    // to turn the id in Array into User document
     const guidesPromises = this.guides.map(async id => await User.findById(id));
 
     //this.guides is Array based on the schema
