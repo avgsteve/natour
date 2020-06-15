@@ -108,8 +108,19 @@ exports.getTour = catchAsync(async (req, res, next) => {
   //ex: 127.0.0.1:3000/api/v1/tours/5 的GET request 會顯示  "req.params": {"id": "5"}
 
   // get all current data from DB
-  const tour = await Tour.findById(req.params.id); //ref:  https://mongoosejs.com/docs/api.html#model_Model.find
+  // const tour = await Tour.findById(req.params.id); //ref:  https://mongoosejs.com/docs/api.html#model_Model.find
   // Tour.findById(req.params.id) equals to the function Tour.findOne( {_id: req.param.id} )
+
+  /* Change the code below to tourModels.js. The middleware:  tourSchema.pre(/^find/, function(next) {  this.populate
+    // const tour = await Tour.findById(req.params.id).populate({
+    //   path: 'guides',
+    //   select: '-__v -passwordChangedAt'
+    // }); // to fill out guide fields
+  */
+
+  const tour = await Tour.findById(req.params.id).populate('guides'); // to fill out guide fields
+
+
 
   if (!tour) {
     //return new AppError for customized Error and terminate function right

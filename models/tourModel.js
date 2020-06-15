@@ -225,6 +225,16 @@ tourSchema.pre(/^find/, function(next) {
 });
 
 
+//
+tourSchema.pre(/^find/, function(next) {
+  this.populate({
+    path: 'guides',
+    select: '-__v -passwordChangedAt',
+  });
+  next();
+});
+
+
 // Query Middleware : process Query data "AFTER" send data to client
 tourSchema.post(/^find/, function(docs, next) {
   //culcalate and show how much time passed from creating a .pre middleware to finish
@@ -232,6 +242,10 @@ tourSchema.post(/^find/, function(docs, next) {
   // console.log(docs);
   next();
 });
+
+
+
+
 
 //AGGREGATION PRE-MIDDLEWARE
 tourSchema.pre('aggregate', function(next) {
