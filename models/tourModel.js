@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 const slugify = require('slugify');
 const validator = require('validator');
 const User = require('./userModel');
+const Review = require('./reviewModel');
 
 //Create a class-like "Schema" to descript the data
 const Schema = mongoose.Schema;
@@ -131,8 +132,17 @@ const tourSchema = new Schema({
       //another way of embedding data
       // type: Schema.Types.ObjectId, //this way works too
       type: mongoose.Schema.ObjectId,
+      //connect to User model
       ref: 'User',
+    }],
+    /*
+    // virtual property
+    reviews: [{
+      type: mongoose.Schema.ObjectId,
+      //connect to Review model
+      ref: 'Review'
     }]
+    */
   },
   //the second parameter (obj) is schema options
   {
@@ -145,10 +155,33 @@ const tourSchema = new Schema({
   }
 );
 
+
 //virtual property (get() is getter and means using getter function)
+//usage: virtual('nameOfVirtualFields')
 tourSchema.virtual('durationWeeks').get(function() {
   return this.duration / 7; // ex: seven day is one week
 });
+
+
+
+//
+// set virtual property inside tour document to link the document to review data
+
+// usage: virtual('nameOfVirtualFields', objOfSchemaToConnect)
+tourSchema.virtual('reviews_populated', {
+  // ref: The model to be connected
+  ref: 'Review',
+
+  // foreignField: The "field name" in the schema of the connected model (ex: Model)
+  foreignField: 'tour',
+
+  // localField (for the tour id  current Tour model):
+  localField: '_id',
+
+  //  !!! and then need to use .populate method in tourController.js
+  //  const tour = await Tour.findById(req.params.id).populate('reviews_populated'); // to fill out "virtual" guide fields
+});
+
 
 // ====  pre-middleware (or pre-save hook) runs before .save() , create() command ===
 
