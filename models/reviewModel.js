@@ -41,6 +41,25 @@ const reviewSchema = new mongoose.Schema({
   }
 );
 
+//populate schema's field inside current incoming Query by using .pre middleware
+reviewSchema.pre(/^find/, function(next) {
+  this
+    // populate({ path: currentSchemaField , select: selected targetId's field })
+    .populate({
+      path: 'tour',
+      // select only the name field of the tour data
+      select: 'name'
+    })
+    //
+    .populate({
+      path: 'user',
+      // select only name and photo fields to display
+      select: 'name photo'
+    });
+
+  next();
+});
+
 
 const Review = mongoose.model('Review', reviewSchema);
 

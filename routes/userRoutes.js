@@ -26,6 +26,6 @@ router.delete('/deleteMe', authController.protect, userController.deleteMe);
 // 3-3) route actions for users
 router.route('/').get(authController.protect, userController.getAllUsers).post(userController.createUser); //從 app.route('/api/v1/users').get 換成 router.route('/').get
 // route actions for SINGLE user
-router.route('/:id').get(userController.getUser).patch(userController.updateUser).delete(userController.deleteUser);
+router.route('/:id').get(userController.getUser).patch(authController.protect, userController.updateMe).delete(userController.deleteUser);
 
 module.exports = router;

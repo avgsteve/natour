@@ -121,8 +121,10 @@ userSchema.pre(/^find/, function(next) {
   /*pre middleware will be looking for the this.op (any operation through this schema: userSchema)property's value */
 
 
-  console.log('\nThis is a log in pre(/^find/) middleware:\n');
-  console.log(this.op);
+  console.log('\nThis is a log in userModels.js pre(/^find/) middleware:\n');
+  //this.op is used to show which Query method is used in current query
+  console.log(this.op); //find
+
   console.log('\n== end of log ==\n');
 
   //this points to current query

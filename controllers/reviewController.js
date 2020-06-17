@@ -6,33 +6,33 @@ const logCurrentModuleName = require("./../utils/getFunctionName");
 
 //
 exports.getAllReviews = catchAsync(async (req, res, next) => {
-	// DisplayCurrentFunctionName();
+  // DisplayCurrentFunctionName();
 
-	// console.log(this); //{ getAllReviews: [Function], createReviews: [Function] }
+  // console.log(this); //{ getAllReviews: [Function], createReviews: [Function] }
 
-	console.log(`Current Module name is: ${Object.keys(this)[0]}`); //	['getAllReviews', 'createReviews']
+  console.log(`Current Module name is: ${Object.keys(this)[0]}`); //	['getAllReviews', 'createReviews']
 
-	// logCurrentModuleName();
+  // logCurrentModuleName();
 
-	const reviews = await Review.find();
+  const reviews = await Review.find();
 
-	res.status(200).json({
-		status: "successfully get all reviews",
-		results: reviews.length,
-		data: {
-			reviews: reviews
-		}
-	});
+  res.status(200).json({
+    status: "successfully get all reviews",
+    results: reviews.length,
+    data: {
+      reviews: reviews
+    }
+  });
 });
 
 //
 exports.createReviews = catchAsync(async (req, res, next) => {
-	const newReview = await Review.create(req.body);
+  const newReview = await Review.create(req.body);
 
-	res.status(201).json({
-		status: "new review successfully created!",
-		data: {
-			newReview: newReview
-		}
-	});
+  res.status(201).json({
+    status: "new review successfully created!",
+    data: {
+      newReview: newReview
+    }
+  });
 });
