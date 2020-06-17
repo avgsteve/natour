@@ -3,6 +3,8 @@
 const express = require('express');
 const userController = require(`./../controllers/userController`);
 const authController = require(`./../controllers/authController`);
+// const reviewController = require(`./../controllers/reviewController`);
+
 
 // 2) ============== ROUTE-HANDLERS moved to userController.js
 
@@ -27,5 +29,6 @@ router.delete('/deleteMe', authController.protect, userController.deleteMe);
 router.route('/').get(authController.protect, userController.getAllUsers).post(userController.createUser); //從 app.route('/api/v1/users').get 換成 router.route('/').get
 // route actions for SINGLE user
 router.route('/:id').get(userController.getUser).patch(authController.protect, userController.updateMe).delete(userController.deleteUser);
+
 
 module.exports = router;

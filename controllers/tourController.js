@@ -124,6 +124,8 @@ exports.getTour = catchAsync(async (req, res, next) => {
   // and populate the Virtual property set in tourModels.js (in section: tourSchema.virtual('reviews_populated', )
   const tour = await Tour.findById(req.params.id).populate('reviews_populated'); // to fill out "virtual" guide fields
 
+  console.log(`\n== From the Tour.findById function in tourControllers.js, the req.body is: \n${req.body}`);
+
   //ref for .populate('virtualPropName'):  https://mongoosejs.com/docs/populate.html#doc-not-found
 
   if (!tour) {

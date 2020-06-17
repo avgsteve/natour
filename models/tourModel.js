@@ -162,8 +162,6 @@ tourSchema.virtual('durationWeeks').get(function() {
   return this.duration / 7; // ex: seven day is one week
 });
 
-
-
 //
 // set virtual property inside tour document to link the document to review data
 

@@ -3,6 +3,8 @@
 const tourController = require(`./../controllers/tourController`);
 const express = require('express');
 const authController = require(`./../controllers/authController`);
+const reviewController = require(`./../controllers/reviewController`);
+
 
 
 // 2) ============== ROUTE-HANDLERS moved to tourController.js
@@ -16,7 +18,6 @@ const router = express.Router(); //原本是 const tourRouter = express.Router()
 
 // http://127.0.0.1:3000/api/v1/tours/top-5-cheap/
 router.route('/top-5-cheap').get(tourController.aliasTopTours, tourController.getAllTours);
-
 
 router.route('/tours-stats').get(tourController.getTourStats);
 
@@ -33,5 +34,20 @@ router.route('/:id').get(tourController.getTour).patch(tourController.updateTour
 //
 // tourRouter.route('/').get(getAllTours).post(createTour);
 // tourRouter.route('/:id').get(getTour).patch(updateTour).delete(deleteTour);
+
+// =====================
+
+// reference for nested ROUTES
+// POST /tour/123abc112d/reviews
+// GET /tour/123abc112d/reviews
+// GET /tour/123abc112d/reviews/asdasd1231231fdf
+
+// mounted Routes (userRouter.js): app.js => app.use('/api/v1/users', userRouter);
+// mounted Routes (tourRouter.js): app.js => app.use('/api/v1/tours', tourRouter);
+
+// for nesting the reviews in tour's URL route
+router.route('/:tourId/reviews').post(authController.protect, authController.restrictTo('user'), reviewController.createReviews);
+
+
 
 module.exports = router;
