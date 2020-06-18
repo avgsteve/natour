@@ -15,7 +15,13 @@ const router = express.Router({
 
 
 
-router.route('/').get(reviewController.getAllReviews).post(authController.protect, authController.restrictTo('user', 'admin'), reviewController.createReviews);
+router.route('/').get(reviewController.getAllReviews)
+  .post(
+    authController.protect,
+    authController.restrictTo('user'),
+    //setTourAndUserIdsforCreateReviews is used to create tourId and user.id in req.body for reviewController.createReviews
+    reviewController.setTourAndUserIdsforCreateReviews,
+    reviewController.createReviews);
 
 router.route('/:id').patch(reviewController.updateReview).delete(reviewController.deleteReview);
 

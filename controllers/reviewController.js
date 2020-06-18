@@ -49,9 +49,8 @@ exports.getAllReviews = catchAsync(async (req, res, next) => {
   });
 });
 
-//
-exports.createReviews = catchAsync(async (req, res, next) => {
-
+//setTourAndUserIds: a middle ware used to set properties in req.body for and before exports.createReviews middle ware
+exports.setTourAndUserIdsforCreateReviews = (req, res, next) => {
   //check if req.body.tour exists, if not, the create.tour property in .body obj,
   //and manually add current tour Id in the URL (from 'params property') to req.body.tour
   if (!req.body.tour) req.body.tour = req.params.tourId;
@@ -61,9 +60,14 @@ exports.createReviews = catchAsync(async (req, res, next) => {
   // req.user = freshUser; // assign to fresh user data to req.user property and make it used by next middleware function
   if (!req.body.user) req.body.user = req.user.id;
 
+  // These two properties in req.body as tourId and user.id have the fields and value needed for creating new view data (via reviewSchema in viewModel.js)
+  next();
+};
 
+//
+exports.createReviews = factory.createOne(Review);
 
-  /* To create new review in the nested URL,
+/* To create new review in the nested URL,
 
   #1 In POSTMAN body:
   {
@@ -89,16 +93,6 @@ exports.createReviews = catchAsync(async (req, res, next) => {
   from req.body (as created above) that are passed in as argument to Review.create(req.body) as below
 
   */
-  const newReview = await Review.create(req.body);
-
-
-  res.status(201).json({
-    status: "new review successfully created!",
-    data: {
-      newReview: newReview
-    }
-  });
-});
 
 exports.updateReview = factory.updateOne(Review);
 
