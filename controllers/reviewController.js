@@ -3,6 +3,8 @@
 const Review = require("./../models/reviewModel");
 const catchAsync = require("./../utils/catchAsync");
 const logCurrentModuleName = require("./../utils/getFunctionName");
+const factory = require('./handlerFactory'); //exports.deleteOne = Model => catchAsync(async (req, res, next) => { ...
+
 
 //
 exports.getAllReviews = catchAsync(async (req, res, next) => {
@@ -90,7 +92,6 @@ exports.createReviews = catchAsync(async (req, res, next) => {
   const newReview = await Review.create(req.body);
 
 
-
   res.status(201).json({
     status: "new review successfully created!",
     data: {
@@ -98,3 +99,8 @@ exports.createReviews = catchAsync(async (req, res, next) => {
     }
   });
 });
+
+exports.updateReview = factory.updateOne(Review);
+
+//pass the Review document to the factory function to get the returned result from Model.findByIdAndDelete
+exports.deleteReview = factory.deleteOne(Review);

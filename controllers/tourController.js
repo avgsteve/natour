@@ -7,7 +7,7 @@ const Tour = require('./../models/tourModel');
 const APIFeatures = require('./../utils/apiFeatures'); // using class APIFeatures
 const catchAsync = require('./../utils/catchAsync'); // using function catchAsync
 const AppError = require('./../utils/appError'); // using function catchAsync
-
+const factory = require('./handlerFactory'); //exports.deleteOne = Model => catchAsync(async (req, res, next) => {
 
 
 /* for testing purpose
@@ -163,19 +163,8 @@ exports.getTour = catchAsync(async (req, res, next) => {
 
 // Use catchAsync reaplce the repeated try ... catch ... block in the async functions
 // ex: exports.createTour = catchAsync( (req, res) => {} );
-exports.createTour = catchAsync(async (req, res, next) => {
-  const newTour = await Tour.create(req.body);
 
-  res.status(201).json({
-    status: 'success',
-    data: {
-      tour: newTour
-    }
-  });
-
-});
-
-
+exports.createTour = factory.createOne(Tour);
 
 
 // ===> (previous version) create new data from POST request
@@ -226,81 +215,46 @@ exports.createTour2 = catchAsync(async (req, res, next) => {
 });
 
 // ===> updateTour
-exports.updateTour = catchAsync(async (req, res, next) => {
-  //在tours Array 裡面搜尋有key: id跟req.params相符內容，並透過find傳回整個符合條件的 Array
-  // exports.tour = tours.find(el => el.id === +req.params.id); //req.params.id前的+號是coersion為數值
-
-  console.log(`\nupdating data with the id "${req.params.id}" & req body:`);
-  console.log(req.body);
-
-  const updatedData = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true, //if true, runs update validators on this command. Update validators validate the update operation against the model's schema.
-  });
-  //ref:  https://mongoosejs.com/docs/api.html#model_Model.findByIdAndUpdate  --> Model.findByIdAndUpdate('id', UpdateContentObj, optionsObj)
-
-  if (!updatedData) {
-    //return new AppError for customized Error and terminate function right
-    return next(new AppError(`No tour found with this tour id: ${req.params.id}`, 404));
-  }
-
-
-
-  res.status(200).json({
-    status: "success",
-    message: "data is successfully updated!",
-    data: {
-      // tour: 'updated content here...',
-      tour: updatedData,
-    }
-  });
-
-  /*
-    } catch (error) {
-      console.log("\nThere's an error in updateTour() after PATCH request!: \n");
-      console.log(error);
-      //send error response with status code 400
-      res.status(404).json({
-        status: 'Updating the data has failed!',
-        errorMessage: error,
-      });
-    }
-  */
-});
+exports.updateTour = factory.updateOne(Tour);
 
 //// ===> deleteTour
-exports.deleteTour = catchAsync(async (req, res, next) => {
-  // try {
-  console.log('\n===== req.param for DELETE request is:');
-  console.log(req.params);
+// pass the Tour model imported from tourModel.js
+exports.deleteTour = factory.deleteOne(Tour);
 
-  const deleteTour = await Tour.findByIdAndDelete(req.params.id);
-  //https://mongoosejs.com/docs/api.html#model_Model.findByIdAndDelete
+//
+//   exports.deleteTour = catchAsync(async (req, res, next) => {
+//     // try {
+//     console.log('\n===== req.param for DELETE request is:');
+//     console.log(req.params);
+//
+//     const deleteTour = await Tour.findByIdAndDelete(req.params.id);
+//     //https://mongoosejs.com/docs/api.html#model_Model.findByIdAndDelete
+//
+//     //If used invalid id, then will get null from deleteTour
+//     if (!deleteTour) {
+//       //return new AppError for customized Error and terminate function right
+//       return next(new AppError(`No tour found with this tour id: ${req.params.id}`, 404));
+//     }
+//
+//
+//     // status 204 will not send out data to browser , only the status code 204
+//     res.status(204).json({
+//       status: 'success',
+//       data: null,
+//     });
+//     /*
+//       // } catch (err) {
+//       //   console.log("\nThere's an error in deleteTour() after DELETE request!: \n");
+//       //   console.log(error);
+//       //   //send error response with status code 400
+//       //   res.status(404).json({
+//       //     status: 'delete new data failed!',
+//       //     errorMessage: error,
+//       //   });
+//       //
+//       // }  */
+// });
 
-  //If used invalid id, then will get null from deleteTour
-  if (!deleteTour) {
-    //return new AppError for customized Error and terminate function right
-    return next(new AppError(`No tour found with this tour id: ${req.params.id}`, 404));
-  }
-
-
-  // status 204 will not send out data to browser , only the status code 204
-  res.status(204).json({
-    status: 'success',
-    data: null,
-  });
-  /*
-    // } catch (err) {
-    //   console.log("\nThere's an error in deleteTour() after DELETE request!: \n");
-    //   console.log(error);
-    //   //send error response with status code 400
-    //   res.status(404).json({
-    //     status: 'delete new data failed!',
-    //     errorMessage: error,
-    //   });
-    //
-    // }  */
-});
 
 //101. Aggregation Pipeline: Matching and Grouping
 exports.getTourStats = catchAsync(async (req, res, next) => {

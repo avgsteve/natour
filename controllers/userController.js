@@ -4,6 +4,8 @@ const User = require('./../models/userModel');
 const APIFeatures = require('./../utils/apiFeatures'); // using class APIFeatures
 const catchAsync = require('./../utils/catchAsync'); // using function catchAsync
 const AppError = require('./../utils/appError'); // using function catchAsync
+const factory = require('./handlerFactory'); //exports.deleteOne = Model => catchAsync(async (req, res, next) => { ...
+
 
 const filterObj = (obj, ...allowedFields) => {
   // in function: exports.updateMe , const filteredBody = filterObj(req.body, 'name', 'email');
@@ -117,17 +119,9 @@ exports.createUser = (req, res) => {
     message: 'This route is not yet defined!'
   });
 };
-exports.updateUser = (req, res) => {
-  // 500 Internal Server Error
-  res.status(500).json({
-    status: 'error',
-    message: 'This route is not yet defined!'
-  });
-};
-exports.deleteUser = (req, res) => {
-  // 500 Internal Server Error
-  res.status(500).json({
-    status: 'error',
-    message: 'This route is not yet defined!'
-  });
-};
+
+//update user data from DB (via route:  router.route('/:id').patch(authController.protect, userController.updateMe))
+exports.updateUser = factory.updateOne(User);
+
+//delete user data from DB (via route:  route('/:id').delete(userController.deleteUser);)
+exports.deleteUser = factory.deleteOne(User);
