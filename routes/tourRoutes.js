@@ -46,6 +46,8 @@ router.route('/:id').get(tourController.getTour).patch(tourController.updateTour
 // mounted Routes (tourRouter.js): app.js => app.use('/api/v1/tours', tourRouter);
 
 // for nesting the reviews in tour's URL route
+// /:tourId/ is the id string nested after /api/v1/tours  .
+// So the whole URL will be http://host/api/v1/tours/:tourId/reviews
 router.route('/:tourId/reviews').post(authController.protect, authController.restrictTo('user'), reviewController.createReviews);
 
 
