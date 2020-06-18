@@ -100,66 +100,26 @@ exports.getAllTours = catchAsync(async (req, res, next) => {
 
 // 2-1) ROUTE-HANDLERS with " params from router.route('/:id') "
 // ===> get only one result from Obj's "tours" array
-exports.getTour = catchAsync(async (req, res, next) => {
-  // req來自於 router.route('/:id').get(getTour)，params property key為 :id
-  // to log the current req params from URI
-  console.log(`\n(from ${scriptName}: ) The req.param is: `);
-  console.log(req.params);
-  //ex: 127.0.0.1:3000/api/v1/tours/5 的GET request 會顯示  "req.params": {"id": "5"}
-
-  // get all current data from DB
-  // const tour = await Tour.findById(req.params.id); //ref:  https://mongoosejs.com/docs/api.html#model_Model.find
-  // Tour.findById(req.params.id) equals to the function Tour.findOne( {_id: req.param.id} )
-
-  /* Change the code below to tourModels.js. The middleware:  tourSchema.pre(/^find/, function(next) {  this.populate
-    // const tour = await Tour.findById(req.params.id).populate({
-    //   path: 'guides',
-    //   select: '-__v -passwordChangedAt'
-    // }); // to fill out guide fields
-  */
-
-  // const tour = await Tour.findById(req.params.id).populate('guides'); // to fill out guide fields
-
-  // get query from Tour model with findById method
-  // and populate the Virtual property set in tourModels.js (in section: tourSchema.virtual('reviews_populated', )
-  const tour = await Tour.findById(req.params.id).populate('reviews_populated_counter').populate('reviews_populated'); // to fill out "virtual" guide fields
-
-  console.log(`\n== From the Tour.findById function in tourControllers.js, the req.body is: \n${req.body}`);
-
-  //ref for .populate('virtualPropName'):  https://mongoosejs.com/docs/populate.html#doc-not-found
-
-  if (!tour) {
-    //return new AppError for customized Error and terminate function right
-    return next(new AppError(`No tour found with this tour id: ${req.params.id}`, 404));
-  }
-
-
-  res.status(200).json({
-    status: 'success',
-    inputs: {
-      'req.params': req.params,
-      'numberOfResults': "1",
-      // 'tour': tour,
-    },
-    data: tour,
-  });
-  /*
-  } catch (error) {
-    console.log("\nThere's an error in getTour() after GET request!: \n");
-    console.log(error);
-    //send error response with status code 400
-    res.status(404).json({
-      status: 'getting the required data failed!',
-      errorMessage: error,
-    });
-  }  */
-
-  //在tours Array 裡面搜尋有key: id跟req.params相符內容，並透過find傳回整個符合條件的 Array
-  // const tour = tours.find(el => el.id === +req.params.id); //req.params.id前的+號是coersion為數值
-
-
+// exports.getTour = factory.getOne(Tour);
+exports.getTour = factory.getOne(Tour, {
+  // path is used for the virtual fields that are going to be populated in results
+  path: 'reviews_populated reviews_populated_counter'
 });
 
+// exports.getTour = factory.getOne(Tour, "reviews_populated_counter", "reviews_populated");
+/*
+} catch (error) {
+  console.log("\nThere's an error in getTour() after GET request!: \n");
+  console.log(error);
+  //send error response with status code 400
+  res.status(404).json({
+    status: 'getting the required data failed!',
+    errorMessage: error,
+  });
+}  */
+
+//在tours Array 裡面搜尋有key: id跟req.params相符內容，並透過find傳回整個符合條件的 Array
+// const tour = tours.find(el => el.id === +req.params.id); //req.params.id前的+號是coersion為數值
 
 // Use catchAsync reaplce the repeated try ... catch ... block in the async functions
 // ex: exports.createTour = catchAsync( (req, res) => {} );

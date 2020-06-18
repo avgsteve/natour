@@ -49,6 +49,9 @@ exports.getAllReviews = catchAsync(async (req, res, next) => {
   });
 });
 
+//
+exports.getReview = factory.getOne(Review);
+
 //setTourAndUserIds: a middle ware used to set properties in req.body for and before exports.createReviews middle ware
 exports.setTourAndUserIdsforCreateReviews = (req, res, next) => {
   //check if req.body.tour exists, if not, the create.tour property in .body obj,

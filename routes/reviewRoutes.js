@@ -23,6 +23,6 @@ router.route('/').get(reviewController.getAllReviews)
     reviewController.setTourAndUserIdsforCreateReviews,
     reviewController.createReviews);
 
-router.route('/:id').patch(reviewController.updateReview).delete(reviewController.deleteReview);
+router.route('/:id').get(reviewController.getReview).patch(reviewController.updateReview).delete(reviewController.deleteReview);
 
 module.exports = router;

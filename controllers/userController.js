@@ -104,19 +104,14 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
 
 });
 
-exports.getUser = (req, res) => {
-  // 500 Internal Server Error
-  res.status(500).json({
-    status: 'error',
-    message: 'This route is not yet defined!'
-  });
-};
+//route middle ware for SINGLE user route, ex: router.route('/:id').get(userController.getUser)
+exports.getUser = factory.getOne(User);
 
 exports.createUser = (req, res) => {
   // 500 Internal Server Error
   res.status(500).json({
     status: 'error',
-    message: 'This route is not yet defined!'
+    message: 'This route /createUser is not yet defined! Please use /signup instead!'
   });
 };
 

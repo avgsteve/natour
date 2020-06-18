@@ -25,9 +25,10 @@ router.patch('/updateMe', authController.protect, userController.updateMe);
 router.delete('/deleteMe', authController.protect, authController.restrictTo('admin'), userController.deleteMe);
 
 
-// 3-3) route actions for users
+// 3-3) route actions for users ex: http://host/api/v1/users
 router.route('/').get(authController.protect, userController.getAllUsers).post(userController.createUser); //從 app.route('/api/v1/users').get 換成 router.route('/').get
-// route actions for SINGLE user
+
+// route actions for SINGLE user ex: http://host/api/v1/users/theId123
 router.route('/:id').get(userController.getUser).patch(authController.protect, userController.updateUser).delete(userController.deleteUser);
 
 
