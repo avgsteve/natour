@@ -181,6 +181,18 @@ tourSchema.virtual('reviews_populated', {
 });
 
 
+tourSchema.virtual('reviews_populated_counter', {
+  ref: 'Review',
+  // foreignField: The "field name" in the schema of the connected model (ex: Model)
+  foreignField: 'tour',
+  // localField (for the tour id  current Tour model):
+  localField: '_id',
+
+  //By enabling this count property, the reviews_populated_counter virtual property delivers only the number of document counts
+  count: true // And only get the number of docs
+});
+
+
 // ====  pre-middleware (or pre-save hook) runs before .save() , create() command ===
 
 // = create slug for data from its data name property =

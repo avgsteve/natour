@@ -122,7 +122,7 @@ exports.getTour = catchAsync(async (req, res, next) => {
 
   // get query from Tour model with findById method
   // and populate the Virtual property set in tourModels.js (in section: tourSchema.virtual('reviews_populated', )
-  const tour = await Tour.findById(req.params.id).populate('reviews_populated'); // to fill out "virtual" guide fields
+  const tour = await Tour.findById(req.params.id).populate('reviews_populated_counter').populate('reviews_populated'); // to fill out "virtual" guide fields
 
   console.log(`\n== From the Tour.findById function in tourControllers.js, the req.body is: \n${req.body}`);
 
