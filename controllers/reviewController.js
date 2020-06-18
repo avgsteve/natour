@@ -6,14 +6,36 @@ const logCurrentModuleName = require("./../utils/getFunctionName");
 
 //
 exports.getAllReviews = catchAsync(async (req, res, next) => {
-  // DisplayCurrentFunctionName();
 
-  // console.log(this); //{ getAllReviews: [Function], createReviews: [Function] }
+  // the filter obj to be used as in Review.find(filter) to get reviews for certain "tour" documents
+  let filter = {};
 
-  console.log(`Current Module name is: ${Object.keys(this)[0]}`); //	['getAllReviews', 'createReviews']
+  /* Get params from the nested URL: ex: http://host/api/v1/tours/:tourId/reviews
 
+  If there's property req.params.tourId
+  from router.use('/:tourId/reviews', reviewRouter) in touRoutes.js
+  (which handles this part of URL: /api/v1/tours in app.use('/api/v1/tours', tourRouter);
+ in app.js)
+
+  and via the express.Router's option "mergeParams: true" in reviewRoutes.js,
+  then we can get value from req.params.tourId in current file (reviewController.js) then assign the value to filter obj
+*/
+  if (req.params.tourId) filter = {
+    tour: req.params.tourId,
+    // // optional filters:
+    // rating: {
+    //   $gte: 4
+    // },
+  };
+
+  // console.log(`Current Module name is: ${Object.keys(this)[0]}`); //	['getAllReviews', 'createReviews']
   // logCurrentModuleName();
 
+  console.log("\nthe filter obj");
+  console.log(filter); // { tour: '5ee78ffdc4ecd526f8f636e3' }
+
+  // Find all documents that match selector. The result will be an array of documents.
+  // await Query.prototype.find(filter, optional: callback)
   const reviews = await Review.find();
 
   res.status(200).json({
