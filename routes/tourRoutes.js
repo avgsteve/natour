@@ -3,8 +3,8 @@
 const tourController = require(`./../controllers/tourController`);
 const express = require('express');
 const authController = require(`./../controllers/authController`);
-const reviewController = require(`./../controllers/reviewController`);
-
+// const reviewController = require(`./../controllers/reviewController`);
+const reviewRouter = require(`./reviewRoutes`);
 
 
 // 2) ============== ROUTE-HANDLERS moved to tourController.js
@@ -48,8 +48,19 @@ router.route('/:id').get(tourController.getTour).patch(tourController.updateTour
 // for nesting the reviews in tour's URL route
 // /:tourId/ is the id string nested after /api/v1/tours  .
 // So the whole URL will be http://host/api/v1/tours/:tourId/reviews
-router.route('/:tourId/reviews').post(authController.protect, authController.restrictTo('user'), reviewController.createReviews);
 
+// router.route('/:tourId/reviews').post(authController.protect, authController.restrictTo('user'), reviewController.createReviews);
+
+// modify above (originally the route for nested URL) as below to refactor the nested URL codes
+// Use middle ware reviewRouter for this specific route
+router.use('/:tourId/reviews', reviewRouter);
+
+/*
+Since the code for /tour route in app.js is app.use('api/v1/tours', tourRouter),
+so in current tourRoutes.js file, when using router.use('/:tourId/reviews', reviewRouter);
+the route '/:tourId/reviews' will be the nested URL after 'api/v1/tours' again
+
+*/
 
 
 module.exports = router;
