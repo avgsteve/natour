@@ -4,8 +4,9 @@
 
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError'); // appError.js
-
-
+const APIFeatures = require('./../utils/apiFeatures'); // using class APIFeatures
+var path = require('path');
+const scriptName = path.basename(__filename);
 
 //delete tour or users by receiving Model obj and return whole async/await function to the caller function
 exports.deleteOne = Model => catchAsync(async (req, res, next) => {
@@ -152,6 +153,35 @@ exports.getOne = (Model, populateOptions) => catchAsync(async (req, res, next) =
     // },
     data: doc,
   });
+});
 
+exports.getAll = Model => catchAsync(async (req, res, next) => {
+  //log current file name and time from
+  console.log(`\n(from ${scriptName}: ) The requested was made at ${req.requestTime}`);
+  console.log("\x1b[93m", "\nThe req.query obj from the GET request:", "\x1b[0m\n");
+  console.log(req.query);
+
+
+  // #1 ============  GET QUERY  ============
+  // According to the property from req.query that is passed in from URL query, ex: req.query.duration (?duration=1) , req.query.sort, req.query.fields , req.query.page, req.query.limit , use correspoding mongoose Query methods in APIFeatures Class.
+
+  const features = new APIFeatures(Model.find(), req.query)
+    .filter()
+    .sort()
+    .limitFields()
+    .paginate(); //To use APIfeatures. filter method
+
+  // #2 ============  EXECUTE QUERY  ============
+  // (before refactoring the code) const tourResults = await newQuery;
+  const doc = await features.query;
+
+  res.status(200).json({
+    status: 'success',
+    requestedAt: req.requestTime, //from app.js => req.requestTime = new Date().toISOString();
+    results: doc.length,
+    data: {
+      tours: doc,
+    }
+  });
 
 });

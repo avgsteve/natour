@@ -4,7 +4,6 @@
 const path = require('path');
 const scriptName = path.basename(__filename);
 const Tour = require('./../models/tourModel');
-const APIFeatures = require('./../utils/apiFeatures'); // using class APIFeatures
 const catchAsync = require('./../utils/catchAsync'); // using function catchAsync
 const AppError = require('./../utils/appError'); // using function catchAsync
 const factory = require('./handlerFactory'); //exports.deleteOne = Model => catchAsync(async (req, res, next) => {
@@ -32,71 +31,8 @@ exports.aliasTopTours = (req, res, next) => {
   next(); // which is tourController.getAllTours
 };
 
-exports.getAllTours = catchAsync(async (req, res, next) => {
-  //log current file name and time from
-  console.log(`\n(from ${scriptName}: ) The requested was made at ${req.requestTime}`);
-  console.log("\x1b[93m", "\nThe req.query obj from the GET request:", "\x1b[0m\n");
-  console.log(req.query);
+exports.getAllTours = factory.getAll(Tour);
 
-  // ex: { difficulty: 'easy', duration: { gte: '5' } }
-
-  // #2 ============  processing QUERY  ============
-
-  //將URL 所傳入的不同的 req.query 次一層物件屬性，例如: req.query.duration , req.query.sort, req.query.fields , req.query.page, req.query.limit 所相對應的mongoose Query methods 改寫進 Class constructor 裡面的 method，
-  const features = new APIFeatures(Tour.find(), req.query)
-    .filter()
-    .sort()
-    .limitFields()
-    .paginate(); //To use APIfeatures. filter method
-
-  // #2 ============  EXECUTE QUERY  ============
-
-  // (before refactoring the code) const tourResults = await newQuery;
-  const tourResults = await features.query;
-
-  /*
-      // get all current data from DB
-      // const tours = await Tour.find(); //ref:  https://mongoosejs.com/docs/api.html#model_Model.find
-
-      // // --- different ways of querying data
-      // // // 1. monogoDB way
-      // const tours = await Tour.find({
-      //   duration: 5,
-      //   difficulty: "easy",
-      // });
-
-      // this method has the same result as #1 monogoDB way
-
-
-      // const queryWith_queryStr = await Tour.find(newQuery);
-
-      // // // 2. mongooseB way
-      // const tours = await Tour.find().where('duration').equals(5).where('difficulty').equals('easy');
-      // ref: https://mongoosejs.com/docs/api/query.html#query_Query-where
-  */
-
-  res.status(200).json({
-    status: 'success',
-    requestedAt: req.requestTime, //from app.js => req.requestTime = new Date().toISOString();
-    results: tourResults.length,
-    data: {
-      tours: tourResults,
-    }
-
-  });
-  /*
-  } catch (error) {
-    console.log("\nThere's an error in getAllTours() after GET request!: \n");
-    console.log(error);
-    //send error response with status code 400
-    res.status(404).json({
-      status: 'getting all data failed!',
-      errorMessage: error,
-    });
-  }
-*/
-
-});
 
 // 2-1) ROUTE-HANDLERS with " params from router.route('/:id') "
 // ===> get only one result from Obj's "tours" array
