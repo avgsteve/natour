@@ -13,16 +13,23 @@ const router = express.Router({
 
 // ref for mergeParams:  https://expressjs.com/en/api.html#express.router
 
-
+// ==== Protect all the routes below this code ===
+// ref:  http://expressjs.com/en/api.html#router.use
+router.use(authController.protect);
 
 router.route('/').get(reviewController.getAllReviews)
   .post(
-    authController.protect,
+    //only user can post reviews
     authController.restrictTo('user'),
     //setTourAndUserIdsforCreateReviews is used to create tourId and user.id in req.body for reviewController.createReviews
     reviewController.setTourAndUserIdsforCreateReviews,
     reviewController.createReviews);
 
-router.route('/:id').get(reviewController.getReview).patch(reviewController.updateReview).delete(reviewController.deleteReview);
+router.route('/:id')
+  .get(reviewController.getReview)
+  .patch(authController.restrictTo('user', 'admin'),
+    reviewController.updateReview)
+  .delete(authController.restrictTo('user', 'admin'),
+    reviewController.deleteReview);
 
 module.exports = router;

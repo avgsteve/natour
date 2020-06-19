@@ -15,24 +15,25 @@ router.post('/signup', authController.signup);
 router.post('/login', authController.login);
 
 router.post('/forgotPassword', authController.forgotPassword);
+
 // router.post('/resetPassword', authController.resetPassword);
 router.patch('/resetPassword/:token', authController.resetPassword);
 
-router.patch('/updateMyPassword', authController.protect, authController.updatePassword);
+// ==== Protect all the routes below this code ===
+// ref:  http://expressjs.com/en/api.html#router.use
+router.use(authController.protect);
 
+// for any logged in users
+router.patch('/updateMyPassword', authController.updatePassword);
+router.get('/me', userController.getMe, userController.getUser);
+router.patch('/updateMe', userController.updateMe);
+router.delete('/deleteMe', userController.deleteMe);
 
-router.get('/me', authController.protect, userController.getMe, userController.getUser);
-
-router.patch('/updateMe', authController.protect, userController.updateMe);
-
-router.delete('/deleteMe', authController.protect, authController.restrictTo('admin'), userController.deleteMe);
-
+// ==== Restrict the route middle ware to 'admin' use only  ===
+router.use(authController.restrictTo('admin'));
 
 // 3-3) route actions for users ex: http://host/api/v1/users
-router.route('/').get(authController.protect, userController.getAllUsers).post(userController.createUser); //從 app.route('/api/v1/users').get 換成 router.route('/').get
-
+router.route('/').get(userController.getAllUsers).post(userController.createUser); //從 app.route('/api/v1/users').get 換成 router.route('/').get
 // route actions for SINGLE user ex: http://host/api/v1/users/theId123
-router.route('/:id').get(userController.getUser).patch(authController.protect, userController.updateUser).delete(userController.deleteUser);
-
-
+router.route('/:id').get(userController.getUser).patch(userController.updateUser).delete(userController.deleteUser);
 module.exports = router;

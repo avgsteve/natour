@@ -21,13 +21,24 @@ router.route('/top-5-cheap').get(tourController.aliasTopTours, tourController.ge
 
 router.route('/tours-stats').get(tourController.getTourStats);
 
-router.route('/monthly-plan/:year').get(tourController.getMonthlyPlan);
+router.route('/monthly-plan/:year').
+get(authController.protect,
+  authController.restrictTo('admin', 'lead-guide', 'guide'),
+  tourController.getMonthlyPlan
+);
 
 
 //在 app.js裡面，使用app.use('/api/v1/tours', tourRouter); 來指定 router.route 使用哪一段網址為 router param ex: '/:id'
-router.route('/').get(authController.protect, tourController.getAllTours).post(tourController.createTour); // post request 要先使用 checkReqBody middleware method
-router.route('/:id').get(tourController.getTour).patch(tourController.updateTour).delete(authController.protect, authController.restrictTo('admin', 'lead-guide'),
-  tourController.deleteTour);
+router.route('/')
+  .get(tourController.getAllTours)
+  .post(authController.restrictTo('admin', 'lead-guide'), tourController.createTour); // post request 要先使用 checkReqBody middleware method
+
+//
+router.route('/:id')
+  .get(tourController.getTour)
+  .patch(authController.protect, authController.restrictTo('admin', 'lead-guide'), tourController.updateTour)
+  .delete(authController.protect, authController.restrictTo('admin', 'lead-guide'),
+    tourController.deleteTour);
 
 // 以下是從app.js移過來，原本的的內容，改成以上方式 (by convention)
 // const tourRouter = express.Router(); //
