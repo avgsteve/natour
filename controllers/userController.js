@@ -44,6 +44,13 @@ use:
 const users = await User.find();
 */
 
+//
+exports.getMe = (req, res, next) => {
+  // Get req.user.id property from previous middle ware (authController.protect) from the route controller.catch.
+  // Then assign req.user.id to req.params.id to give req.params.id and new property which is going to be used in next middl ware funcion (userController.getUser)
+  req.params.id = req.user.id;
+  next();
+};
 
 //for updating user's data except for password related fields
 exports.updateMe = catchAsync(async (req, res, next) => {
