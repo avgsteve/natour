@@ -31,7 +31,10 @@ exports.aliasTopTours = (req, res, next) => {
   next(); // which is tourController.getAllTours
 };
 
-exports.getAllTours = factory.getAll(Tour);
+exports.getAllTours = factory.getAll(Tour, {
+  // path: 'guides',
+  // select: '-__v -passwordChangedAt guides'
+});
 
 
 // 2-1) ROUTE-HANDLERS with " params from router.route('/:id') "

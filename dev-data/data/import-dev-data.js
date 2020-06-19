@@ -6,6 +6,9 @@ const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const fs = require('fs');
 const Tour = require('./../../models/tourModel'); // in tourModel.js , const Tour = mongoose.model('Tour', tourSchema);
+const Review = require('./../../models/reviewModel');
+const User = require('./../../models/userModel');
+
 
 console.log(`\nExecuting ${scriptName}... \n`);
 
@@ -38,6 +41,8 @@ mongoose.connect(DB, {
 //Read json file and convert it javascript obj format
 // const tours = JSON.parse(fs.readFileSync(`${__dirname}/tours-simple.json`, 'utf-8'));
 const tours = JSON.parse(fs.readFileSync(`${__dirname}/tours.json`, 'utf-8'));
+const users = JSON.parse(fs.readFileSync(`${__dirname}/users.json`, 'utf-8'));
+const reviews = JSON.parse(fs.readFileSync(`${__dirname}/reviews.json`, 'utf-8'));
 
 
 //create data based on the Schema of Tour
@@ -45,6 +50,11 @@ const importData = async () => {
   try {
     //pass the argument as Documents to insert, as a spread or array
     await Tour.create(tours); //ref:  https://mongoosejs.com/docs/api.html#model_Model.create
+    await Review.create(reviews);
+    await User.create(users, {
+      // to skip the passwordConfirm field
+      validateBeforeSave: false
+    });
 
     console.log('==== Data succussfully loaded! ====');
 
@@ -61,6 +71,9 @@ const deleteData = async () => {
   try {
     //delete all data
     await Tour.deleteMany({});
+    await Review.deleteMany({});
+    await User.deleteMany({});
+
 
     console.log('==== Data succussfully deleted! ====');
 

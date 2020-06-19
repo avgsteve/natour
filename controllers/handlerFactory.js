@@ -102,9 +102,11 @@ exports.deleteTour = catchAsync(async (req, res, next) => {
 
 //
 exports.getOne = (Model, populateOptions) => catchAsync(async (req, res, next) => {
+  //populateOptions ex:  {  path: 'reviews_populated reviews_populated_counter'}
 
   // get query from Tour model with findById method
   // and populate the Virtual property set in tourModels.js (in section: tourSchema.virtual('reviews_populated', )
+
   // // below was the original code for document with populated virtual fields
   // const doc = await Model.findById(req.params.id).populate('reviews_populated_counter').populate('reviews_populated'); // to fill out "virtual" guide fields
 
@@ -155,7 +157,7 @@ exports.getOne = (Model, populateOptions) => catchAsync(async (req, res, next) =
   });
 });
 
-exports.getAll = Model => catchAsync(async (req, res, next) => {
+exports.getAll = (Model, populateOptions) => catchAsync(async (req, res, next) => {
   //log current file name and time from
   console.log(`\n(from ${scriptName}: ) The requested was made at ${req.requestTime}`);
   console.log("\x1b[93m", "\nThe req.query obj from the GET request:", "\x1b[0m\n");
@@ -190,11 +192,32 @@ exports.getAll = Model => catchAsync(async (req, res, next) => {
   // #1 ============  GET QUERY  ============
   // According to the property from req.query that is passed in from URL query, ex: req.query.duration (?duration=1) , req.query.sort, req.query.fields , req.query.page, req.query.limit , use correspoding mongoose Query methods in APIFeatures Class.
 
-  const features = new APIFeatures(Model.find(filter), req.query)
+  let features = new APIFeatures(Model.find(filter), req.query)
     .filter()
     .sort()
     .limitFields()
     .paginate(); //To use APIfeatures. filter method
+
+
+  // if (populateOptions) {
+  //   features.query = features.query.populate(populateOptions);
+  // }
+  //
+
+  //if (populateOptions) {
+  //  query = query.populate(populateOptions);
+  //}
+
+  // console.log('features:\n');
+  // console.log(features);
+
+  // console.log(`\n\n== From the getOne function module in handlerFactory.js, the "populateOptions": \n`);
+  // if (populateOptions) {
+  //   console.log(populateOptions);
+  // } else {
+  //   console.log('The argument for parameter "populateOptions" is not provided.\n');
+  // }
+
 
   // #2 ============  EXECUTE QUERY  ============
   // (before refactoring the code) const tourResults = await newQuery;

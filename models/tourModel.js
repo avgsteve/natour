@@ -268,15 +268,27 @@ tourSchema.pre(/^find/, function(next) {
 });
 
 
+// tourSchema.virtual('guides', {
+//   // ref: The model to be connected
+//   ref: 'Review',
+//   // foreignField: The "field name" in the schema of the connected model (ex: Model)
+//   foreignField: 'tour',
+//   // localField (for the tour id  current Tour model):
+//   localField: '_id',
+//   //  !!! and then need to use .populate method in tourController.js
+//   //  const tour = await Tour.findById(req.params.id).populate('reviews_populated'); // to fill out "virtual" guide fields
+// });
+
+
 //
 tourSchema.pre(/^find/, function(next) {
   this.populate({
     path: 'guides',
-    select: '-__v -passwordChangedAt',
+    select: '-__v -passwordChangedAt'
   });
+
   next();
 });
-
 
 // Query Middleware : process Query data "AFTER" send data to client
 tourSchema.post(/^find/, function(docs, next) {
