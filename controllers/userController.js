@@ -28,33 +28,22 @@ const filterObj = (obj, ...allowedFields) => {
 };
 
 //
-// 2) ============== ROUTE-HANDLERS
-exports.getAllUsers = catchAsync(async (req, res, next) => {
+// 2) ============== ROUTE-HANDLERS ==============
 
-  const users = await User.find();
-  /*password field is set not to be shown in userModel.js:
-  password: {
-    type: String,
-    required: [true, 'Please provide a password'],
-    minlength: 6,
-    maxlength: 12,
-    select: false, // won't be shown in results
-  },
-  use:
-  const users = await User.find();
-
+//
+exports.getAllUsers = factory.getAll(User);
+/*password field is set not to be shown in userModel.js:
+password: {
+  type: String,
+  required: [true, 'Please provide a password'],
+  minlength: 6,
+  maxlength: 12,
+  select: false, // won't be shown in results
+},
+use:
+const users = await User.find();
 */
 
-  // Send response
-  res.status(200).json({
-    status: 'success',
-    results: users.length,
-    data: {
-      users: users,
-    },
-  });
-
-});
 
 //for updating user's data except for password related fields
 exports.updateMe = catchAsync(async (req, res, next) => {

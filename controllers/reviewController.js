@@ -1,56 +1,10 @@
 /*jshint esversion: 6 */
 /*jshint esversion: 8 */
 const Review = require("./../models/reviewModel");
-const catchAsync = require("./../utils/catchAsync");
+// const catchAsync = require("./../utils/catchAsync");
 const logCurrentModuleName = require("./../utils/getFunctionName");
 const factory = require('./handlerFactory'); //exports.deleteOne = Model => catchAsync(async (req, res, next) => { ...
 
-
-//
-exports.getAllReviews = catchAsync(async (req, res, next) => {
-
-  // the filter obj to be used as in Review.find(filter) to get reviews for certain "tour" documents
-  let filter = {};
-
-  /* Get params from the nested URL: ex: http://host/api/v1/tours/:tourId/reviews
-
-  If there's property req.params.tourId
-  from router.use('/:tourId/reviews', reviewRouter) in touRoutes.js
-  (which handles this part of URL: /api/v1/tours in app.use('/api/v1/tours', tourRouter);
- in app.js)
-
-  and via the express.Router's option "mergeParams: true" in reviewRoutes.js,
-  then we can get value from req.params.tourId in current file (reviewController.js) then assign the value to filter obj
-*/
-  if (req.params.tourId) filter = {
-    tour: req.params.tourId,
-    // // optional filters:
-    // rating: {
-    //   $gte: 4
-    // },
-  };
-
-  // console.log(`Current Module name is: ${Object.keys(this)[0]}`); //	['getAllReviews', 'createReviews']
-  // logCurrentModuleName();
-
-  console.log("\nthe filter obj");
-  console.log(filter); // { tour: '5ee78ffdc4ecd526f8f636e3' }
-
-  // Find all documents that match selector. The result will be an array of documents.
-  // await Query.prototype.find(filter, optional: callback)
-  const reviews = await Review.find();
-
-  res.status(200).json({
-    status: "successfully get all reviews",
-    results: reviews.length,
-    data: {
-      reviews: reviews
-    }
-  });
-});
-
-//
-exports.getReview = factory.getOne(Review);
 
 //setTourAndUserIds: a middle ware used to set properties in req.body for and before exports.createReviews middle ware
 exports.setTourAndUserIdsforCreateReviews = (req, res, next) => {
@@ -66,6 +20,13 @@ exports.setTourAndUserIdsforCreateReviews = (req, res, next) => {
   // These two properties in req.body as tourId and user.id have the fields and value needed for creating new view data (via reviewSchema in viewModel.js)
   next();
 };
+
+
+//
+exports.getAllReviews = factory.getAll(Review);
+
+//
+exports.getReview = factory.getOne(Review);
 
 //
 exports.createReviews = factory.createOne(Review);

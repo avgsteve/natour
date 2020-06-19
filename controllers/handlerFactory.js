@@ -162,10 +162,35 @@ exports.getAll = Model => catchAsync(async (req, res, next) => {
   console.log(req.query);
 
 
+  // #0 ==== small hack of getting a "filter" from nested URL for REVIEW Query obj ====
+  // the filter obj to be used as in Review.find(filter) to get reviews for certain "tour" documents
+  let filter = {};
+
+  /* Get params from the nested URL: ex: http://host/api/v1/tours/:tourId/reviews
+
+  If there's property req.params.tourId
+  from router.use('/:tourId/reviews', reviewRouter) in touRoutes.js
+  (which handles this part of URL: /api/v1/tours in app.use('/api/v1/tours', tourRouter);
+ in app.js)
+
+  and via the express.Router's option "mergeParams: true" in reviewRoutes.js,
+  then we can get value from req.params.tourId in current file (reviewController.js) then assign the value to filter obj
+*/
+  if (req.params.tourId) filter = {
+    tour: req.params.tourId,
+    // // optional filters:
+    // rating: {
+    //   $gte: 4
+    // },
+  }; //example result from filter: { tour: '5ee78ffdc4ecd526f8f636e3' }
+
+  // Find all documents that match selector. The result will be an array of documents.
+  // await Query.prototype.find(filter, optional: callback)
+
   // #1 ============  GET QUERY  ============
   // According to the property from req.query that is passed in from URL query, ex: req.query.duration (?duration=1) , req.query.sort, req.query.fields , req.query.page, req.query.limit , use correspoding mongoose Query methods in APIFeatures Class.
 
-  const features = new APIFeatures(Model.find(), req.query)
+  const features = new APIFeatures(Model.find(filter), req.query)
     .filter()
     .sort()
     .limitFields()
