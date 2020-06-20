@@ -155,6 +155,17 @@ const tourSchema = new Schema({
   }
 );
 
+// tourSchema for index which can reduce time by get results only from certain repeated search instead of scanning all documents every timeout
+// query needs to be:   const doc = await features.query.explain();  to see that effect in POSTMAN
+tourSchema.index({
+  price: 1,
+  ratingAverage: -1
+});
+
+//
+tourSchema.index({
+  slug: 1
+});
 
 //virtual property (get() is getter and means using getter function)
 //usage: virtual('nameOfVirtualFields')

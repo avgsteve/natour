@@ -223,6 +223,10 @@ exports.getAll = (Model, populateOptions) => catchAsync(async (req, res, next) =
   // (before refactoring the code) const tourResults = await newQuery;
   const doc = await features.query;
 
+  // for examing created indexed query in POSTMAN
+  // const doc = await features.query.explain();
+
+
   res.status(200).json({
     status: 'success',
     requestedAt: req.requestTime, //from app.js => req.requestTime = new Date().toISOString();
