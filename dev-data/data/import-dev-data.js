@@ -50,11 +50,11 @@ const importData = async () => {
   try {
     //pass the argument as Documents to insert, as a spread or array
     await Tour.create(tours); //ref:  https://mongoosejs.com/docs/api.html#model_Model.create
-    await Review.create(reviews);
-    await User.create(users, {
-      // to skip the passwordConfirm field
-      validateBeforeSave: false
-    });
+    // await Review.create(reviews);
+    // await User.create(users, {
+    //   // to skip the passwordConfirm field
+    //   validateBeforeSave: false
+    // });
 
     console.log('==== Data succussfully loaded! ====');
 
@@ -71,8 +71,8 @@ const deleteData = async () => {
   try {
     //delete all data
     await Tour.deleteMany({});
-    await Review.deleteMany({});
-    await User.deleteMany({});
+    // await Review.deleteMany({});
+    // await User.deleteMany({});
 
 
     console.log('==== Data succussfully deleted! ====');

@@ -49,14 +49,14 @@ const tourSchema = new Schema({
         message: props => `The input value: "${props.value}" is invalid. The difficulty must be easy, medium or difficult`,
       }
     },
-    ratingAverage: {
+    ratingsAverage: {
       type: Number,
       default: 4.5,
       min: [1, 'Rating must be higher than or equal to 1'],
       max: [5, 'Rating must be higher than or equal to 5'],
 
     },
-    ratingQuantity: {
+    ratingsQuantity: {
       type: Number,
       default: 4.5,
     },
@@ -159,7 +159,7 @@ const tourSchema = new Schema({
 // query needs to be:   const doc = await features.query.explain();  to see that effect in POSTMAN
 tourSchema.index({
   price: 1,
-  ratingAverage: -1
+  ratingsAverage: -1
 });
 
 //
