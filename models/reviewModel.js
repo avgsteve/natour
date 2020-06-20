@@ -3,6 +3,7 @@
 //review / rating / createdAt / ref to tour / ref to user
 
 const mongoose = require('mongoose');
+const Tour = require('./tourModel');
 
 const reviewSchema = new mongoose.Schema({
     review: {
@@ -61,40 +62,67 @@ reviewSchema.pre(/^find/, function(next) {
 });
 
 
-//static statics
+// add static functions to model (to be create from reviewSchema)
+//ref:  https://mongoosejs.com/docs/guide.html#statics
 reviewSchema.statics.calcAverageRatings = async function(tourId) {
-  //"this" is current model
+
+  // Create aggregated data and "this" is current model (Review)
+  // https://mongoosejs.com/docs/api.html#model_Model.aggregate
+  // https://docs.mongodb.com/manual/aggregation/
   const stats = await this.aggregate([
-    //first stage
+    //first stage: $match. Find out all results with the matched id in tour fields
     {
       $match: {
         tour: tourId
       }
     },
-    //
+    //second stage: group by field (tour)
     {
-      group: {
+      $group: {
+        //
         _id: '$tour',
+        //creat a field in result called "nRating" for the number of ratings
         nRating: {
+          //Returns a sum of numerical values. Ignores non-numeric values.
+          //https://docs.mongodb.com/manual/reference/operator/aggregation/sum/#grp._S_sum
           $sum: 1
         },
+        //creat a field in result called "avgRating" for the average of ratings
         avgRating: {
+          //Returns the average value of the numeric values. $avg ignores non-numeric values.
           $avg: '$rating'
         }
       }
     },
   ]);
 
+  console.log("\nstats:\n");
+  console.log(stats); //ex: results:   [ { _id: 5eee23531daf5a7350af0e1f, nRating: 16, avgRating: 4.4375 } ]
+
+
+  //====
+  if (stats.length > 0) {
+
+    // await Model.staticFunction
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingsQuantity: stats[0].nRating,
+      ratingsAverage: stats[0].avgRating
+    });
+  } else {
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingsQuantity: 0,
+      ratingsAverage: 4.5
+    });
+  }
+
 };
 
-reviewSchema.pre('save', function(next) {
-  // "this" points to current review
+reviewSchema.post('save', function(next) {
+  // "this" points to current review document is being saved
 
   // "this.tour" is the current tour Id to be passed in
   // Review.calcAverageRatings(this.tour);
-  this.construct.calcAverageRatings(this.tour);
-
-  next();
+  this.constructor.calcAverageRatings(this.tour);
 });
 
 

@@ -7,7 +7,8 @@ const mongoose = require('mongoose');
 const slugify = require('slugify');
 const validator = require('validator');
 const User = require('./userModel');
-const Review = require('./reviewModel');
+// const Review = require('./reviewModel');
+
 
 //Create a class-like "Schema" to descript the data
 const Schema = mongoose.Schema;
@@ -304,7 +305,7 @@ tourSchema.pre(/^find/, function(next) {
 // Query Middleware : process Query data "AFTER" send data to client
 tourSchema.post(/^find/, function(docs, next) {
   //culcalate and show how much time passed from creating a .pre middleware to finish
-  console.log(`\nThe Query took ${Date.now() - this.start} milliseconds!\nThe content of Query obj:\n`);
+  console.log(`\nThe Query took ${Date.now() - this.start} milliseconds!\n`);
   // console.log(docs);
   next();
 });

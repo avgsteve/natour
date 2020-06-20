@@ -176,7 +176,7 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   // 1) Getting token from header and check if token exists
   req.requestTime = new Date().toISOString();
-  console.log(req.headers);
+  // console.log(req.headers);
   /* headers example:
     {
       authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlZDdjZWU1NTlkOTQwNzI1MDY2OWQ2ZSJ9.E5PwSCrEy5UIZP4L7xuJdVFT-qTJG2OyzyMZMSBQGWw',
@@ -293,8 +293,8 @@ exports.restrictTo = (...roles) => {
   return (req, res, next) => {
     // roles ['admin', 'lead-guide'] role =  'user'
 
-    console.log('\n=== The req obj in authController.restrictTo:\n');
-    console.log(req);
+    // console.log('\n=== The req obj in authController.restrictTo:\n');
+    // console.log(req);
 
     // if the passed-in roles array does not include any .role property
     if (!roles.includes(req.user.role)) {

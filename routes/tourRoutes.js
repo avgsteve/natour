@@ -31,7 +31,7 @@ get(authController.protect,
 //在 app.js裡面，使用app.use('/api/v1/tours', tourRouter); 來指定 router.route 使用哪一段網址為 router param ex: '/:id'
 router.route('/')
   .get(tourController.getAllTours)
-  .post(authController.restrictTo('admin', 'lead-guide'), tourController.createTour); // post request 要先使用 checkReqBody middleware method
+  .post(authController.protect, authController.restrictTo('admin', 'lead-guide'), tourController.createTour); // post request 要先使用 checkReqBody middleware method
 
 //
 router.route('/:id')
