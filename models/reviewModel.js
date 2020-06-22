@@ -44,6 +44,15 @@ const reviewSchema = new mongoose.Schema({
   }
 );
 
+//
+reviewSchema.index({
+  tour: 1,
+  user: 1
+}, {
+  unique: true
+}); // In natours.reviews' indexes tab in MongoDB Compass, will show tour_1_user_1 index.
+
+
 //populate schema's field inside current incoming Query by using .pre middleware
 reviewSchema.pre(/^find/, function(next) {
   //
