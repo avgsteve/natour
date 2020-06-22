@@ -266,8 +266,8 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   req.user = freshUser; // assign to fresh user data to req.user property and make it used by next middleware function
 
-  console.log('\n=== The req.user === :\n');
-  console.log(req.user);
+  // console.log('\n=== The req.user === :\n');
+  // console.log(req.user);
   /* req.user will be the result obj from the code:
 
   const freshUser = await User.findById(decoded.id);

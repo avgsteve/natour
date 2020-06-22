@@ -29,8 +29,8 @@ exports.deleteOne = Model => catchAsync(async (req, res, next) => {
 //update tour or users by receiving Model obj and return whole async/await function to the caller function
 exports.updateOne = Model => catchAsync(async (req, res, next) => {
 
-  console.log(`\n== From the updateOne function module in handlerFactory.js, the "req.body" is: \n`);
-  console.log(req.body);
+  // console.log(`\n== From the updateOne function module in handlerFactory.js, the "req.body" is: \n`);
+  // console.log(req.body);
 
   // find data by Id and update from req.body
   const updatedData = await Model.findByIdAndUpdate(req.params.id, req.body, {
