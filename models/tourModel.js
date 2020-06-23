@@ -170,6 +170,14 @@ tourSchema.index({
   slug: 1
 });
 
+
+//for using geospatial in the document
+tourSchema.index({
+  startLocation: '2dsphere',
+
+  //ref: https://docs.mongodb.com/manual/core/2dsphere/#dsphere-indexes
+});
+
 //virtual property (get() is getter and means using getter function)
 //usage: virtual('nameOfVirtualFields')
 tourSchema.virtual('durationWeeks').get(function() {

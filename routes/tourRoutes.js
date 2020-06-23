@@ -27,6 +27,10 @@ get(authController.protect,
   tourController.getMonthlyPlan
 );
 
+//latlng = latitude & longitude, mi = miles
+router.route('/tours-within/:distance/center/:latlng/unit/:unit').get(tourController.getToursWithin);
+// another example:  /tours-distance?distance=233&center=-40,45&&unit=mi
+// this example:  /tours-distance/233/center/-45,45/unit/mi
 
 //在 app.js裡面，使用app.use('/api/v1/tours', tourRouter); 來指定 router.route 使用哪一段網址為 router param ex: '/:id'
 router.route('/')

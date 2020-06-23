@@ -317,6 +317,54 @@ exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
 });
 
 
+// router.route('/tours-within/:distance/center/:latlng/unit/:unit', tourController.getToursWithin);
+//     example:  /tours-distance/233/center/31.111745,-118.113491/unit/mi
+
+exports.getToursWithin = catchAsync(async (req, res, next) => {
+
+  const {
+    distance,
+    latlng,
+    unit
+  } = req.params;
+
+  //the radius of earth is 3963.2 miles which equals to 6378.1 km
+  const radius = unit === 'mi' ? distance / 3963.2 : distance / 6378.1; // ex: distance 200 miles / 3963.2 is ‭0.05046 from center point
+
+  const [lat, lng] = latlng.split(',');
+
+  if (!lat || !lng) {
+    next(new AppError('Please provide longitude and latitude in the format lat,lng', 400));
+  }
+
+  console.log(distance, lat, lng, unit);
+
+  const tours = await Tour.find({
+    startLocation: {
+      $geoWithin: {
+        $centerSphere: [
+          [lng, lat], radius
+        ]
+      }
+    }
+  });
+
+
+  res.status(200).json({
+    status: 'getToursWithin() is successful',
+    requestedAt: req.requestTime, //from app.js => req.requestTime = new Date().toISOString();
+    dataResultsCount: tours.length,
+    dataFromReqParams: {
+      distance,
+      lat,
+      lng,
+      unit
+    },
+    data: tours,
+  });
+
+
+});
 ////// Check id middleware :  to make sure user entered the correct id. Export this function
 // exports.checkID = (req, res, next, val) => {
 //   console.log(`\n(From tourControllers.js, checkID middleware.) \nthe param for 'id' is: ${val}`);
