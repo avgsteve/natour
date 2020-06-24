@@ -324,24 +324,24 @@ tourSchema.post(/^find/, function(docs, next) {
 
 
 
-//AGGREGATION PRE-MIDDLEWARE
-tourSchema.pre('aggregate', function(next) {
-
-  // 將 pipeline method (Array)的內容加入 篩選的 $match 物件， 限制輸出特定內容
-  // 效果同等於 tourSchema.pre(/^find
-  this.pipeline().unshift({
-    $match: {
-      secretTour: {
-        $ne: true
-      }
-    }
-  });
-  // console.log(this); //show the aggregation's pipeline property
-  console.log(`\nThe .pre of aggregation's method .pipeline() : \n`);
-  console.log(this.pipeline()); //show the aggregation's pipeline property
-
-  next();
-});
+// //AGGREGATION PRE-MIDDLEWARE
+// tourSchema.pre('aggregate', function(next) {
+//
+//   // 將 pipeline method (Array)的內容加入 篩選的 $match 物件， 限制輸出特定內容
+//   // 效果同等於 tourSchema.pre(/^find
+//   this.pipeline().unshift({
+//     $match: {
+//       secretTour: {
+//         $ne: true
+//       }
+//     }
+//   });
+//   // console.log(this); //show the aggregation's pipeline property
+//   console.log(`\nThe .pre of aggregation's method .pipeline() : \n`);
+//   console.log(this.pipeline()); //show the aggregation's pipeline property
+//
+//   next();
+// });
 
 // // make a collection based on the tourSchema by using model constructors function.
 // // // Ex: mongoose.model('collectionName', SchemaName) will be "collectionNames" shown on database collection

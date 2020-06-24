@@ -365,6 +365,73 @@ exports.getToursWithin = catchAsync(async (req, res, next) => {
 
 
 });
+
+
+exports.getDistances = catchAsync(async (req, res, next) => {
+
+  const {
+    latlng,
+    unit
+  } = req.params;
+
+  const [lat, lng] = latlng.split(',');
+
+  const distanceUnit = unit === 'mi' ? 'distanceInMiles' : 'distanceInKilometers';
+
+  //if unit is mi for miles , then multiply the default distance unit meter with 0.000621371
+  const multiplier = unit === 'mi' ? 0.000621371 : 0.001;
+
+
+  if (!lat || !lng) {
+    next(new AppError('Please provide longitude and latitude in the format lat,lng', 400));
+  }
+
+  const distances = await Tour.aggregate([
+    //$geoNear is always to be at the first stage
+    //in tourModel.js tourSchema.pre('aggregate') ... will be the first stage in a pipeline as .pre middlw ware
+    //therefore, need to get rid of it in order not to interfere with   $geoNear: {
+
+    //ref: https://docs.mongodb.com/manual/reference/operator/aggregation/geoNear/
+    {
+      $geoNear: {
+
+        near: {
+          tpye: 'Point',
+          coordinates: [lng * 1, lat * 1],
+        },
+        //the name of distance field
+        // distanceField: 'distance',
+        distanceField: "distanceInMiles",
+        distanceMultiplier: multiplier,
+      },
+    },
+    {
+      $project: {
+        distance: 1,
+        distanceInMiles: 1,
+        name: 1
+      }
+    }
+  ]);
+
+
+  res.status(200).json({
+    status: 'getDistances() is successful',
+    requestedAt: req.requestTime, //from app.js => req.requestTime = new Date().toISOString();
+    dataFromReqParams: {
+      lat,
+      lng,
+      unit
+    },
+    data: {
+      dataCounts: distances.length,
+      data: distances,
+    }
+  });
+
+
+});
+
 ////// Check id middleware :  to make sure user entered the correct id. Export this function
 // exports.checkID = (req, res, next, val) => {
 //   console.log(`\n(From tourControllers.js, checkID middleware.) \nthe param for 'id' is: ${val}`);
