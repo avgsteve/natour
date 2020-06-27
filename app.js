@@ -9,7 +9,7 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
-
+const path = require('path');
 
 // for reading Environment Variables from config.env file
 dotenv.config({
@@ -29,7 +29,18 @@ const startServer = require('./server'); // server.js
 
 const app = express();
 
+//
+app.set('view engine', 'pug');
+//will create a path with a joined path name
+app.set('views', path.join(__dirname, 'views'));
+
 // 1) ============== MIDDLE-WARES ==============
+
+// === SERVING STATIC FILES ===
+// build-in middleware "express.static" for serving static file like .html
+// app.use(express.static(`${__dirname}/public`)); //https://expressjs.com/en/starter/static-files.html
+app.use(express.static(path.join(__dirname, 'public')));
+
 
 // ===== SECURING http header ======
 // Helmet helps you set and secure your Express apps by setting various HTTP headers.
@@ -70,10 +81,7 @@ const limiter = rateLimit({
 app.use('/api', limiter);
 
 
-// === SERVING STATIC FILES ===
-// build-in middleware "express.static" for serving static file like .html
-app.use(express.static(`${__dirname}/public`)); //https://expressjs.com/en/starter/static-files.html
-//the URL for page is http://127.0.0.1:3000/overview.html as the app.use doesn't set any router
+
 
 // //for testing middleware
 // app.use((req, res, next) => {
@@ -105,6 +113,19 @@ app.use((req, res, next) => {
 // ex:  const getAllTours = (req, res) => { ....
 
 // 3) ============== ROUTES ()
+// //
+app.get('/', (req, res) => {
+  //render base.pug
+  res.status(200).render('base');
+  //note: This middle ware function reads setting from the code in this app.js file as below:
+
+  // app.set('view engine', 'pug');
+  // //will create a path with a joined path name
+  // app.set('views', path.join(__dirname, 'views'));
+
+});
+
+
 // --->>> 3-1)  *針對 tour 跟 user的 express.Router (middleware) 設定
 // --->>> const tourRouter = express.Router();      //移到 tourRouter.js
 
