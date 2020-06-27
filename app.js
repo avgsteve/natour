@@ -116,9 +116,14 @@ app.use((req, res, next) => {
 // //
 app.get('/', (req, res) => {
   //render base.pug
-  res.status(200).render('base');
-  //note: This middle ware function reads setting from the code in this app.js file as below:
+  res.status(200).render('base', {
+    //This obj argument with properties is called "locals"
+    //ref:  http://expressjs.com/en/5x/api.html#res.render
+    tour: 'The Forest Hiker',
+    user: 'Steve'
+  });
 
+  //note: This middle ware function reads setting from the code in this app.js file as below:
   // app.set('view engine', 'pug');
   // //will create a path with a joined path name
   // app.set('views', path.join(__dirname, 'views'));

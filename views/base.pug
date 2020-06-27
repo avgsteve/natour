@@ -1,2 +1,23 @@
-h1 The Park Camper
-//- <h1> The Park Capmer</h1>
+<!--  ref: https://pugjs.org/language/doctype.html -->
+
+doctype html
+
+html
+  head
+    //- #{variable} will be pug syntax like template literal in ES6
+    title Natours | #{tour} 
+        
+    // === For CSS and materials: ===
+    // Normal way of using CSS file in HTML: <link rel="stylesheet" href="css/style.css"/>
+    // All the related file will be serverd via Middle ware function in app.js used for Node.js:
+    // app.use(express.static(path.join(__dirname, 'public')));
+    link(rel="stylesheet" href="css/style.css")
+    link(rel="shortcut icon" type='image/png' href="img/favicon.png")
+
+  body
+    //The comment from pug to be rendered in browser
+    //- Below is called "buffered code" ref: https://pugjs.org/language/code.html#buffered-code
+    h1=tour
+    h2=user.toUpperCase()
+    //- Below is just normal text for HTML paragraph tag
+    p This is a test paragraph
