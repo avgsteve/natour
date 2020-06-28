@@ -123,13 +123,25 @@ app.get('/', (req, res) => {
     user: 'Steve'
   });
 
-  //note: This middle ware function reads setting from the code in this app.js file as below:
+  // note: This middle ware function reads setting from the code in this app.js file as below:
   // app.set('view engine', 'pug');
   // //will create a path with a joined path name
   // app.set('views', path.join(__dirname, 'views'));
-
 });
 
+//
+app.get('/overview', (req, res) => {
+  res.status(200).render('overview', {
+    title: 'All tours'
+  });
+});
+
+//
+app.get('/tour', (req, res) => {
+  res.status(200).render('tour', {
+    title: 'The Forest Hiker Tour'
+  });
+});
 
 // --->>> 3-1)  *針對 tour 跟 user的 express.Router (middleware) 設定
 // --->>> const tourRouter = express.Router();      //移到 tourRouter.js

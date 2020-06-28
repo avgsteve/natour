@@ -15,20 +15,21 @@ html
     link(rel="shortcut icon" type='image/png' href="img/favicon.png")
     link(rel='stylesheet' href='https://fonts.googleapis.com/css?family=Lato:300,300i,700')
 
+
     //- #{variable} will be pug syntax like template literal in ES6
-    
-    <title>Natours | Exciting tours for adventurous people</title>
+    //- and get value from "locals" variable's value from the route handler
+    <title>Natours | #{title} </title>
         
 
   body
-    //The comment from pug to be rendered in browser
+    // The comment from pug to be rendered in browser
     
     // HEADER
     include _header
         
     // CONTENT
-    section.overview
-      h1= tour
+    block content
+      h1 This is a placeholder heading
 
     // FOOTER
     include _footer
