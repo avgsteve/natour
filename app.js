@@ -24,6 +24,7 @@ const globalErrorHandler = require('./controllers/errorController'); // appError
 const tourRouter = require('./routes/tourRoutes'); // tourRoutes.js
 const userRouter = require('./routes/userRoutes'); // userRoutes.js
 const reviewRouter = require('./routes/reviewRoutes');
+const viewRouter = require('./routes/viewRoutes');
 const startServer = require('./server'); // server.js
 
 
@@ -113,35 +114,7 @@ app.use((req, res, next) => {
 // ex:  const getAllTours = (req, res) => { ....
 
 // 3) ============== ROUTES ()
-// //
-app.get('/', (req, res) => {
-  //render base.pug
-  res.status(200).render('base', {
-    //This obj argument with properties is called "locals"
-    //ref:  http://expressjs.com/en/5x/api.html#res.render
-    tour: 'The Forest Hiker',
-    user: 'Steve'
-  });
-
-  // note: This middle ware function reads setting from the code in this app.js file as below:
-  // app.set('view engine', 'pug');
-  // //will create a path with a joined path name
-  // app.set('views', path.join(__dirname, 'views'));
-});
-
-//
-app.get('/overview', (req, res) => {
-  res.status(200).render('overview', {
-    title: 'All tours'
-  });
-});
-
-//
-app.get('/tour', (req, res) => {
-  res.status(200).render('tour', {
-    title: 'The Forest Hiker Tour'
-  });
-});
+app.use('/', viewRouter);
 
 // --->>> 3-1)  *針對 tour 跟 user的 express.Router (middleware) 設定
 // --->>> const tourRouter = express.Router();      //移到 tourRouter.js
