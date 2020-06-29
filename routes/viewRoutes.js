@@ -30,7 +30,7 @@ router.get('/', (req, res) => {
 router.get('/', viewsController.getOverview);
 
 //
-router.get('/tour', viewsController.getTour);
+router.get('/tour/:slug', viewsController.getTour);
 
 
 module.exports = router;
