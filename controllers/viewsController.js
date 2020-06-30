@@ -24,13 +24,13 @@ exports.getOverview = catchAsync(async (req, res, next) => {
 
 });
 
-//
+//middle ware used by router.get('/tour/:slug', viewsController.getTour); in viewRoutes.js
 exports.getTour = catchAsync(async (req, res, next) => {
   // 1) get the data, for the requested tour ()
   const tour = await Tour.findOne({
     slug: req.params.slug
   }).populate({
-    path: 'reviews',
+    path: 'reviews_Populated reviews_Populated_Counter',
     fields: 'review rating user'
   });
 

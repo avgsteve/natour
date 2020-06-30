@@ -188,7 +188,7 @@ tourSchema.virtual('durationWeeks').get(function() {
 // set virtual property inside tour document to link the document to review data
 
 // usage: virtual('nameOfVirtualFields', objOfSchemaToConnect)
-tourSchema.virtual('reviews_populated', {
+tourSchema.virtual('reviews_Populated', {
   // ref: The model to be connected
   ref: 'Review',
 
@@ -199,19 +199,33 @@ tourSchema.virtual('reviews_populated', {
   localField: '_id',
 
   //  !!! and then need to use .populate method in tourController.js
-  //  const tour = await Tour.findById(req.params.id).populate('reviews_populated'); // to fill out "virtual" guide fields
+  //  const tour = await Tour.findById(req.params.id).populate('reviews_Populated'); // to fill out "virtual" guide fields
 });
 
-
-tourSchema.virtual('reviews_populated_counter', {
+tourSchema.virtual('reviews_Populated_Counter', {
   ref: 'Review',
   // foreignField: The "field name" in the schema of the connected model (ex: Model)
   foreignField: 'tour',
   // localField (for the tour id  current Tour model):
   localField: '_id',
 
-  //By enabling this count property, the reviews_populated_counter virtual property delivers only the number of document counts
+  //By enabling this count property, the reviews_Populated_counter virtual property delivers only the number of document counts
   count: true // And only get the number of docs
+});
+
+
+tourSchema.virtual('reviews', {
+  // ref: The model to be connected
+  ref: 'Review',
+
+  // foreignField: The "field name" in the schema of the connected model (ex: Model)
+  foreignField: 'tour',
+
+  // localField (for the tour id  current Tour model):
+  localField: '_id',
+
+  //  !!! and then need to use .populate method in tourController.js
+  //  const tour = await Tour.findById(req.params.id).populate('reviews_Populated'); // to fill out "virtual" guide fields
 });
 
 
@@ -298,7 +312,7 @@ tourSchema.pre(/^find/, function(next) {
 //   // localField (for the tour id  current Tour model):
 //   localField: '_id',
 //   //  !!! and then need to use .populate method in tourController.js
-//   //  const tour = await Tour.findById(req.params.id).populate('reviews_populated'); // to fill out "virtual" guide fields
+//   //  const tour = await Tour.findById(req.params.id).populate('reviews_Populated'); // to fill out "virtual" guide fields
 // });
 
 

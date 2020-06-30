@@ -42,10 +42,11 @@ exports.getAllTours = factory.getAll(Tour, {
 // exports.getTour = factory.getOne(Tour);
 exports.getTour = factory.getOne(Tour, {
   // path is used for the virtual fields that are going to be populated in results
-  path: 'reviews_populated reviews_populated_counter'
+  path: 'reviews_Populated reviews_Populated_Counter'
+  // path: 'reviews'
 });
 
-// exports.getTour = factory.getOne(Tour, "reviews_populated_counter", "reviews_populated");
+// exports.getTour = factory.getOne(Tour, "reviews_Populated_Counter", "reviews_Populated");
 /*
 } catch (error) {
   console.log("\nThere's an error in getTour() after GET request!: \n");

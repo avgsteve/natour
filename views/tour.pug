@@ -1,6 +1,12 @@
 //- This file gets basic template from base.pug by "extends" and rewrite
 extends base
 
+//- And get data from the data filed in viewRoutes.js with the middle ware function
+//- exports.getTour = catchAsync(async (req, res, next) => {
+//- res.status(200).render('tour', {
+//-   tour: tour,
+//- });
+
 //-
 mixin overviewBox(label, text, icon)
   .overview-box__detail
@@ -8,6 +14,30 @@ mixin overviewBox(label, text, icon)
       use(xlink:href=`/img/icons.svg#icon-${icon}`)
     span.overview-box__label= label
     span.overview-box__text= text
+
+//-
+mixin reviewCard(review)
+  .reviews__card
+    
+    //-
+    .reviews__avatar
+      img.reviews__avatar-img(src=`${review.user.photo}`, alt=`${review.user.name}`)
+      h6.reviews__user=review.user.name
+    p.reviews__text Lorem ipsum dolor sit amet consectetur adipisicing elit. Cumque dignissimos sint quo commodi corrupti accusantium veniam saepe numquam.
+    
+    //-
+    .reviews__rating      
+      //-
+      svg.reviews__star.reviews__star--active
+        use(xlink:href='/img/icons.svg#icon-star')
+      svg.reviews__star.reviews__star--active
+        use(xlink:href='/img/icons.svg#icon-star')
+      svg.reviews__star.reviews__star--active
+        use(xlink:href='/img/icons.svg#icon-star')
+      svg.reviews__star.reviews__star--active
+        use(xlink:href='/img/icons.svg#icon-star')
+      svg.reviews__star.reviews__star--active
+        use(xlink:href='/img/icons.svg#icon-star')
 
 
 //- use the block with variable name "content" and rewrite the content in the block
@@ -35,9 +65,8 @@ block content
     
     //-
     .overview-box
-      div
-        
-        //-
+      div        
+        //- ===== Use mixin to render data =====
         .overview-box__group
           
           h2.heading-secondary.ma-bt-lg Quick facts
@@ -81,7 +110,7 @@ block content
           //-   span.overview-box__label Rating
           //-   span.overview-box__text 4.9 / 5
         
-        
+        //- ===== Loop through tour.guides data =====
         .overview-box__group
           h2.heading-secondary.ma-bt-lg Your tour guides      
           
@@ -116,35 +145,47 @@ block content
       //- p.description__text Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum!
 
   section.section-pictures
-    .picture-box
-      img.picture-box__img.picture-box__img--1(src='/img/tour-5-1.jpg', alt='The Park Camper Tour 1')
-    .picture-box
-      img.picture-box__img.picture-box__img--2(src='/img/tour-5-2.jpg', alt='The Park Camper Tour 1')
-    .picture-box
-      img.picture-box__img.picture-box__img--3(src='/img/tour-5-3.jpg', alt='The Park Camper Tour 1')
+    //- use "each" and "img" for looping through the array. "i" is the index
+    each img, i in tour.images
+      .picture-box
+        img.picture-box__img(src=`/img/tours/${img}`, alt='The Park Camper Tour ${i+1}', class=`picture-box__img--${i+1}`)  
+       
+    //- .picture-box
+    //-   img.picture-box__img.picture-box__img--1(src='/img/tour-5-1.jpg', alt='The Park Camper Tour 1')
+    //- .picture-box
+    //-   img.picture-box__img.picture-box__img--2(src='/img/tour-5-2.jpg', alt='The Park Camper Tour 1')
+    //- .picture-box
+    //-   img.picture-box__img.picture-box__img--3(src='/img/tour-5-3.jpg', alt='The Park Camper Tour 1')
 
   section.section-map
     #map
 
   section.section-reviews
     .reviews
+      //- loop through reviews data inside the .reviews section
+      each review in tour.reviews_Populated
+      
+        +reviewCard(review)
 
-      .reviews__card
-        .reviews__avatar
-          img.reviews__avatar-img(src='/img/users/user-7.jpg', alt='Jim Brown')
-          h6.reviews__user Jim Brown
-        p.reviews__text Lorem ipsum dolor sit amet consectetur adipisicing elit. Cumque dignissimos sint quo commodi corrupti accusantium veniam saepe numquam.
-        .reviews__rating
-          svg.reviews__star.reviews__star--active
-            use(xlink:href='/img/icons.svg#icon-star')
-          svg.reviews__star.reviews__star--active
-            use(xlink:href='/img/icons.svg#icon-star')
-          svg.reviews__star.reviews__star--active
-            use(xlink:href='/img/icons.svg#icon-star')
-          svg.reviews__star.reviews__star--active
-            use(xlink:href='/img/icons.svg#icon-star')
-          svg.reviews__star.reviews__star--active
-            use(xlink:href='/img/icons.svg#icon-star')
+        //- .reviews__card
+        //-   .reviews__avatar
+        //-     img.reviews__avatar-img(src='/img/users/user-7.jpg', alt='Jim Brown')
+        //-     h6.reviews__user Jim Brown
+        //-   p.reviews__text Lorem ipsum dolor sit amet consectetur adipisicing elit. Cumque dignissimos sint quo commodi corrupti accusantium veniam saepe numquam.
+        //-   .reviews__rating
+        //- 
+        //- 
+        //-     //-
+        //-     svg.reviews__star.reviews__star--active
+        //-       use(xlink:href='/img/icons.svg#icon-star')
+        //-     svg.reviews__star.reviews__star--active
+        //-       use(xlink:href='/img/icons.svg#icon-star')
+        //-     svg.reviews__star.reviews__star--active
+        //-       use(xlink:href='/img/icons.svg#icon-star')
+        //-     svg.reviews__star.reviews__star--active
+        //-       use(xlink:href='/img/icons.svg#icon-star')
+        //-     svg.reviews__star.reviews__star--active
+        //-       use(xlink:href='/img/icons.svg#icon-star')
 
   section.section-cta
     .cta
