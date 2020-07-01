@@ -4,21 +4,23 @@ doctype html
 
 html
   head
-    meta(charset='UTF-8')
-    meta(name='viewport' content='width=device-width, initial-scale=1.0')
+    block head
+      meta(charset='UTF-8')
+      meta(name='viewport' content='width=device-width, initial-scale=1.0')
 
-    // === For CSS and materials: ===
-    // Normal way of using CSS file in HTML: <link rel="stylesheet" href="css/style.css"/>
-    // All the related file will be serverd via Middle ware function in app.js used for Node.js:
-    // app.use(express.static(path.join(__dirname, 'public')));
-    link(rel="stylesheet" href="/css/style.css")
-    link(rel="shortcut icon" type='image/png' href="/img/favicon.png")
-    link(rel='stylesheet' href='https://fonts.googleapis.com/css?family=Lato:300,300i,700')
+      // === For CSS and materials: ===
+      // Normal way of using CSS file in HTML: <link rel="stylesheet" href="css/style.css"/>
+      // All the related file will be serverd via Middle ware function in app.js used for Node.js:
+      // app.use(express.static(path.join(__dirname, 'public')));
+      link(rel="stylesheet" href="/css/style.css")
+      link(rel="shortcut icon" type='image/png' href="/img/favicon.png")
+      link(rel='stylesheet' href='https://fonts.googleapis.com/css?family=Lato:300,300i,700')
+      //- In the tour.pug file, the code : block append head
+      //- will append the script file and its source path back to this base.pug's block "head section"
 
-
-    //- #{variable} will be pug syntax like template literal in ES6
-    //- and get value from "locals" variable's value from the route handler
-    <title>Natours | #{title} </title>
+      //- #{variable} will be pug syntax like template literal in ES6
+      //- and get value from "locals" variable's value from the route handler
+      <title>Natours | #{title} </title>
         
 
   body
@@ -33,8 +35,10 @@ html
 
     // FOOTER
     include _footer
-        
-        
+    
+    // JavaScript files    
+    script(src='/js/mapbox.js')
+    
         
         
         

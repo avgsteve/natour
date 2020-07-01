@@ -117,18 +117,20 @@ const tourSchema = new Schema({
       address: String,
       description: String,
     },
-    locations: {
-      //GeoJSON
+    locations: [{
+      //type: GeoJSON
       type: {
         type: String,
         default: 'Point',
+        // enum validator: check if data is in Array
         enum: ['Point']
       },
+      // other infomation for locations field
       coordinates: [Number],
       address: String,
       description: String,
-      day: Number, //the day people will go to the tour
-    },
+      day: Number, //the days people will spend on the tour
+    }],
     // embedded data
     // guides: Array,
     guides: [{

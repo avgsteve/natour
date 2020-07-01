@@ -7,6 +7,10 @@ extends base
 //-   tour: tour,
 //- });
 
+//- To append the content after the existing content (in the "block head" section of base.pug)
+block append head
+    //-will inject the script file and its source path
+  
 //-
 mixin overviewBox(label, text, icon)
   .overview-box__detail
@@ -147,7 +151,9 @@ block content
 
 
   section.section-map
-    #map
+    //- section.section-map will be rendered as <div id="map">
+    //- Use JSON.stringify to make data in JSON format for later process
+    #map(data-locations=`${JSON.stringify(tour.locations)}`)
 
   //- ===== REVIEW FROM OTHER USERS =====
   section.section-reviews
