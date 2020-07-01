@@ -9,8 +9,11 @@ extends base
 
 //- To append the content after the existing content (in the "block head" section of base.pug)
 block append head
-    //-will inject the script file and its source path
   
+  //- cdn for using mapbox
+  script(src='https://api.mapbox.com/mapbox-gl-js/v1.11.0/mapbox-gl.js')
+  link(href='https://api.mapbox.com/mapbox-gl-js/v1.11.0/mapbox-gl.css' rel='stylesheet')
+
 //-
 mixin overviewBox(label, text, icon)
   .overview-box__detail
