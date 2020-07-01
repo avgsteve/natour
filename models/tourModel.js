@@ -329,7 +329,7 @@ tourSchema.pre(/^find/, function(next) {
 // Query Middleware : process Query data "AFTER" send data to client
 tourSchema.post(/^find/, function(docs, next) {
   //culcalate and show how much time passed from creating a .pre middleware to finish
-  console.log(`\nThe Query took ${Date.now() - this.start} milliseconds!\n`);
+  // console.log(`\nThe Query took ${Date.now() - this.start} milliseconds!\n`);
   // console.log(docs);
   next();
 });
