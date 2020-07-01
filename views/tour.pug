@@ -15,37 +15,9 @@ mixin overviewBox(label, text, icon)
     span.overview-box__label= label
     span.overview-box__text= text
 
-//-
-mixin reviewCard(review)
-  .reviews__card
-    
-    //-
-    .reviews__avatar
-      img.reviews__avatar-img(src=`/img/users/${review.user.photo}`, alt=`${review.user.name}`)
-      h6.reviews__user=review.user.name
-    p.reviews__text=review.review
-    
-    //-
-    .reviews__rating      
-      //- Let the code block for star be looped through 5 times by an Array containing 5 numbers which stand for the score
-      each star in [1,2,3,4,5]
-        //- Use ternery operator to read the rating score and set the item "star" in the loop individually as active or inactive depending on the rating score
-        //- ex: 3 out 5 stars , the first 3 blocks for star will be active, the rest 2 blocks will be inactive
-        svg.reviews__star(class=`reviews__star--${review.rating >= star? 'active' : 'inactive'}`)
-          use(xlink:href='/img/icons.svg#icon-star')
-
-      
-      //- svg.reviews__star.reviews__star--active
-      //-   use(xlink:href='/img/icons.svg#icon-star')
-      //- svg.reviews__star.reviews__star--active
-      //-   use(xlink:href='/img/icons.svg#icon-star')
-      //- svg.reviews__star.reviews__star--active
-      //-   use(xlink:href='/img/icons.svg#icon-star')
-      //- svg.reviews__star.reviews__star--active
-      //-   use(xlink:href='/img/icons.svg#icon-star')
-      //- svg.reviews__star.reviews__star--active
-      //-   use(xlink:href='/img/icons.svg#icon-star')
-
+//- import module _reviewCard from file: _reviewCard.pug
+//- to use its mixin function reviewCard(review) and this will be used as +reviewCard(reviews) in the review code section
+include _reviewCard
 
 //- use the block with variable name "content" and rewrite the content in the block
 //- and this makes overview.pug a parent file of the base.pug
@@ -145,7 +117,7 @@ block content
 
               span.overview-box__text= guide.name
               
-    //-
+    //- DESCRIPTION SECTION FOR tour name and details
     .description-box
       h2.heading-secondary.ma-bt-lg= `About ${tour.name} tour` 
       
@@ -159,6 +131,7 @@ block content
       //- p.description__text Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
       //- p.description__text Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum!
 
+  //- ===== TOUR IMAGES =====
   section.section-pictures
     //- use "each" and "img" for looping through the array. "i" is the index
     each img, i in tour.images
@@ -172,44 +145,29 @@ block content
     //- .picture-box
     //-   img.picture-box__img.picture-box__img--3(src='/img/tour-5-3.jpg', alt='The Park Camper Tour 1')
 
+
   section.section-map
     #map
 
+  //- ===== REVIEW FROM OTHER USERS =====
   section.section-reviews
     .reviews
       //- loop through reviews data inside the .reviews section
       //- each review in tour.reviews
       each review in tour.reviews_Populated
-
+        //- Use the module "reviewCard" from the code: include _reviewCard
+        //- to generate multiple cards
         +reviewCard(review)
-
-        //- .reviews__card
-        //-   .reviews__avatar
-        //-     img.reviews__avatar-img(src='/img/users/user-7.jpg', alt='Jim Brown')
-        //-     h6.reviews__user Jim Brown
-        //-   p.reviews__text Lorem ipsum dolor sit amet consectetur adipisicing elit. Cumque dignissimos sint quo commodi corrupti accusantium veniam saepe numquam.
-        //-   .reviews__rating
-        //- 
-        //- 
-        //-     //-
-        //-     svg.reviews__star.reviews__star--active
-        //-       use(xlink:href='/img/icons.svg#icon-star')
-        //-     svg.reviews__star.reviews__star--active
-        //-       use(xlink:href='/img/icons.svg#icon-star')
-        //-     svg.reviews__star.reviews__star--active
-        //-       use(xlink:href='/img/icons.svg#icon-star')
-        //-     svg.reviews__star.reviews__star--active
-        //-       use(xlink:href='/img/icons.svg#icon-star')
-        //-     svg.reviews__star.reviews__star--active
-        //-       use(xlink:href='/img/icons.svg#icon-star')
 
   section.section-cta
     .cta
       .cta__img.cta__img--logo
         img(src='/img/logo-white.png', alt='Natours logo')
-      img.cta__img.cta__img--1(src='/img/tours/tour-5-2.jpg', alt='')
-      img.cta__img.cta__img--2(src='/img/tours/tour-5-1.jpg', alt='')
+      img.cta__img.cta__img--1(src=`/img/tours/${tour.images[1]}`, alt='Tour picture')
+      img.cta__img.cta__img--2(src=`/img/tours/${tour.images[2]}`, alt='Tour picture')
       .cta__content
         h2.heading-secondary What are you waiting for?
-        p.cta__text 10 days. 1 adventure. Infinite memories. Make it yours today!
+        //- p.cta__text 10 days. 1 adventure. Infinite memories. Make it yours today!
+        p.cta__text=`${tour.duration} days. 1 adventure. Infinite memories. Make it yours today!`
+        
         button.btn.btn--green.span-all-rows Book tour now!

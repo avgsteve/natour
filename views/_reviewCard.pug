@@ -1,0 +1,29 @@
+mixin reviewCard(review)
+  .reviews__card
+    
+    //-
+    .reviews__avatar
+      img.reviews__avatar-img(src=`/img/users/${review.user.photo}`, alt=`${review.user.name}`)
+      h6.reviews__user=review.user.name
+    p.reviews__text=review.review
+    
+    //-
+    .reviews__rating      
+      //- Let the code block for star be looped through 5 times by an Array containing 5 numbers which stand for the score
+      each star in [1,2,3,4,5]
+        //- Use ternery operator to read the rating score and set the item "star" in the loop individually as active or inactive depending on the rating score
+        //- ex: 3 out 5 stars , the first 3 blocks for star will be active, the rest 2 blocks will be inactive
+        svg.reviews__star(class=`reviews__star--${review.rating >= star? 'active' : 'inactive'}`)
+          use(xlink:href='/img/icons.svg#icon-star')
+
+      
+      //- svg.reviews__star.reviews__star--active
+      //-   use(xlink:href='/img/icons.svg#icon-star')
+      //- svg.reviews__star.reviews__star--active
+      //-   use(xlink:href='/img/icons.svg#icon-star')
+      //- svg.reviews__star.reviews__star--active
+      //-   use(xlink:href='/img/icons.svg#icon-star')
+      //- svg.reviews__star.reviews__star--active
+      //-   use(xlink:href='/img/icons.svg#icon-star')
+      //- svg.reviews__star.reviews__star--active
+      //-   use(xlink:href='/img/icons.svg#icon-star')
