@@ -4,7 +4,7 @@
 
 const login = async (email, password) => {
 
-  console.log(`\n == The email is: ${email}, passowrd is: ${password} ==\n`);
+  // console.log(`\n == The email is: ${email}, passowrd is: ${password} ==\n`);
 
   try {
 

@@ -191,9 +191,15 @@ exports.protect = catchAsync(async (req, res, next) => {
   */
   let token;
 
+  // first check if there's authorization property and also the value starts with initial "Bearer"
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     token = req.headers.authorization.split(' ')[1];
     // ex:  ['Bearer', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlZDdjZWU1NTlkOTQwNzI1MDY2OWQ2ZSJ9.E5PwSCrEy5UIZP4L7xuJdVFT-qTJG2OyzyMZMSBQGWw'][1]
+  }
+  // check if there's jwt token (json web token) in cookie
+  else if (req.cookies.jwt) {
+    // then show what's in the cookies
+    token = req.cookies.jwt;
   }
 
 
