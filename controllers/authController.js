@@ -295,6 +295,46 @@ exports.protect = catchAsync(async (req, res, next) => {
 });
 
 
+// ========== Check if use is logged in ===========
+// Will be used for rendered pages, no errors
+exports.isLoggedIn = catchAsync(async (req, res, next) => {
+
+  // first check if there's authorization property and also the value starts with initial "Bearer"
+  if (req.cookies.jwt) {
+
+    // 1) verify TOKEN from cookie (which is the value from req.cookies.jwt)
+    const decoded = await promisify(jwt.verify)(req.cookies.jwt, process.env.JWT_SECRET);
+    console.log(`The decoded result from \nawait promisify(jwt.verify)(token, process.env.JWT_SECRET); : \n`);
+    console.log(decoded); // { id: '5ede44f1202c03583865838d', iat: 1591624946, exp: 1599400946 }
+    /* how jwt.verify() works:
+      #1. original payload: {
+      "id": "5ed7cee559d9407250669d6e"
+      }
+      #2. Token generated (ref:  https://jwt.io/): eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlZDdjZWU1NTlkOTQwNzI1MDY2OWQ2ZSJ9.E5PwSCrEy5UIZP4L7xuJdVFT-qTJG2OyzyMZMSBQGWw
+    */
+
+    // 2) Check if user still exists
+    const currentUser = await User.findById(decoded.id);
+    if (!currentUser) {
+      return next();
+    }
+
+    // 3) Check if user has changed password
+    if (currentUser.changedPasswordAfter(decoded.iat)) {
+      return next();
+    }
+
+    //if all above 3 test are passed, it means the user is logged in and can move on to next middle ware
+    //then create a property in res.location.user which will be accessible to .pug file
+    res.location.user = currentUser;
+    next();
+  }
+
+  //if there's no cookie, there won't be user document (which means no logged in user)
+  next();
+});
+
+
 // verify user's role based on his role property
 // In authController.js,  delete(authController.protect, authController.restrictTo('admin', 'lead-guide'),
 exports.restrictTo = (...roles) => {
