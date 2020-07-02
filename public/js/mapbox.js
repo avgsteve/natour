@@ -70,9 +70,12 @@ mapboxgl.accessToken = 'pk.eyJ1IjoiYXZnc3RldmUiLCJhIjoiY2tjM2Y0cXBvMmN5bDM0bXh5b
 //    --==== configuration for Mapbox map
 //    ref:  https://docs.mapbox.com/mapbox-gl-js/api/map/
 var map = new mapboxgl.Map({
+
+  // ref for all parameters:
+  // https://docs.mapbox.com/mapbox-gl-js/api/map/#map-parameters
+
+  // Find the HTML element with the id "map" in which will be the "container" to render map.
   container: 'map',
-  // The "options.container" in doc page:
-  // ref: https://docs.mapbox.com/mapbox-gl-js/api/map/#map-parameters
 
   // style property for using default or customized map styles
   style: 'mapbox://styles/avgsteve/ckc3fgxvn0svq1itaflci74ke',
@@ -82,9 +85,15 @@ var map = new mapboxgl.Map({
   // set default map location
   // ref:  https://docs.mapbox.com/mapbox-gl-js/example/attribution-position/index.html
   center: [-77.04, 38.907],
+
+  //Set default zoom
   zoom: 15,
 
-  // to make map static (can't be dragged. Will look like a photo on page)
+  //To disable the zoom-in zoom-out functionality (but still draggable)
+  scrollZoom: false,
+
+
+  //// to make map static (can't be dragged. Will look like a photo on page)
   // interactive: false
 
 });
