@@ -89,17 +89,15 @@ var map = new mapboxgl.Map({
 
 });
 
-//
-map.addControl(new mapboxgl.AttributionControl(), 'top-left');
-
-
-// === Set marker on map and area to be displayed ===
+// === Add marker(s) on map and area to be displayed ===
 
 // Set the area will be displayed on the map by creating new mapboxgl.LatLngBounds(); Obj
 // https://docs.mapbox.com/mapbox-gl-js/api/geography/#lnglatbounds
 
 // If no arguments are provided to the constructor, a null bounding box is created.
 const bounds = new mapboxgl.LngLatBounds();
+// new .LngLatBounds obj will be worked with the code: bounds.extend(singleLocation.coordinates); to set bound (display area) for all given coordinates
+
 
 
 // Look for coordinates in each singleLocation to create marker on map by looping through the locations data Array
@@ -123,14 +121,28 @@ locations.forEach(singleLocation => {
     })
 
     // (chainable methods)
-    // Then set the coordinates (which is read from each location item from "locations" Array) for the marker
+    // THEN set the coordinates (which is read from each location item from "locations" Array) for the marker
     .setLngLat(singleLocation.coordinates)
 
     //Then add (attach) the marker object to map obj
     .addTo(map); //ref: https://docs.mapbox.com/mapbox-gl-js/api/markers/#marker#addto
 
 
-  // === bounds.extend: ===
+
+  // ===  Add popup caption effect on each marker (location) ===
+  new mapboxgl.Popup(
+      //object for options
+      {
+        // property "offset" : To adjust position off-set for popup caption. Value can be Number or Array [x,y]
+        offset: 50,
+        // other properties:  https://docs.mapbox.com/mapbox-gl-js/api/markers/#popup-parameters
+      })
+    .setLngLat(singleLocation.coordinates)
+    //The caption content (as HTML code)
+    .setHTML(`<p>Day ${singleLocation.day}:  ${singleLocation.description}</p>`)
+    .addTo(map);
+
+  // === Setting map boundary by using bounds.extend: ===
   // Extend map bounds to include current location
   // ref: https://docs.mapbox.com/mapbox-gl-js/api/geography/#lnglatbounds#extend
 
@@ -158,10 +170,10 @@ map.fitBounds(bounds,
   {
     padding: {
       //units: px
-      top: 200,
-      bottom: 200,
+      top: 300,
+      bottom: 150,
       left: 100,
-      right: 100
+      right: 150
     }
   }
 );
