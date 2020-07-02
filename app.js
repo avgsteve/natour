@@ -10,6 +10,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
 const path = require('path');
+const cookieParser = require('cookie-parser');
 
 // for reading Environment Variables from config.env file
 dotenv.config({
@@ -58,6 +59,8 @@ app.use(express.json({
   limit: '10kb',
 })); //middleware的使用解說參照git commit 54-1 Node.js Express 的 Middleware的使用 &解說
 
+// === Parsing Cookie from client request ===
+app.use(cookieParser()); // will display req.cookie in test middle ware
 
 // === Data sanitization against NoSQL query injection attack ===
 app.use(mongoSanitize()); //https://www.npmjs.com/package/express-mongo-sanitize
@@ -104,9 +107,19 @@ app.use(responseSize((req, res, size) => {
 // === Test middleware ===
 // to show WHEN a request happened
 app.use((req, res, next) => {
+  console.log(`\n\n\n--// === Start of Test middle ware === //--\n`);
+
   req.requestTime = new Date()
     .toISOString(); // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
+  // //
   // console.log("Test error for undefined ' x':" + x); //D:\\Dropbox\\Udemy\\JavaScript\\complete-node-bootcamp\\4-natours\\app.js:58:49\n    at Layer.handle [as handle_request]
+
+  // // Test the request.cookie message
+  console.log(`\nTest message for the content in req.cookie\n`);
+  console.log(req.cookies);
+
+  console.log(`\n--// === End of Test middle ware === //--\n`);
+
   next();
 });
 

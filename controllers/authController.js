@@ -140,11 +140,15 @@ exports.login = catchAsync(async (req, res, next) => {
   // if user is false or correctPassword is false, return an new Error
   if (!user || !(await user.correctPassword(password, user.password)) //
   ) {
+    console.log(`\nMessage from authController: \n`);
+    console.log("\x1b[31m", "User log-in has failed!\n" + "\u001b[0m");
     return next(new AppError('Incorrect email or password', 401));
   }
 
 
-  console.log(user);
+  console.log(`\nMessage from authController: \n`);
+  console.log("User: " + "\u001b[32m" + user.name + "\u001b[0m" + " has successful logged in!\n");
+
   /* (original password 1234)
   {
     _id: 5ed91a42e076015f68b1243e,
