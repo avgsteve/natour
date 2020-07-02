@@ -1,0 +1,23 @@
+extends base
+
+//- For clicking the log in button on root page (host/login)
+//- Client can get log in form from the router handler from router.get('/login', viewsController.getLoginForm); in viewRoutes.js
+//- Files will be sent to client and rendered by exports.getLoginForm function in viewsController.js
+
+//- Use base.pug as main template file ( code: extends base  )
+
+
+//- Replace the content inside the block "content" inside body section in HTML
+block content
+  main.main
+    .login-form
+      h2.heading-secondary.ma-bt-lg Log into your account
+      form.form
+        .form__group
+          label.form__label(for='email') Email address
+          input#email.form__input(type='email', placeholder='you@example.com', required)
+        .form__group.ma-bt-md
+          label.form__label(for='password') Password
+          input#password.form__input(type='password', placeholder='••••••••', required, minlength='8')
+        .form__group
+          button.btn.btn--green Login

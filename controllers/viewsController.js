@@ -5,6 +5,17 @@ const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
+/* !!! Set view engine and path with the code below in app.js in advance to make sure HTTP response obj can render the .pug files in designated folder
+
+app.set('view engine', 'pug'); // will render .pug file to HTML format
+
+//And create a path with a joined path name
+app.set('views', path.join(__dirname, 'views')); // which is the "views" folder relatively located under app.js current folder
+
+//Note: path is from another package imported to app.js
+
+*/
+
 //
 exports.getOverview = catchAsync(async (req, res, next) => {
   // 1) Get tour data from collection (from database)
@@ -58,5 +69,14 @@ exports.getTour = catchAsync(async (req, res, next) => {
   res.status(200).render('tour', {
     title: `${tour.name} Tour`,
     tour: tour
+  });
+});
+
+//
+exports.getLoginForm = catchAsync(async (req, res, next) => {
+
+  // Render template "login.pug"
+  res.status(200).render('login', {
+    title: `Log into your account`,
   });
 });

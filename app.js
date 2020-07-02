@@ -32,8 +32,8 @@ const app = express();
 
 //
 app.set('view engine', 'pug');
-//will create a path with a joined path name
-app.set('views', path.join(__dirname, 'views'));
+//And create a path with a joined path name
+app.set('views', path.join(__dirname, 'views')); // which is the "views" folder relatively located under app.js current folder
 
 // 1) ============== MIDDLE-WARES ==============
 
