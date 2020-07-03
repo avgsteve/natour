@@ -2,6 +2,9 @@
 /*jshint esversion: 8 */
 
 import axios from 'axios';
+import {
+  showAlert
+} from './alerts';
 
 //Use "export" - the key word from 'Common JS' to export module in Node.js.  ref:  https://stackoverflow.com/questions/42461330/difference-between-export-const-foo-export-default-foo-and-module-exports-foo
 export const login = async (email, password) => {
@@ -31,7 +34,7 @@ export const login = async (email, password) => {
     // === Redirect page after log in is successful ===
     //
     if (result.data.status === 'success') {
-      alert('Logged in successfully!');
+      showAlert("success", 'Logged in successfully!');
       //
       window.setTimeout(
         () => {
@@ -52,7 +55,7 @@ export const login = async (email, password) => {
     // console.log(error.response.data.message); //  "Incorrect email or password"
 
     // display error message with alert popup
-    alert(error.response.data.message);
+    showAlert("error", error.response.data.message);
 
     //end of try/catch block
   }

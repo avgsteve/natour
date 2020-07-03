@@ -7,6 +7,9 @@ import {
 import {
   login
 } from './login';
+import {
+  showAlert
+} from './alerts';
 
 
 // == 1) preparation before executing functions with DOM elements
@@ -83,4 +86,3 @@ if (mapBox) {
   4. Use CLI to create bundled file with Hot Module Replacement
   cmd:  npm run watch:js
 */
-console.log("" + "\n=== Message from index.js ===" + "\n");
