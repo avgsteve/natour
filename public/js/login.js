@@ -1,8 +1,10 @@
 /*jshint esversion: 6 */
 /*jshint esversion: 8 */
 
+import axios from 'axios';
 
-const login = async (email, password) => {
+//Use "export" - the key word from 'Common JS' to export module in Node.js.  ref:  https://stackoverflow.com/questions/42461330/difference-between-export-const-foo-export-default-foo-and-module-exports-foo
+export const login = async (email, password) => {
 
   // console.log(`\n == The email is: ${email}, passowrd is: ${password} ==\n`);
 
@@ -57,16 +59,3 @@ const login = async (email, password) => {
 
 
 };
-
-
-//Get email and password from the form in host/login page
-document.querySelector('.form').addEventListener('submit', element => {
-  //prevent submit action from reloading page
-  element.preventDefault();
-
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
-
-  login(email, password);
-
-});
