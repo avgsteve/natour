@@ -104,21 +104,40 @@ app.use(responseSize((req, res, size) => {
   // IE: shove into a database for further analysis, wait, spreadsheets are databases, right?
 }));
 
+
 // === Test middleware ===
-// to show WHEN a request happened
+// to show WHEN a request/log happened
 app.use((req, res, next) => {
-  console.log(`\n\n\n--// === Start of Test middle ware === //--\n`);
 
-  req.requestTime = new Date()
-    .toISOString(); // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
-  // //
-  // console.log("Test error for undefined ' x':" + x); //D:\\Dropbox\\Udemy\\JavaScript\\complete-node-bootcamp\\4-natours\\app.js:58:49\n    at Layer.handle [as handle_request]
+  //  ---- Time stamp setting ----
+  const optionsForTime = {
+    timeZone: "Asia/Taipei",
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric'
+  };
+  var formatter = new Intl.DateTimeFormat('zh-tw', optionsForTime); //  https://www.science.co.il/language/Locale-codes.php
+  var localTime = formatter.format(new Date());
 
-  // // Test the request.cookie message
-  console.log(`\nTest message for the content in req.cookie\n`);
-  console.log(req.cookies);
+  // req.requestTime = new Date()
+  //   .toISOString(); // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
 
-  console.log(`\n--// === End of Test middle ware === //--\n`);
+  console.log("\x1b[33m" + "\n--// === Start of Test middle ware === //--\n" + "\x1b[0m");
+  console.log("\x1b[0m" + "\nCurrent log time is: " + localTime + "\x1b[0m" + "\n");
+  //  ---- end of Time stamp setting ----
+
+
+  //
+  if (req.cookies) {
+    // // Test the request.cookie message
+    console.log(`\nTest message for the content in req.cookie\n`);
+    console.log(req.cookies);
+  }
+
+  console.log("\x1b[33m" + "\n--// === End of Test middle ware === //--\n\n" + "\x1b[0m");
 
   next();
 });
@@ -149,7 +168,7 @@ app.all('*', (req, res, next) => {
   // Use AppError as the object to pass into the next() as argument
   // (ref: By using err as argument, the middleware stack will skip to app.use((err))  )
   //
-  next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
+  next(new AppError(`\nCan't find ${req.originalUrl} on this server!!\n`, 404));
 });
 
 
