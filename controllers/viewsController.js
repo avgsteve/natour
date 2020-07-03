@@ -78,5 +78,9 @@ exports.getLoginForm = catchAsync(async (req, res, next) => {
   // Render template "login.pug"
   res.status(200).render('login', {
     title: `Log into your account`,
+
+    //- In the _header.pug file, there will be a "user" variable contains user document which come from res.locals.user
+    //- created by isLoggedIn function in "authController.js" used by router.use(); in viewRoutes.js
+    //- as a global middle ware pipeline
   });
 });

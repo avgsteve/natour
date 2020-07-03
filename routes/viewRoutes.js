@@ -6,6 +6,11 @@ const authController = require('../controllers/authController');
 
 const router = express.Router();
 
+// ***The authController.isLoggedIn middle ware can store document
+// from a logged-in user in response as "res.locals.user"
+// so after this middle ware, all the .pug templates can access the "user" property as locals
+router.use(authController.isLoggedIn);
+
 /* The for testing purpose
 const router = express.Router();
 
@@ -33,7 +38,7 @@ router.get('/', viewsController.getOverview);
 
 // For routing to the individual page for tour details
 // link from: overview.pug -->  a.btn.btn--green.btn--small(href=`/tour/${tour.slug}`) Details
-router.get('/tour/:slug', authController.protect, viewsController.getTour);
+router.get('/tour/:slug', viewsController.getTour);
 
 
 // Routing user to login page

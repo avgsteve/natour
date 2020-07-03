@@ -1,20 +1,43 @@
 
-//- header.pug is "included" in base.pug file in the body section as below:
+//- This _header.pug is "included" in base.pug file in the body section as below:
 //-   body
 //-    include _header
 
 
 header.header
+
   nav.nav.nav--tours
     a.nav__el(href='/') All tours
   .header__logo
     img(src='/img/logo-white.png' alt='Natours logo')
+      
+      
   nav.nav.nav--user
+    
+    //- 1) the "user" variable contains user document which come from res.locals.user 
+    //- created by isLoggedIn function in "authController.js" used by router.use(); in viewRoutes.js
+    //- as a global middle ware pipeline
+    
+    //- As _header is imported to login.pug, and login.pug is rendered in getLoginForm function in viewsController.js
+    //- all .pug files automatically have access to all data under .locals property in HTTP response. See viewsController.js & below for reference
+
+    //- reference for :      
+      //res.locals :  https://expressjs.com/en/api.html#res.locals
+      //res.render (will automatically use data from res.locals as arguments): https://expressjs.com/en/api.html#res.render
+
+    //- 2) Use conditions to determine how to header section will be like depending on if the user prop exists ( as local variable from getLoginForm function's res.render function in viewsController.js)
+    
+    //- If there's a user property in res.locals (created by res.render() in viewsController.js)
     if user
       a.nav__el.nav__el--logout Log out
+      
       a.nav__el(href='/me')
         img.nav__user-img(src=`/img/users/${user.photo}` alt=`Photo of ${user.name}`)
+        //- Display first name only (the first element in user.name Array)
         span= user.name.split(' ')[0]
+        
     else
       a.nav__el(href='/login') Log in
       a.nav__el.nav__el--cta(href='#') Sign up
+      
+      
