@@ -14,6 +14,10 @@ const router = express.Router();
 router.post('/signup', authController.signup);
 router.post('/login', authController.login);
 
+// Let user log out by sending a token that expires immediately
+router.get('/logout', authController.logout);
+
+
 router.post('/forgotPassword', authController.forgotPassword);
 
 // router.post('/resetPassword', authController.resetPassword);

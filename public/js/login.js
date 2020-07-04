@@ -6,7 +6,7 @@ import {
   showAlert
 } from './alerts';
 
-//Use "export" - the key word from 'Common JS' to export module in Node.js.  ref:  https://stackoverflow.com/questions/42461330/difference-between-export-const-foo-export-default-foo-and-module-exports-foo
+// Use "export" - the key word from 'Common JS' to export module in Node.js.  ref:  https://stackoverflow.com/questions/42461330/difference-between-export-const-foo-export-default-foo-and-module-exports-foo
 export const login = async (email, password) => {
 
   // console.log(`\n == The email is: ${email}, passowrd is: ${password} ==\n`);
@@ -60,5 +60,30 @@ export const login = async (email, password) => {
     //end of try/catch block
   }
 
+
+};
+
+// Let user LOG OUT By sending the token expires immediately in a very short period of time
+export const logout = async (email, password) => {
+
+  try {
+
+    // Send a get request to server to get a token for log-out
+    const res = await axios({
+      method: 'GET',
+      url: 'http://127.0.0.1:3000/api/v1/users/logout'
+    });
+
+    // if the GET req is successful
+    if (res.data.status === 'success') {
+      //then force browser to reload page from server instead of from cache.
+      window.setTimeout(() => location.reload(true), 1500);
+    }
+
+    showAlert("success", 'Logged OUT successfully! Now reloading the page...');
+
+  } catch (error) {
+    showAlert('error', 'Error logging out! Please try again.');
+  }
 
 };

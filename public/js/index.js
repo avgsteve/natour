@@ -5,7 +5,8 @@ import {
   displayMap
 } from './mapbox';
 import {
-  login
+  login,
+  logout
 } from './login';
 import {
   showAlert
@@ -16,7 +17,7 @@ import {
 // == setting up variables for DOM ELEMENTS to be used in later on
 const mapBox = document.getElementById('map'); //for #map id
 const loginForm = document.querySelector('.form'); //for .form class
-
+const logOutBtn = document.querySelector('.nav__el--logout'); //
 
 // === (login.js) Get email and password from the form in host/login page
 if (loginForm) {
@@ -51,6 +52,14 @@ if (mapBox) {
   displayMap(locations);
 }
 
+
+// ==== for the "logout" function from login.js ===
+
+if (logOutBtn) {
+
+  logOutBtn.addEventListener('click', logout);
+
+}
 
 
 

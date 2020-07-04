@@ -176,6 +176,28 @@ exports.login = catchAsync(async (req, res, next) => {
 
 });
 
+
+// ========== LOG OUT ===========
+// By sending the token expires immediately in a very short period of time
+exports.logout = catchAsync(async (req, res, next) => {
+
+  // The cookie "loggedOut" will trigger the false value returned from function "isLoggedIn".
+  // Also, this cookie won't appear in browser anymore next time the page is reloaded
+  //  as the cookie has expired in 0.5 second
+  res.cookie('jwt', 'loggedOut', {
+    expires: new Date(Date.now() + 100),
+    httpOnly: true,
+  });
+
+  //
+  res.status(200).json({
+    status: 'success',
+    responseMessage: 'token for logging out user has been sent!',
+  });
+
+});
+
+
 // ========== PROTECTion for routes from accessing with tampered or invalid token ===========
 exports.protect = catchAsync(async (req, res, next) => {
 
@@ -342,6 +364,7 @@ exports.isLoggedIn = async (req, res, next) => {
 
     } catch (error) {
 
+      //if there's any error occured, just go next middle ware function
       return next();
     }
     //end of if (req.cookies.jwt) {
