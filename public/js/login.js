@@ -76,8 +76,14 @@ export const logout = async (email, password) => {
 
     // if the GET req is successful
     if (res.data.status === 'success') {
+
+      let domainName = window.location.origin;
       //then force browser to reload page from server instead of from cache.
-      window.setTimeout(() => location.reload(true), 1500);
+      window.setTimeout(() => {
+        location.replace(domainName);
+        // location.reload(true);
+
+      }, 1500);
     }
 
     showAlert("success", 'Logged OUT successfully! Now reloading the page...');

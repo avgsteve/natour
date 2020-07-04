@@ -52,52 +52,91 @@ const handelJWTExpiredError = () => {
 
 const sendErrorDev = (err, req, res) => {
 
-  // display error message as json format error when the error is from URL starts with /api
+  // === Condition 1) API (related to tour and user) ERROR and display error message as json format when the error is from URL starts with /api ===
   if (req.originalUrl.startsWith('/api')) {
 
-    res.status(err.statusCode).json({
+    console.error('\nERROR (related to API/data ) 💥\n', err);
+
+    return res.status(err.statusCode).json({
       status: err.status,
       error: err,
       message: err.message,
-      stack: err.stack,
+      stack: err.stack
+    });
+  }
+
+  // === Condition 2) RENDERING error in web page if is not an error related to API (like wrong slug for tour data)
+
+  console.error('\nERROR (related to tour routes/slug)💥\n', err);
+
+  // render error.pug for displaying error message in web page when it's error from entering the tour route (slug) doesn't exist
+  return res.status(err.statusCode).render('error', {
+    title: 'Something went wrong!',
+    msg: err.message
+  });
+
+};
+
+// Error message in production mode
+const sendErrorProd = (err, req, res) => {
+
+  // Condition 1) API (related to tour and user) ERROR and display error message as json format when the error is from URL starts with /api ===
+  if (req.originalUrl.startsWith('/api')) {
+
+    // console.error('\nERROR (related to API/data) 💥\n', err);
+
+    // A) if it's an operational and trusted error, then it can be sent to client
+    if (err.isOperational) {
+
+      res.status(err.statusCode).json({
+        status: err.status,
+        message: err.message,
+      });
+    }
+
+    // B) if it's an programming or other unknown error can't be leaked to client
+
+    console.error('ERROR 💥', err);
+
+    // Then sending generic error code
+    res.status(err.statusCode).json({
+      status: 'error',
+      message: 'Something went wrong!',
     });
 
-  } else {
+    //end of if (req.originalUrl.startsWith('/api')) {
+  }
 
-    // render error.pug for displaying error message in web page when it's error from entering the tour route (slug) doesn't exist
-    res.status(err.statusCode).render('error', {
-      title: 'Something went wrong',
+
+  // === Condition 2) URL not starts with /api. (such as /tour-slug)
+  // Then RENDERING error in web page
+
+  // A) if it's an operational and trusted error, then it can be sent to client
+  if (err.isOperational) {
+    // 1) Log error
+    // console.log(err.message);
+    console.error('\nERROR (related to tour routes/slug)💥\n');
+    console.log(err);
+
+    return res.status(err.statusCode).render('error', {
+      title: 'Something went wrong!',
       msg: err.message
     });
 
   }
 
+  // B) Programming or other unknown error: don't leak error details
+  // 1) Log error
+  console.error('ERROR 💥', err);
+  // 2) Send generic message
+  return res.status(err.statusCode).render('error', {
+    title: 'Something went wrong!',
+    msg: 'Please try again later.'
+  });
 
+  // end of const sendErrorProd = (err, req, res) => {
 };
 
-const sendErrorProd = (err, req, res) => {
-
-  //err.isOperational property is from class AppError extends Error {
-  //Operational, trusted error: send message to client
-  if (err.isOperational) {
-
-    res.status(err.statusCode).json({
-      status: err.status,
-      message: err.message,
-    });
-
-    //Programming or other unknown error: don't leak error details
-  } else {
-    // 1) Log error
-    console.error('Error!', err);
-
-    // 2) sending generic error code
-    res.status(err.statusCode).json({
-      status: 'error',
-      message: 'Something went wrong!',
-    });
-  }
-};
 
 //a middleware to show the trace of error log and which app or function throws the error.
 module.exports = (err, req, res, next) => {
@@ -138,6 +177,8 @@ module.exports = (err, req, res, next) => {
           },
       */
     };
+
+    error.message = err.message;
 
     //
     // 'CastError' is from res.status(err.statusCode).json({  error: err, when the data id doesn't match (wrong id)
@@ -195,8 +236,12 @@ module.exports = (err, req, res, next) => {
             "statusCode": 500,
             "status": "error"
         },*/
+    // console.log('\n\nerror:\n');
+    // console.log(err);
+    // console.log('\n\nerror message:\n');
+    // console.log(err.message);
 
-    sendErrorProd(error, res);
+    sendErrorProd(err, req, res);
   }
 
 

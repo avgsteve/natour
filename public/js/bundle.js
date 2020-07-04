@@ -8528,7 +8528,7 @@ exports.showAlert = showAlert;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.login = void 0;
+exports.logout = exports.login = void 0;
 
 var _axios = _interopRequireDefault(require("axios"));
 
@@ -8540,7 +8540,7 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
-//Use "export" - the key word from 'Common JS' to export module in Node.js.  ref:  https://stackoverflow.com/questions/42461330/difference-between-export-const-foo-export-default-foo-and-module-exports-foo
+// Use "export" - the key word from 'Common JS' to export module in Node.js.  ref:  https://stackoverflow.com/questions/42461330/difference-between-export-const-foo-export-default-foo-and-module-exports-foo
 var login = /*#__PURE__*/function () {
   var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(email, password) {
     var result;
@@ -8605,9 +8605,60 @@ var login = /*#__PURE__*/function () {
   return function login(_x, _x2) {
     return _ref.apply(this, arguments);
   };
-}();
+}(); // Let user LOG OUT By sending the token expires immediately in a very short period of time
+
 
 exports.login = login;
+
+var logout = /*#__PURE__*/function () {
+  var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(email, password) {
+    var res, domainName;
+    return regeneratorRuntime.wrap(function _callee2$(_context2) {
+      while (1) {
+        switch (_context2.prev = _context2.next) {
+          case 0:
+            _context2.prev = 0;
+            _context2.next = 3;
+            return (0, _axios.default)({
+              method: 'GET',
+              url: 'http://127.0.0.1:3000/api/v1/users/logout'
+            });
+
+          case 3:
+            res = _context2.sent;
+
+            // if the GET req is successful
+            if (res.data.status === 'success') {
+              domainName = window.location.origin; //then force browser to reload page from server instead of from cache.
+
+              window.setTimeout(function () {
+                location.replace(domainName); // location.reload(true);
+              }, 1500);
+            }
+
+            (0, _alerts.showAlert)("success", 'Logged OUT successfully! Now reloading the page...');
+            _context2.next = 11;
+            break;
+
+          case 8:
+            _context2.prev = 8;
+            _context2.t0 = _context2["catch"](0);
+            (0, _alerts.showAlert)('error', 'Error logging out! Please try again.');
+
+          case 11:
+          case "end":
+            return _context2.stop();
+        }
+      }
+    }, _callee2, null, [[0, 8]]);
+  }));
+
+  return function logout(_x3, _x4) {
+    return _ref2.apply(this, arguments);
+  };
+}();
+
+exports.logout = logout;
 },{"axios":"../../node_modules/axios/index.js","./alerts":"alerts.js"}],"index.js":[function(require,module,exports) {
 "use strict";
 
@@ -8878,6 +8929,8 @@ var _alerts = require("./alerts");
 var mapBox = document.getElementById('map'); //for #map id
 
 var loginForm = document.querySelector('.form'); //for .form class
+
+var logOutBtn = document.querySelector('.nav__el--logout'); //
 // === (login.js) Get email and password from the form in host/login page
 
 if (loginForm) {
@@ -8903,6 +8956,11 @@ if (loginForm) {
 if (mapBox) {
   var locations = JSON.parse(mapBox.dataset.locations);
   (0, _mapbox.displayMap)(locations);
+} // ==== for the "logout" function from login.js ===
+
+
+if (logOutBtn) {
+  logOutBtn.addEventListener('click', _login.logout);
 } //
 //
 
@@ -8964,7 +9022,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "2067" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "3643" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
