@@ -50,16 +50,32 @@ const handelJWTExpiredError = () => {
 };
 
 
-const sendErrorDev = (err, res) => {
-  res.status(err.statusCode).json({
-    status: err.status,
-    error: err,
-    message: err.message,
-    stack: err.stack,
-  });
+const sendErrorDev = (err, req, res) => {
+
+  // display error message as json format error when the error is from URL starts with /api
+  if (req.originalUrl.startsWith('/api')) {
+
+    res.status(err.statusCode).json({
+      status: err.status,
+      error: err,
+      message: err.message,
+      stack: err.stack,
+    });
+
+  } else {
+
+    // render error.pug for displaying error message in web page when it's error from entering the tour route (slug) doesn't exist
+    res.status(err.statusCode).render('error', {
+      title: 'Something went wrong',
+      msg: err.message
+    });
+
+  }
+
+
 };
 
-const sendErrorProd = (err, res) => {
+const sendErrorProd = (err, req, res) => {
 
   //err.isOperational property is from class AppError extends Error {
   //Operational, trusted error: send message to client
@@ -101,7 +117,7 @@ module.exports = (err, req, res, next) => {
   if (process.env.NODE_ENV === 'development') {
 
     //send Error info for dev mode
-    sendErrorDev(err, res);
+    sendErrorDev(err, req, res);
 
   } else if (process.env.NODE_ENV === 'production') {
 
