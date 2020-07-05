@@ -1,12 +1,25 @@
 extends base
 
+//- Use mixin to replace repeated code blocks
+mixin navItem(link, itemName, iconType, isActive)
+  //- If the isActive argument as true Boolean value passed in, then add side-nav--active class to "li" element
+  //- The class "side-nav--active" will trigger css style
+  li(class=`${isActive ? 'side-nav--active': ''}`)
+    a(href=`${link}`)
+      svg
+        use(xlink:href=`img/icons.svg#icon-${iconType}`)
+        //- This itemName variable is the title of this "li" item block
+      | #{itemName}
 
 block content
   main.main
     .user-view
       nav.user-view__menu
         ul.side-nav
-          li.side-nav--active
+          //- use mixin (use "+mixinName", ex: +navItem ) here to add new "li" element
+          +navItem('#', 'SettingsTest', 'settings',true)
+
+          li
             a(href='#')
               svg
                 use(xlink:href='img/icons.svg#icon-settings')
