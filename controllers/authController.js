@@ -299,6 +299,8 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   req.user = freshUser; // assign to fresh user data to req.user property and make it used by next middleware function
 
+  res.locals.user = freshUser; // .locals can let .pug templates use the locals properties as variables and read values
+
   // console.log('\n=== The req.user === :\n');
   // console.log(req.user);
   /* req.user will be the result obj from the code:

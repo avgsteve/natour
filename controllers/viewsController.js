@@ -72,7 +72,7 @@ exports.getTour = catchAsync(async (req, res, next) => {
   });
 });
 
-// User's management page with the URL: host/me
+// User's management page with the URL: host/me. No need to verify user or set locals again
 exports.getAccount = (req, res) => {
   res.status(200).render('account', {
     title: 'Your account'

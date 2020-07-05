@@ -6,6 +6,10 @@ const authController = require('../controllers/authController');
 
 const router = express.Router();
 
+// Move this route handler above router.use(authController.isLoggedIn);
+// to prevent the other routes are protected twice by .protect and .isLoggedIn
+router.get('/me', authController.protect, viewsController.getAccount);
+
 // ***The authController.isLoggedIn middle ware can store document
 // from a logged-in user in response as "res.locals.user"
 // so after this middle ware, all the .pug templates can access the "user" property as locals
@@ -44,7 +48,5 @@ router.get('/tour/:slug', authController.protect, viewsController.getTour);
 // Routing user to login page
 router.get('/login', viewsController.getLoginForm);
 
-//
-router.get('/me', authController.protect, viewsController.getAccount);
 
 module.exports = router;
