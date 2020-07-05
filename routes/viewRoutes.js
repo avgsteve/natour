@@ -44,4 +44,7 @@ router.get('/tour/:slug', authController.protect, viewsController.getTour);
 // Routing user to login page
 router.get('/login', viewsController.getLoginForm);
 
+//
+router.get('/me', authController.protect, viewsController.getAccount);
+
 module.exports = router;

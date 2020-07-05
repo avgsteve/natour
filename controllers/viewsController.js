@@ -72,6 +72,13 @@ exports.getTour = catchAsync(async (req, res, next) => {
   });
 });
 
+// User's management page with the URL: host/me
+exports.getAccount = (req, res) => {
+  res.status(200).render('account', {
+    title: 'Your account'
+  });
+};
+
 //
 exports.getLoginForm = catchAsync(async (req, res, next) => {
 
