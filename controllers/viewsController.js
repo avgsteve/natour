@@ -1,7 +1,7 @@
 /*jshint esversion: 6 */
 /*jshint esversion: 8 */
 const Tour = require('../models/tourModel');
-const User = require('../models/userModel');
+const User = require('../models/userModel'); //to get user's document data
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
@@ -93,11 +93,10 @@ exports.getLoginForm = catchAsync(async (req, res, next) => {
 });
 
 
-exports.updateUserData = (req, res, next) => {
+exports.updateUserData = catchAsync(async (req, res, next) => {
   // Test for the data received from form (class='form-user-data')
   console.log("\n-- The req.body for updating user from form (class='form-user-data') : \n");
   console.log(req.body);
-
 
   /* For receiving and parsing body.req correctly with data sent from form,
      need to add app.use(express.urlencoded); in app.use to parse data in req.body
@@ -110,5 +109,29 @@ exports.updateUserData = (req, res, next) => {
      ref:  https://expressjs.com/en/api.html#express.urlencoded
 */
 
+  // Find the user document for updating the content later
+  const updatedUser = await User.findByIdAndUpdate(
+    // 1st argument: The id to be used to look up in DB for finding the document
+    req.user.id,
+    // 2nd argument: field and content to be updated
+    {
+      name: req.body.name,
+      email: req.body.email,
+    },
+    // 3rd argument: option. ref: https://mongoosejs.com/docs/api.html#query_Query-findOneAndUpdate
+    {
+      //update document as new document will add a property "isNew" with value "true"
+      new: true,
+      runValidator: true,
+      //ref
+    });
 
-};
+
+  res.status(200).render('account', {
+    title: 'Your account with updated info:',
+    user: updatedUser,
+
+  });
+
+
+});

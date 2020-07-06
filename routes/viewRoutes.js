@@ -48,7 +48,7 @@ router.get('/tour/:slug', authController.protect, viewsController.getTour);
 router.get('/login', viewsController.getLoginForm);
 
 // For receiving data (as in req.body's properties data) from form (class='form-user-data')
-router.post('/submit-user-data', viewsController.updateUserData);
+router.post('/submit-user-data', authController.protect, viewsController.updateUserData);
 
 
 
