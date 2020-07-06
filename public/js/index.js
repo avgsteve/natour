@@ -16,7 +16,7 @@ import {
 // == 1) preparation before executing functions with DOM elements
 // == setting up variables for DOM ELEMENTS to be used in later on
 const mapBox = document.getElementById('map'); //for #map id
-const loginForm = document.querySelector('.form'); //for .form class
+const loginForm = document.querySelector('.form--login'); //for .form class
 const logOutBtn = document.querySelector('.nav__el--logout'); //
 
 // === (login.js) Get email and password from the form in host/login page

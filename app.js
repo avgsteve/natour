@@ -62,6 +62,12 @@ app.use(express.json({
 // === Parsing Cookie from client request ===
 app.use(cookieParser()); // will display req.cookie in test middle ware
 
+// === Parse request data from form submitted
+app.use(express.urlencoded({
+  extended: true,
+  limit: '10kb'
+}));
+
 // === Data sanitization against NoSQL query injection attack ===
 app.use(mongoSanitize()); //https://www.npmjs.com/package/express-mongo-sanitize
 

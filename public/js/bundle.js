@@ -8928,7 +8928,7 @@ var _alerts = require("./alerts");
 // == setting up variables for DOM ELEMENTS to be used in later on
 var mapBox = document.getElementById('map'); //for #map id
 
-var loginForm = document.querySelector('.form'); //for .form class
+var loginForm = document.querySelector('.form--login'); //for .form class
 
 var logOutBtn = document.querySelector('.nav__el--logout'); //
 // === (login.js) Get email and password from the form in host/login page
@@ -9022,7 +9022,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "3968" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "5723" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

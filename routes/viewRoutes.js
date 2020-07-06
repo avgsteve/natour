@@ -44,9 +44,12 @@ router.get('/', viewsController.getOverview);
 // link from: overview.pug -->  a.btn.btn--green.btn--small(href=`/tour/${tour.slug}`) Details
 router.get('/tour/:slug', authController.protect, viewsController.getTour);
 
-
 // Routing user to login page
 router.get('/login', viewsController.getLoginForm);
+
+// For receiving data (as in req.body's properties data) from form (class='form-user-data')
+router.post('/submit-user-data', viewsController.updateUserData);
+
 
 
 module.exports = router;

@@ -91,3 +91,24 @@ exports.getLoginForm = catchAsync(async (req, res, next) => {
     //- as a global middle ware pipeline
   });
 });
+
+
+exports.updateUserData = (req, res, next) => {
+  // Test for the data received from form (class='form-user-data')
+  console.log("\n-- The req.body for updating user from form (class='form-user-data') : \n");
+  console.log(req.body);
+
+
+  /* For receiving and parsing body.req correctly with data sent from form,
+     need to add app.use(express.urlencoded); in app.use to parse data in req.body
+
+        app.use(express.urlencoded({
+          extended: true,
+          limit: '10kb'
+        }));
+
+     ref:  https://expressjs.com/en/api.html#express.urlencoded
+*/
+
+
+};
