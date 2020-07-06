@@ -3,8 +3,9 @@
 const express = require('express');
 const userController = require(`./../controllers/userController`);
 const authController = require(`./../controllers/authController`);
-// const reviewController = require(`./../controllers/reviewController`);
+const viewsController = require(`./../controllers/viewsController`);
 
+// const reviewController = require(`./../controllers/reviewController`);
 
 // 2) ============== ROUTE-HANDLERS moved to userController.js
 
@@ -30,7 +31,10 @@ router.use(authController.protect);
 // for any logged in users
 router.patch('/updateMyPassword', authController.updatePassword);
 router.get('/me', userController.getMe, userController.getUser);
-router.patch('/updateMe', userController.updateMe);
+
+router.patch('/updateMe', userController.updateMe); // update user by sending
+// router.patch('/updateMe', authController.protect, viewsController.updateUserData);
+
 router.delete('/deleteMe', userController.deleteMe);
 
 // ==== Restrict the route middle ware to 'admin' use only  ===

@@ -20,10 +20,13 @@ block content
     - console.log("\x1b[33m" + '\n=== log the info of current logged-in user in account.pug (from route: /me) ===\n' + "\x1b[0m")
     - console.log(user)
     
+    //- div for whole view of the page at host/me route
     .user-view
+    
+      //- Navigation content div            
       nav.user-view__menu
         
-        //- ====== Nav panel for User (in unordered list with a class="side-nav")======
+        //- --Nav panel 1) for User (in unordered list with a class="side-nav")======
         ul.side-nav
           //- use mixin (use "+mixinName", ex: +navItem ) here to add new "li" element
           +navItem('#', 'SettingsTest', 'settings',true)
@@ -31,29 +34,36 @@ block content
           +navItem('#', 'My reviews', 'star')
           +navItem('#', 'Billing', 'credit-card')
 
-        //- ====== Nav panel for Admin ONLY! (in unordered list with a class="side-nav")======
-        //- use unbuffered code hyphen "-" to use JavaScript code for if condition
-        //- Use locals property "user.role" in the if statement to switch .admin-nav block
+        //- --Nav panel 2) for Admin ONLY! (in unordered list with a class="side-nav")======      
+        //- 🡣 use unbuffered code hyphen "-" before "if" to use JavaScript code for if condition
         - if (user.role === 'admin')
+          //- Use locals property "user.role" in the if statement to switch .admin-nav block
           .admin-nav
             h5.admin-nav__heading Admin
             ul.side-nav
               +navItem('#', 'Manage tours', 'map')
               +navItem('#', 'Manage users', 'users')
               +navItem('#', 'Manage reviews', 'map')
-              +navItem('#', 'Manage bookings', 'briefcase')
-                  
+              +navItem('#', 'Manage bookings', 'briefcase')   
+    
+      //- Main content div            
       .user-view__content
         .user-view__form-container
           h2.heading-secondary.ma-bt-md Your account settings
-          //-
-          form.form.form-user-data(action='/submit-user-data' method='POST')
+          
+          //- 🡣 UPDATE USER'S email and name
+          
+          //- == option 1) WITHOUT API. Use res.render in viewsController & POST method in HTML form
+          //- form.form.form-user-data(action='/submit-user-data' method='POST')
+        
+          //- == option 2) WITH API. Use updateMe function at router.patch('/updateMe', userController.updateMe); to update user with axios sending PATCH req in js/updateSettings.js
+          form.form.form-user-data
             .form__group
               label.form__label(for='name') Name
-              input#name.form__input(type='text', value=`${user.name}`, required, name='name')
+              input#userName.form__input(type='text', value=`${user.name}`, required, name='name')
             .form__group.ma-bt-md
               label.form__label(for='email') Email address
-              input#email.form__input(type='email', value=`${user.email}`, required, name='email')
+              input#userEmail.form__input(type='email', value=`${user.email}`, required, name='email')            
             .form__group.form__photo-upload
               img.form__user-photo(src=`img/users/${user.photo}`, alt='User photo')
               a.btn-text(href='') Choose new photo
@@ -65,12 +75,12 @@ block content
           form.form.form-user-settings
             .form__group
               label.form__label(for='password-current') Current password
-              input#password-current.form__input(type='password', placeholder='••••••••', required, minlength='8')
+              input#password-current.form__input(type='password', placeholder='••••••••', required, minlength='8',autocomplete="on")
             .form__group
               label.form__label(for='password') New password
-              input#password.form__input(type='password', placeholder='••••••••', required, minlength='8')
+              input#password.form__input(type='password', placeholder='••••••••', required, minlength='8',autocomplete="on")
             .form__group.ma-bt-lg
               label.form__label(for='password-confirm') Confirm password
-              input#password-confirm.form__input(type='password', placeholder='••••••••', required, minlength='8')
+              input#password-confirm.form__input(type='password', placeholder='••••••••', required, minlength='8',autocomplete="on")
             .form__group.right
               button.btn.btn--small.btn--green Save password

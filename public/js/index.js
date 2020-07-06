@@ -11,6 +11,9 @@ import {
 import {
   showAlert
 } from './alerts';
+import {
+  updateData //for updating user's name & email @host/me page
+} from './updateSettings';
 
 
 // == 1) preparation before executing functions with DOM elements
@@ -18,6 +21,7 @@ import {
 const mapBox = document.getElementById('map'); //for #map id
 const loginForm = document.querySelector('.form--login'); //for .form class
 const logOutBtn = document.querySelector('.nav__el--logout'); //
+const userDataForm = document.querySelector('.form-user-data'); // for user's name & email from form class .form-user-data with updateDate()
 
 // === (login.js) Get email and password from the form in host/login page
 if (loginForm) {
@@ -36,11 +40,8 @@ if (loginForm) {
 
 }
 
-
 // ==== for mapbox.js ===
-
 /* Note for using mapbox in index.js:
-
 // Will need to pass in the locations data as argument into displayMap() to render map in HTML section with id: #map
 
 // 1) Get location data from HTML first (the variable mapBox)
@@ -52,16 +53,21 @@ if (mapBox) {
   displayMap(locations);
 }
 
-
 // ==== for the "logout" function from login.js ===
-
 if (logOutBtn) {
 
   logOutBtn.addEventListener('click', logout);
 
 }
 
-
+if (userDataForm) {
+  userDataForm.addEventListener('submit', element => {
+    element.preventDefault();
+    const name = document.getElementById('userName').value;
+    const email = document.getElementById('userEmail').value;
+    updateData(name, email);
+  });
+}
 
 //
 //

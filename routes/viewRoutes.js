@@ -47,7 +47,8 @@ router.get('/tour/:slug', authController.protect, viewsController.getTour);
 // Routing user to login page
 router.get('/login', viewsController.getLoginForm);
 
-// For receiving data (as in req.body's properties data) from form (class='form-user-data')
+// Using form's attribute: action='/submit-user-data' method='POST' to update data
+// Then reload the page by rendering account.pug file with the data from res.locals
 router.post('/submit-user-data', authController.protect, viewsController.updateUserData);
 
 

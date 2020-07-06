@@ -52,8 +52,14 @@ exports.getMe = (req, res, next) => {
   next();
 };
 
-//for updating user's data except for password related fields
+// for updating user's data except for password related fields
+// function is used by router.patch('/updateMe', userController.updateMe); in routes/userRoutes.js
+// and used by js/updateSettings.js
 exports.updateMe = catchAsync(async (req, res, next) => {
+
+  console.log("\x1b[32m" + "\n-- The req.body for updating user from \n  with updateSettings.js using API (PATCH request): \n" + "\x1b[0m");
+  console.log("  (function location: userController.updateMe used by routes/viewRoutes.js)\n");
+  console.log(req.body);
 
   // 1) Create error if user POSTs password data
   if (req.body.password || req.body.passwordConfirm) {
@@ -79,10 +85,19 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   });
 
   //
-  res.status(500).json({
+  res.status(200).json({
     status: 'success',
+    message: 'The user\'s data has been updated by PATCH req with userController.updateMe in userRoutes.js',
     data: updatedUser
   });
+
+  console.log("\n -- res.locals:");
+  console.log(res.locals);
+
+  console.log("\n -- res.message:");
+  console.log(res.locals);
+
+  console.log("\n" + "\x1b[32m" + "-- End of the log for updating user from form (class='form-user-data') : \n" + "\x1b[0m");
 
 });
 

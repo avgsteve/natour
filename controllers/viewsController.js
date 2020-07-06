@@ -92,10 +92,13 @@ exports.getLoginForm = catchAsync(async (req, res, next) => {
   });
 });
 
-
+// update user with form . from html
+// function is used by router.post('/submit-user-data', authController.protect, viewsController.updateUserData);
+// in routes/viewRoutes.js
 exports.updateUserData = catchAsync(async (req, res, next) => {
-  // Test for the data received from form (class='form-user-data')
-  console.log("\n-- The req.body for updating user from form (class='form-user-data') : \n");
+
+  console.log("\x1b[32m" + "\n-- The req.body for updating user from \nby using form's attribute: action='/submit-user-data' method='POST' to update data WITHOUT using API on certain routes \n" + "\x1b[0m");
+  console.log("  (function location: updateUserData function in routes/viewRoutes.js)\n");
   console.log(req.body);
 
   /* For receiving and parsing body.req correctly with data sent from form,
@@ -130,8 +133,17 @@ exports.updateUserData = catchAsync(async (req, res, next) => {
   res.status(200).render('account', {
     title: 'Your account with updated info:',
     user: updatedUser,
-
+    // then this "user" property will be assigned to res.locals which can be used by account.pug
+    // such as user.name,  user.email
   });
+
+  console.log("\n -- res.locals:");
+  console.log(res.locals);
+
+  console.log("\n -- res.message:");
+  console.log(res.locals);
+
+  console.log("\n" + "\x1b[32m" + "-- End of the log for updating user from form (class='form-user-data') : \n" + "\x1b[0m");
 
 
 });
