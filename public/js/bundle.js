@@ -8513,12 +8513,13 @@ exports.hideAlert = hideAlert;
 
 var showAlert = function showAlert(errorType, errorMessage) {
   //make sure all alert element (if any) before make a new one
-  hideAlert();
+  hideAlert(); // errorType is "success" or "error"
+
   var markupForError = "<div class=\"alert alert--".concat(errorType, "\">").concat(errorMessage, "</div"); //insert error message div block on the top of the first child element under body section in HTML
 
   document.querySelector('body').insertAdjacentHTML('afterbegin', markupForError); //Then hide the alert after 3 seconds
 
-  window.setTimeout(hideAlert, 3000);
+  window.setTimeout(hideAlert, 4000);
 };
 
 exports.showAlert = showAlert;
@@ -9405,11 +9406,12 @@ var updateSettings = /*#__PURE__*/function () {
 
           case 4:
             res = _context.sent;
-            console.log('\nLog from updateSettings\n');
-            console.log(res); // if the response from server has 'success' in status
+            console.log('\nLog for the HTTP response from js/updateSettings.js\n');
+            console.log(res); // if the response from server has 'success' in res.data.status
 
             if (res.data.status === 'success') {
               (0, _alerts.showAlert)('success', 'Data updated successfully!');
+              setTimeout(window.location.reload.bind(window.location), 2000);
             }
 
             _context.next = 13;
@@ -9418,7 +9420,7 @@ var updateSettings = /*#__PURE__*/function () {
           case 10:
             _context.prev = 10;
             _context.t0 = _context["catch"](0);
-            (0, _alerts.showAlert)('\n--> Error while updating user\'s data from js/updateSettings.js\n', _context.t0);
+            (0, _alerts.showAlert)('error', "Your password is incorrect!");
 
           case 13:
           case "end":
@@ -9777,10 +9779,29 @@ if (userPasswordForm) {
               passwordCurrent = document.getElementById('password-current');
               password = document.getElementById('password');
               passwordConfirm = document.getElementById('password-confirm');
-              btnSavePwd.textContent = 'Updating password ...'; // update user's data with async function
-              // updateSettings(data, type) in updateSettings.js
+              btnSavePwd.textContent = 'Updating password ...'; // if new password doesn't match the password in confirm field
 
-              _context.next = 8;
+              if (!(password.value !== passwordConfirm.value)) {
+                _context.next = 11;
+                break;
+              }
+
+              //
+              btnSavePwd.textContent = 'Save password';
+              return _context.abrupt("return", (0, _alerts.showAlert)('error', 'Your NEW password doesn\'t match ! Please check them again!'));
+
+            case 11:
+              if (!(!passwordCurrent.value || passwordCurrent.value.length < 8)) {
+                _context.next = 14;
+                break;
+              }
+
+              //
+              btnSavePwd.textContent = 'Save password';
+              return _context.abrupt("return", (0, _alerts.showAlert)('error', 'Please check your current password!'));
+
+            case 14:
+              _context.next = 16;
               return (0, _updateSettings.updateSettings)({
                 passwordCurrent: passwordCurrent.value,
                 password: password.value,
@@ -9788,14 +9809,10 @@ if (userPasswordForm) {
 
               }, 'password');
 
-            case 8:
-              btnSavePwd.textContent = 'Password updated!'; // clear all fields by setting the value to empty string
+            case 16:
+              btnSavePwd.textContent = 'Save password';
 
-              passwordCurrent.value = "";
-              password.value = "";
-              passwordConfirm.value = "";
-
-            case 12:
+            case 17:
             case "end":
               return _context.stop();
           }

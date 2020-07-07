@@ -90,6 +90,19 @@ if (userPasswordForm) {
 
     btnSavePwd.textContent = 'Updating password ...';
 
+    // if new password doesn't match the password in confirm field
+    if (password.value !== passwordConfirm.value) {
+      //
+      btnSavePwd.textContent = 'Save password';
+      return showAlert('error', 'Your NEW password doesn\'t match ! Please check them again!');
+
+      // if not entered current password or current password in wrong format
+    } else if (!passwordCurrent.value || passwordCurrent.value.length < 8) {
+      //
+      btnSavePwd.textContent = 'Save password';
+      return showAlert('error', 'Please check your current password!');
+    }
+
     // update user's data with async function
     // updateSettings(data, type) in updateSettings.js
     await updateSettings({
@@ -99,12 +112,8 @@ if (userPasswordForm) {
       //keys will be parsed into req.body like req.body.passwordConfirm in authController.updatePassword()
     }, 'password');
 
+    btnSavePwd.textContent = 'Save password';
 
-    btnSavePwd.textContent = 'Password updated!';
-    // clear all fields by setting the value to empty string
-    passwordCurrent.value = "";
-    password.value = "";
-    passwordConfirm.value = "";
   });
 }
 

@@ -44,17 +44,17 @@ export const updateSettings = async (dataToUpdate, type) => {
       //GET /me?name=Laura+Wilson+Test&email=laura%40example.com 200 2793.498 ms - 4055
     });
 
-    console.log('\nLog from updateSettings\n');
+    console.log('\nLog for the HTTP response from js/updateSettings.js\n');
     console.log(res);
 
-    // if the response from server has 'success' in status
+    // if the response from server has 'success' in res.data.status
     if (res.data.status === 'success') {
       showAlert('success', 'Data updated successfully!');
-
+      setTimeout(window.location.reload.bind(window.location), 2000);
     }
 
   } catch (e) {
-    showAlert('\n--> Error while updating user\'s data from js/updateSettings.js\n', e);
+    showAlert('error', "Your password is incorrect!");
   }
 
 };
