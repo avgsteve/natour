@@ -5,7 +5,51 @@ const APIFeatures = require('./../utils/apiFeatures'); // using class APIFeature
 const catchAsync = require('./../utils/catchAsync'); // using function catchAsync
 const AppError = require('./../utils/appError'); // using function catchAsync
 const factory = require('./handlerFactory'); //exports.deleteOne = Model => catchAsync(async (req, res, next) => { ...
+const multer = require('multer'); // https://www.npmjs.com/package/multer
 
+// === configure multer package ====
+
+// 1) configure the storage with multer // https://www.npmjs.com/package/multer#diskstorage
+const multerStorage = multer.diskStorage({
+  // a) use callback to set up folder path
+  destination: (req, file, callback) => {
+    callback(null, 'public/img/users');
+  },
+  // b) Formatting file name based on user id etc,. Like user-45345jiji-timeStamp.jpeg
+  filename: (req, file, callback) => {
+    // get the "extension name" from the incoming file
+    const ext = file.mimetype.split('/')[1];
+    // Put user id, time stamp and extension name together
+    callback(null, `user-${req.user.id}-${Date.now()}.${ext}`);
+  }
+});
+
+// 2) To verify if uploaded file is image. Returns Boolean
+const multerFilter = (req, file, callback) => {
+
+  if (file.mimetype.startsWith('image')) {
+    callback(null, true);
+  } else {
+    callback(
+      new AppError('Not an image! Please uploading only images.', 400),
+      false);
+  }
+};
+
+// 3) Set destination folder path for uploading file and file filter
+const upload = multer({
+  // // (Not in use)alternative config for file path:
+  // dest: 'public/img/users',
+
+  // use storage obj to config
+  storage: multerStorage,
+  fileFilter: multerFilter,
+});
+
+// 4) export multer package with config for router:
+// router.patch('/updateMe', userController.uploadUserPhoto, userController.updateMe);
+exports.uploadUserPhoto = upload.single('photo');
+// upload.single('name of the field in the form for uploading file')
 
 const filterObj = (obj, ...allowedFields) => {
   // in function: exports.updateMe , const filteredBody = filterObj(req.body, 'name', 'email');

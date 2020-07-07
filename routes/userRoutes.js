@@ -6,10 +6,6 @@ const userController = require(`./../controllers/userController`);
 const authController = require(`./../controllers/authController`);
 const viewsController = require(`./../controllers/viewsController`);
 
-// configure multer functions
-const upload = multer({
-  dest: 'public/img/users'
-});
 
 // const reviewController = require(`./../controllers/reviewController`);
 
@@ -38,9 +34,8 @@ router.use(authController.protect);
 router.patch('/updateMyPassword', authController.updatePassword);
 router.get('/me', userController.getMe, userController.getUser);
 
-router.patch('/updateMe', upload.single('photo'), userController.updateMe); // update user by sending
+router.patch('/updateMe', userController.uploadUserPhoto, userController.updateMe); // update user by sending
 // router.patch('/updateMe', authController.protect, viewsController.updateUserData);
-// upload.single('name of the field in the form for uploading file')
 
 router.delete('/deleteMe', userController.deleteMe);
 
