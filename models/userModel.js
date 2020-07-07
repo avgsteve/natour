@@ -151,25 +151,32 @@
    // https://mongoosejs.com/docs/api/schema.html#schema_Schema-method
  };
 
- //
- userSchema.methods.changedPasswordAfter = function(JWTTimestamp) {
 
-   // if the property passwordChangedAt: Date exists, then do the comparison
+ //Check if the password has been updated (returns Boolean) with methods called by authController.protect
+ userSchema.methods.changedPasswordAfter = function(JWTTimestamp) { //The parameter "JWTTimestamp" shoukl receive JWT Token time (the time stamp in a decoded JWT token from authController.protect)
+
+   // 1) if the property passwordChangedAt: Date exists, then do the comparison
+   // Note: passwordChangedAt property will be added when .pre middleware detects an password field update
    if (this.passwordChangedAt) {
 
-     //changedTimeStamp is created or updated after password is changed
+     //Convert the time in passwordChangedAt (Unix Epoch time) to base10 number
+     //use .getTime() method as passwordChangedAt property is a Date object
      const changedTimeStamp = parseInt(this.passwordChangedAt.getTime() / 1000,
        10 //base10 number
      );
 
-     console.log('\nThe log in changedPasswordAfter\n');
-     console.log(changedTimeStamp, JWTTimestamp);
+     console.log("\x1b[32m" + '\nThe log from userSchema.methods.changedPasswordAfter:\nChecking if the password has been updated by comparing the time when password changed vs the time JWT was generated.\n' + "\x1b[0m");
 
-     //if the JWTTimestamp (time stamp when token is created) is earlier than changedTimeStamp means password is changed
-     return JWTTimestamp < changedTimeStamp;
+     console.log(`The last time password was changed at: \n  ===> ${new Date(changedTimeStamp * 1000)}, \nThe JWT was generated at: \n  ===> ${new Date(JWTTimestamp * 1000)}`);
+
+     // Note: Check if the password has been updated
+     // by comparing changedTimeStamp vs. JWTTimestamp (time stamp when token is created)
+     // Returns true if password changed after the time JWT token was created
+     return changedTimeStamp > JWTTimestamp;
    }
 
-   return false; // means password is not changed
+   // 2) If two time stamps (changedTimeStamp and JWTTimestamp) has equal value or changedTimeStamp has smaller value, then the token is valid (not generated before password changed)
+   return false;
  };
 
 

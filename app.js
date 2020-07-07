@@ -131,7 +131,7 @@ app.use((req, res, next) => {
   // req.requestTime = new Date()
   //   .toISOString(); // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
 
-  console.log("\x1b[33m" + "\n--// === Start of Test middle ware === //--\n" + "\x1b[0m");
+  console.log("\x1b[33m" + "\n\n\n--// === Start of Test middle ware === //--\n" + "\x1b[0m");
   console.log("\x1b[0m" + "\nCurrent log time is: " + localTime + "\x1b[0m" + "\n");
   //  ---- end of Time stamp setting ----
 

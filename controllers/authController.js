@@ -38,6 +38,7 @@ const createSendToken = (user, statusCode, res) => {
   const cookieOptions = {
     // Option: expires .  Expiry date of the cookie in GMT. If not specified or set to 0, creates a session cookie.
     expires: new Date(
+      //conver the value in .JWT_COOKIE_EXPIRES_IN to day (* 24 * 60 * 60 * 1000)
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000 // * 24 * 60 * 60 * 1000 => one day
     ),
 
