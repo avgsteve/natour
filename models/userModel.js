@@ -30,7 +30,11 @@
        lowercase: true, //For example, if you want to lowercase a string before saving:
        validate: [validator.isEmail],
      },
-     photo: String, // path
+     photo: {
+       // path name will be String type
+       type: String,
+       default: 'default.jpg'
+     },
      role: {
        type: String,
        enum: ['user', 'guide', 'lead-guide', 'admin'],
