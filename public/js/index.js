@@ -12,7 +12,7 @@ import {
   showAlert
 } from './alerts';
 import {
-  updateData //for updating user's name & email @host/me page
+  updateSettings //for updating user's name & email @host/me page
 } from './updateSettings';
 
 
@@ -21,7 +21,10 @@ import {
 const mapBox = document.getElementById('map'); //for #map id
 const loginForm = document.querySelector('.form--login'); //for .form class
 const logOutBtn = document.querySelector('.nav__el--logout'); //
-const userDataForm = document.querySelector('.form-user-data'); // for user's name & email from form class .form-user-data with updateDate()
+const userDataForm = document.querySelector('.form-user-data'); // for updating user's name & email from form class .form-user-data with updateDate()
+const userPasswordForm = document.querySelector('.form-user-password'); // for updating user's password & with updateDate()
+
+// == 2) Set .addEventListener to elements that are present in the HTML for triggering functions
 
 // === (login.js) Get email and password from the form in host/login page
 if (loginForm) {
@@ -53,19 +56,55 @@ if (mapBox) {
   displayMap(locations);
 }
 
-// ==== for the "logout" function from login.js ===
+// ==== Log user out with the "logout" function from login.js ===
 if (logOutBtn) {
 
   logOutBtn.addEventListener('click', logout);
 
 }
 
+// ==== Update user's name and email when there's form with class .form-user-data===
 if (userDataForm) {
   userDataForm.addEventListener('submit', element => {
     element.preventDefault();
     const name = document.getElementById('userName').value;
     const email = document.getElementById('userEmail').value;
-    updateData(name, email);
+    updateSettings({
+      name,
+      email
+    }, 'data');
+  });
+}
+
+// ==== Update user's password when there's form with class .form-user-data===
+if (userPasswordForm) {
+
+  userPasswordForm.addEventListener('submit', async (element) => {
+    element.preventDefault();
+    // Button to be clicked for saving password
+    const btnSavePwd = document.querySelector('.btn--save-passowrd');
+    // Fields for inputs for updating password
+    const passwordCurrent = document.getElementById('password-current');
+    const password = document.getElementById('password');
+    const passwordConfirm = document.getElementById('password-confirm');
+
+    btnSavePwd.textContent = 'Updating password ...';
+
+    // update user's data with async function
+    // updateSettings(data, type) in updateSettings.js
+    await updateSettings({
+      passwordCurrent: passwordCurrent.value,
+      password: password.value,
+      passwordConfirm: passwordConfirm.value,
+      //keys will be parsed into req.body like req.body.passwordConfirm in authController.updatePassword()
+    }, 'password');
+
+
+    btnSavePwd.textContent = 'Password updated!';
+    // clear all fields by setting the value to empty string
+    passwordCurrent.value = "";
+    password.value = "";
+    passwordConfirm.value = "";
   });
 }
 
