@@ -5,26 +5,33 @@ const APIFeatures = require('./../utils/apiFeatures'); // using class APIFeature
 const catchAsync = require('./../utils/catchAsync'); // using function catchAsync
 const AppError = require('./../utils/appError'); // using function catchAsync
 const factory = require('./handlerFactory'); //exports.deleteOne = Model => catchAsync(async (req, res, next) => { ...
+const sharp = require('sharp');
 const multer = require('multer'); // https://www.npmjs.com/package/multer
 
 // === configure multer package ====
 
-// 1) configure the storage with multer // https://www.npmjs.com/package/multer#diskstorage
-const multerStorage = multer.diskStorage({
-  // a) use callback to set up folder path
-  destination: (req, file, callback) => {
-    callback(null, 'public/img/users');
-  },
-  // b) Formatting file name based on user id etc,. Like user-45345jiji-timeStamp.jpeg
-  filename: (req, file, callback) => {
-    // get the "extension name" from the incoming file
-    const ext = file.mimetype.split('/')[1];
-    // Put user id, time stamp and extension name together
-    callback(null, `user-${req.user.id}-${Date.now()}.${ext}`);
-  }
-});
+// 1) configure the storage with multer
+// //https://www.npmjs.com/package/multer#diskstorage
 
-// 2) To verify if uploaded file is image. Returns Boolean
+// // option A) save file directly to disk storage
+// const multerStorage = multer.diskStorage({
+//   // a) use callback to set up folder path
+//   destination: (req, file, callback) => {
+//     callback(null, 'public/img/users');
+//   },
+//   // b) Formatting file name based on user id etc,. Like user-45345jiji-timeStamp.jpeg
+//   filename: (req, file, callback) => {
+//     // get the "extension name" from the incoming file
+//     const fileExtension = file.mimetype.split('/')[1];
+//     // Put user id, time stamp and extension name together
+//     callback(null, `user-${req.user.id}-${Date.now()}.${fileExtension}`);
+//   }
+// });
+
+// // option B) save file directly to memory storage
+const multerStorage = multer.memoryStorage();
+
+// 2) To verify if uploaded file is image. Returns Boolean. ref:  https://www.npmjs.com/package/multer#filefilter
 const multerFilter = (req, file, callback) => {
 
   if (file.mimetype.startsWith('image')) {
@@ -51,6 +58,42 @@ const upload = multer({
 // router.patch('/updateMe', userController.uploadUserPhoto, userController.updateMe);
 exports.uploadUserPhoto = upload.single('photo');
 // upload.single('name of the field in the form for uploading file')
+
+
+/* // === Important Note for req.file and req.file.buffer objects === //:
+
+// #1 The update Object's method "upload.single('photo')" will store the file in "req.file"
+// ref:  https://github.com/expressjs/multer#singlefieldname
+
+// #2 In multer({ }), when it takes argument obj as option has the "storage" option, the file in "req.file" will be turned into Buffer obj. And the Buffer obj will be in "req.file.buffer" for the next middleware to use or process.
+
+// ref 1): (In req.file) The key ".buffer" is a Buffer of the entire file	//ref source: https://www.npmjs.com/package/multer#api
+
+// ref 2): When using memory storage, the file info will contain a field called buffer that contains the entire file.  //ref source: https://www.npmjs.com/package/multer#memorystorage
+*/
+
+// Resize user's photo upon uploading it
+exports.resizeUserPhoto = (req, res, next) => {
+  // 1) first check if there's any uploaded file
+  if (!req.file) return next();
+
+  // 2) Change the value for the key ".filename" in req.file obj
+  req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`;
+
+  // 3) save file to memory first instead of disk. This will make it return a Buffer obj due to the setting: const multerStorage = multer.memoryStorage()
+  // // ref:  https://www.npmjs.com/package/multer#memorystorage
+  sharp(req.file.buffer)
+    // resize(width, height)
+    .resize(500, 500)
+    .toFormat('jpeg')
+    .jpeg({
+      quality: 90
+    })
+    .toFile(`public/img/users/${req.file.filename}`);
+  // ref: https://sharp.pixelplumbing.com/api-resize#parameters
+
+  next();
+};
 
 //Obj for filtering fields that are input from the keys in req.body obj
 const filterObj = (obj, ...allowedFields) => {
