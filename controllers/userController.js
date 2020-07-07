@@ -36,7 +36,8 @@ const multerFilter = (req, file, callback) => {
   }
 };
 
-// 3) Set destination folder path for uploading file and file filter
+// 3) Set option for multer. Ex: "storage" for destination folder path
+// and file filter
 const upload = multer({
   // // (Not in use)alternative config for file path:
   // dest: 'public/img/users',
@@ -51,19 +52,20 @@ const upload = multer({
 exports.uploadUserPhoto = upload.single('photo');
 // upload.single('name of the field in the form for uploading file')
 
+//Obj for filtering fields that are input from the keys in req.body obj
 const filterObj = (obj, ...allowedFields) => {
-  // in function: exports.updateMe , const filteredBody = filterObj(req.body, 'name', 'email');
+  // in function: exports.updateMe , const objWithFilteredKeys = filterObj(req.body, 'name', 'email');
   const newObj = {};
 
-  Object.keys(obj).forEach(propertyInObj => {
-    //Object.keys(object1) return an array of all object's property names (as propertyInObj)
+  Object.keys(obj).forEach(allowedKeyForValue => {
+    //Object.keys(object1) return an array of all object's property names (as allowedKeyForValue)
 
-    //If the propertyInObj is included the allowedFields array , ex: 'name' , 'email'
-    if (allowedFields.includes(propertyInObj)) {
+    //If the allowedKeyForValue is included the allowedFields ARRAY , ex: 'name' , 'email'
+    if (allowedFields.includes(allowedKeyForValue)) {
       //allowedFields is array: ['name', 'email']
 
       //Then assign the obj's property and value that has been "filtered" to newObj object
-      newObj[propertyInObj] = obj[propertyInObj];
+      newObj[allowedKeyForValue] = obj[allowedKeyForValue];
     }
 
   });
@@ -130,12 +132,16 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     return next(new AppError('This route is not for password updates. Please use /updateMyPassword', 400));
   }
 
-  // 2) Use function:  const filterObj = (obj, ...allowedFields) => { ... to filter out the fields that are not allowed to be updated
-  // ...allowedFields is 'name', 'email'
-  const filteredBody = filterObj(req.body, 'name', 'email', 'photo');
+  // 2) Use function:  const filterObj = (obj, ...allowedFields) to modify req.body obj
+  // to make req.body obj has only allowed keys. So user can update data with only allowed fields
+  const objWithFilteredKeys = filterObj(req.body, 'name', 'email', 'photo');
+
+  // // 2-1) Add a "photo" property to objWithFilteredKeys obj with assigned value from req.file.filename to update "photo" fields' value
+  // // req.file.filename
+  if (req.file) objWithFilteredKeys.photo = req.file.filename;
 
   // 3) Update the user document : findByIdAndUpdate(id, Obj for data, Obj for options)
-  const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
+  const updatedUser = await User.findByIdAndUpdate(req.user.id, objWithFilteredKeys, {
     new: true,
     runValidators: true,
 
