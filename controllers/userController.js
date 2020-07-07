@@ -61,6 +61,26 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   console.log("  (function location: userController.updateMe used by routes/viewRoutes.js)\n");
   console.log(req.body);
 
+  // for file uploading
+  if (req.file) {
+    console.log("\x1b[32m" + "\n  -- The req.file for uploading file\n" + "\x1b[0m");
+    console.log(req.file);
+    console.log("\x1b[32m" + "\n\n" + "\x1b[0m");
+    /* the log example:
+      {
+        fieldname: 'photo',
+        originalname: 'default - Copy.jpg',
+        encoding: '7bit',
+        mimetype: 'image/jpeg',
+        destination: 'public/img/users',
+        filename: 'cdefddfaef9231c10511d70a0ea20bfb',
+        path: 'public\\img\\users\\cdefddfaef9231c10511d70a0ea20bfb',
+        size: 14088
+      }
+    */
+
+  }
+
   // 1) Create error if user POSTs password data
   if (req.body.password || req.body.passwordConfirm) {
     return next(new AppError('This route is not for password updates. Please use /updateMyPassword', 400));
