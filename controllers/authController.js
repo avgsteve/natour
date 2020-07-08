@@ -424,16 +424,18 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   // await user.save({ validateBeforeSave: false });  (will save the property to database later)
 
   // 3) Send URL with reset token suffix to user's email //req.protocol is current http or https protocol
-  const resetURL = `${req.protocol}://${req.get('host')}/api/va/users/resetPassword/${resetToken}`;
-
-  const messageForResetting = `Forgot your password? Submit a Patch request with your newpassword and passwordConfirm to: ${resetURL}  \nIf you didn't forget your password, please ingore this email!`;
-
   try {
-    // await sendEmail({ // use function imported(require) from './../utils/email'
-    //   email: user.email,
-    //   subject: 'Your password reset token (valid for 10 min)',
-    //   message: messageForResetting,
-    // });
+
+    const resetURL = `${req.protocol}://${req.get('host')}/api/va/users/resetPassword/${resetToken}`;
+
+    /* // The code used previously for sending email to reset user's password //
+    await sendEmail({ // use function imported(require) from './../utils/email'
+      email: user.email,
+      subject: 'Your password reset token (valid for 10 min)',
+      message: messageForResetting,
+    });
+    // Replace the code block above with the ones below */
+    await new EmailWithNodeMailer(user, resetURL).sendPasswordReset();
 
     res.status(200).json({
       status: 'success',

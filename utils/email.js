@@ -107,6 +107,7 @@ module.exports = class EmailWithNodeMailer {
   // ===> email type 1): password reset
   async sendPasswordReset() {
     await this.send(
+      //template name: passwordReset.pug
       'passwordReset',
       'Your password reset token (valid for only 10 minutes)'
     );
