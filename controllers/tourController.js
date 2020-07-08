@@ -7,6 +7,67 @@ const Tour = require('./../models/tourModel');
 const catchAsync = require('./../utils/catchAsync'); // using function catchAsync
 const AppError = require('./../utils/appError'); // using function catchAsync
 const factory = require('./handlerFactory'); //exports.deleteOne = Model => catchAsync(async (req, res, next) => {
+const multer = require('multer');
+const sharp = require('sharp');
+
+// Set up the config for multer package
+//  1) save file directly to memory storage
+const multerStorage = multer.memoryStorage();
+
+// 2) To verify if uploaded file is image. Returns Boolean. ref:  https://www.npmjs.com/package/multer#filefilter
+const multerFilter = (req, file, callback) => {
+
+  if (file.mimetype.startsWith('image')) {
+    callback(null, true);
+  } else {
+    callback(
+      new AppError('Not an image! Please uploading only images.', 400),
+      false);
+  }
+};
+
+// 3) Set option for multer. Ex: "storage" for destination folder path
+// and file filter
+const upload = multer({
+  // // (Not in use)alternative config for file path:
+  // dest: 'public/img/users',
+
+  // use storage obj to config
+  storage: multerStorage,
+  fileFilter: multerFilter,
+});
+
+//
+exports.uploadTourImages = upload.fields([
+  // ref:  https://github.com/expressjs/multer#fieldsfields
+  { // set max count as 1 according to the field "imageCover" in Tour schema
+    name: 'imageCover',
+    maxCount: 1
+  },
+  { // set max count as 3 according to the field "images" in Tour schema
+    name: 'images',
+    maxCount: 3
+  },
+
+  /* Note: The upload.fields([objs,]) equals to below functions:
+  upload.single('imageCover');
+  upload.array('images', 3);
+  */
+
+]);
+
+//
+exports.resizeTourImages = (req, res, next) => {
+
+  //
+  console.log('\nThe log of req.files in resizeTourImages in tourController.js\n');
+  console.log(req.files);
+
+
+  next();
+
+};
+
 
 
 /* for testing purpose
