@@ -27,11 +27,11 @@ require('axios-debug-log')({
 
 //get the data (name, email fields) to be updated with this updateDate function used in index.js
 //type is either 'password' or 'data'
-export const updateSettings = async (dataToUpdate, type) => {
+export const updateSettings = async (dataToUpdate, typeOfUpdate) => {
 
   try {
     //decide what end-point of URL to use for updating either password or data.
-    const urlEndPoint = type === 'password' ?
+    const urlEndPoint = typeOfUpdate === 'password' ?
       'http://127.0.0.1:3000/api/v1/users/updateMyPassword' :
       'http://127.0.0.1:3000/api/v1/users/updateMe';
 

@@ -9386,7 +9386,7 @@ require('axios-debug-log')({
 
 
 var updateSettings = /*#__PURE__*/function () {
-  var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(dataToUpdate, type) {
+  var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(dataToUpdate, typeOfUpdate) {
     var urlEndPoint, res;
     return regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
@@ -9394,7 +9394,7 @@ var updateSettings = /*#__PURE__*/function () {
           case 0:
             _context.prev = 0;
             //decide what end-point of URL to use for updating either password or data.
-            urlEndPoint = type === 'password' ? 'http://127.0.0.1:3000/api/v1/users/updateMyPassword' : 'http://127.0.0.1:3000/api/v1/users/updateMe';
+            urlEndPoint = typeOfUpdate === 'password' ? 'http://127.0.0.1:3000/api/v1/users/updateMyPassword' : 'http://127.0.0.1:3000/api/v1/users/updateMe';
             _context.next = 4;
             return (0, _axios.default)({
               method: 'PATCH',
@@ -9754,12 +9754,24 @@ if (logOutBtn) {
 if (userDataForm) {
   userDataForm.addEventListener('submit', function (element) {
     element.preventDefault();
-    var name = document.getElementById('userName').value;
-    var email = document.getElementById('userEmail').value;
-    (0, _updateSettings.updateSettings)({
-      name: name,
-      email: email
-    }, 'data');
+    var form = new FormData(); // Use FormData() Constructor as API
+    // ref: https://developer.mozilla.org/en-US/docs/Web/API/FormData
+
+    form.append('name', document.getElementById('userName').value);
+    form.append('email', document.getElementById('userEmail').value);
+    form.append('photo', document.getElementById('photo').files[0]); // Note:formData.append(name, value(find by field's name) );
+    // ref for form.append: https://developer.mozilla.org/en-US/docs/Web/API/FormData/append
+
+    console.log('\nThe form Object\n');
+    console.log(form); // (This block is replaced with above form.append)
+    // const name = document.getElementById('userName').value;
+    // const email = document.getElementById('userEmail').value;
+
+    (0, _updateSettings.updateSettings)( // arguments: dataToUpdate, typeOfUpdate ('data' or 'password')
+    // name,
+    // email,
+    form, // pass the 'form' obj which has data inside an obj as:  {name: 'someString', email: 'test@gmail.com'}
+    'data');
   });
 } // ==== Update user's password when there's form with class .form-user-data===
 
@@ -9885,7 +9897,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "5723" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "6219" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

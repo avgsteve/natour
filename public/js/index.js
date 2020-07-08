@@ -65,15 +65,34 @@ if (logOutBtn) {
 
 // ==== Update user's name and email when there's form with class .form-user-data===
 if (userDataForm) {
+
   userDataForm.addEventListener('submit', element => {
     element.preventDefault();
-    const name = document.getElementById('userName').value;
-    const email = document.getElementById('userEmail').value;
-    updateSettings({
-      name,
-      email
-    }, 'data');
+
+    const form = new FormData();
+    // Use FormData() Constructor as API
+    // ref: https://developer.mozilla.org/en-US/docs/Web/API/FormData
+
+    form.append('name', document.getElementById('userName').value);
+    form.append('email', document.getElementById('userEmail').value);
+    form.append('photo', document.getElementById('photo').files[0]);
+    // Note:formData.append(name, value(find by field's name) );
+    // ref for form.append: https://developer.mozilla.org/en-US/docs/Web/API/FormData/append
+
+    console.log('\nThe form Object\n');
+    console.log(form);
+
+    // (This block is replaced with above form.append)
+    // const name = document.getElementById('userName').value;
+    // const email = document.getElementById('userEmail').value;
+
+    updateSettings( // arguments: dataToUpdate, typeOfUpdate ('data' or 'password')
+      // name,
+      // email,
+      form, // pass the 'form' obj which has data inside an obj as:  {name: 'someString', email: 'test@gmail.com'}
+      'data');
   });
+
 }
 
 // ==== Update user's password when there's form with class .form-user-data===

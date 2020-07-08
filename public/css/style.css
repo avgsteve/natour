@@ -1252,6 +1252,31 @@ body {
   margin-bottom: 0.75rem;
 }
 
+.form__label__upload {
+  display: block;
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.form__label__upload:hover {
+  background-color: #55c57a;
+  font-size: 1.6rem;
+  color: #fff;
+  -webkit-box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.15);
+  -webkit-transform: translateY(-2px);
+  transform: translateY(-2px);
+}
+
+
+.form__label__upload:hover::after {
+  content: "  ➨ \a0\a0";
+  font-size: 1.6rem;
+  color: #fff;
+}
+
+
+
 .form__photo-upload {
   display: -webkit-box;
   display: -ms-flexbox;

@@ -51,12 +51,15 @@ block content
         .user-view__form-container
           h2.heading-secondary.ma-bt-md Your account settings
           
-          //- 🡣 UPDATE USER'S email and name
+          //- 🡣 UPDATE USER'S email and name (two options)
           
-          //- == option 1) WITHOUT API. Use res.render in viewsController & POST method in HTML form
-          //- form.form.form-user-data(action='/submit-user-data' method='POST')
+          //- ==== option 1) WITHOUT API. 
+          //- Use res.render in viewsController & POST method in HTML form
+          //- form.form.form-user-data(action='/submit-user-data' method='POST' enctype='multipart/form-data')
+          //- Note: ↑ Attribute: enctype='multipart/form-data' is necessary for multer package to upload files
         
-          //- == option 2) WITH API. Use updateMe function at router.patch('/updateMe', userController.updateMe); to update user with axios sending PATCH req in js/updateSettings.js
+          //- ==== option 2) WITH API. 
+          //- Use updateMe function at router.patch('/updateMe', userController.updateMe); to update user with axios sending PATCH req in js/updateSettings.js
           form.form.form-user-data
             .form__group
               label.form__label(for='name') Name
@@ -64,9 +67,23 @@ block content
             .form__group.ma-bt-md
               label.form__label(for='email') Email address
               input#userEmail.form__input(type='email', value=`${user.email}`, required, name='email')            
+            
             .form__group.form__photo-upload
               img.form__user-photo(src=`img/users/${user.photo}`, alt='User photo')
-              a.btn-text(href='') Choose new photo
+              //- a.btn-text(href='') Choose new photo
+              
+              //- Note: 
+              //- 1) Change above to below. accept='image/*' means all types of image file
+              //- 2) name='photo' attribute is for:
+              //-    a) multer package in userController (the middleware: exports.uploadUserPhoto = upload.single('photo'); )
+              //-    b) field name in user document
+              
+              //- label.form__label__upload(for='photo') Change my photo ! &nbsp;
+              input.form__upload(type='file', accept='image/*', id='photo', name='photo')
+              label(for='photo') Change my photo ! &nbsp;
+              //- Photo file upload function is controlled by userDataForm.addEventListener in index.js
+
+
             .form__group.right
               button.btn.btn--small.btn--green Save settings
               
