@@ -52,21 +52,94 @@ exports.uploadTourImages = upload.fields([
   /* Note: The upload.fields([objs,]) equals to below functions:
   upload.single('imageCover');
   upload.array('images', 3);
+
+  And for uploading multiple files for fields 'images', it will save the images as individual object inside the Array obj as req.files.images (.images is an Array obj has multiple items holds the data of each uploaded image)
   */
 
 ]);
 
 //
-exports.resizeTourImages = (req, res, next) => {
+exports.resizeTourImages = catchAsync(async (req, res, next) => {
+  // Note: For either imageCover or images, the file will be read from req.files
+  // Then will be save to req.body to be send to next middleware (tourController.updateTour)
 
-  //
-  console.log('\nThe log of req.files in resizeTourImages in tourController.js\n');
+  console.log('\n--== The log of req.files in resizeTourImages in tourController.js ==---\n');
   console.log(req.files);
 
+  // First, check if there's any .imageCover or .images is "missing" in req.files
+  if (!req.files.imageCover || !req.files.images) return next();
+
+  // ==== 1) For single file (image cover): ====
+
+  //  a) Save the name of the file in "req.body" as .imageCover
+  //   req.params.id is the tour id as passed-in id in URL
+  req.body.imageCover = `tour-${req.params.id}-${Date.now()}-cover.jpeg`;
+  /*  Note: Make a new property to req.body as ".imageCover".
+  Because the req.body will contain the data used to update document (as in Model.findByIdAndUpdate(req.params.id, req.body) in factory function).
+  So the imageCover : 'fileName.jpeg' will be the key-value pair to update document
+*/
+
+  //  b) Read (buffered) image data from req.files.imageCover with sharp() function.
+  //   Then in the end of process, save the processed file to physical disk by
+  //   the ".toFile" method with path name.
+  //  Note: ( As sharp() will return a Promise, so need to use await here. )
+  await sharp(req.files.imageCover[0].buffer) // // User the first element in uploaded files (in req.files obj)
+    .resize(2000, 1333) //resize(width, height) to 3:2 ratio
+    .toFormat('jpeg')
+    .jpeg({
+      quality: 90
+    })
+    .toFile(`public/img/tours/${req.body.imageCover}`);
+  // // ref: https://sharp.pixelplumbing.com/api-resize#parameters
+
+
+  // ==== 2) For multiple files (Images for gallery on the page) ====
+  req.body.images = []; //the empty Array as a container to hold data from each resolved Promise image object
+
+  // a) Get processed image from a resolved Promse
+  await Promise.all(
+
+    req.files.images.map(async (eachImageFile, indexOfFile) => {
+
+      // b) Create individual file name base on the index number in the images Array
+      const fileName = `tour-${req.params.id}-${Date.now()}-${indexOfFile + 1}.jpeg`;
+
+      // b) Create a Promise with a buffered object made by upload.fields([])
+      /* Note: Use .map method to read the buffer property from
+        req.files.images Array. This equals to :
+        req.files.images[0].buffer, req.files.images[1].buffer
+        req.files.images[2].buffer, etc,. ....
+      */
+      await sharp(eachImageFile.buffer)
+        .resize(2000, 1333) //resize(width, height) to 3:2 ratio
+        .toFormat('jpeg')
+        .jpeg({
+          quality: 90
+        })
+        .toFile(`public/img/tours/${fileName}`); // will be saved as file with the iterated name from variable "fileName":
+
+      // c) Push the names of each processed file into the req.body.images Array
+      /* Note: The data is now saved inside the "images" Array nested inside the "req.body" obj
+         so it can be passed into next middleware which is tourController.updateTour
+  */
+      req.body.images.push(fileName);
+
+    })
+
+    /* Note for using Promise.all() and .map function in the code below :
+       1) As .map method returns an Array filled with "Promise" item created by
+         await sharp() function, the returned Arrays will be Like:  [Prms#1,Prms#2, Prms#3, ...]
+       2) For Promise.all() , it takes argument as an Array so it will also return an Array filled with the resolved results from each Promise inside the Array
+
+       ==> So don't resolve Promise by using async/await inside a "forEach" loop
+       as this forEach mothod will  move on to next() without waiting for Promise to be resolved
+     */
+
+  );
 
   next();
 
-};
+});
 
 
 
