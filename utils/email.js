@@ -13,7 +13,7 @@ const htmlToText = require('html-to-text');
 //
 // new Email(user, url).sendWelcome();
 
-module.exports = class Email {
+module.exports = class EmailWithNodeMailer {
 
   constructor(user, url) {
     this.to = user.email;
@@ -99,6 +99,7 @@ module.exports = class Email {
   // send(pugTemplate, subject)
 
   // ===> email type 1): welcome message
+  // Used by exports.signup in authController.js
   async sendWelcome() {
     await this.send('welcome', 'Welcome to Natours!');
   }

@@ -7,7 +7,7 @@ const AppError = require('./../utils/appError');
 const {
   promisify
 } = require('util');
-const sendEmail = require('./../utils/email');
+const EmailWithNodeMailer = require('./../utils/email');
 const crypto = require('crypto');
 
 //getting token with jwt.sign method by passing in the id as argument
@@ -80,7 +80,6 @@ exports.signup = catchAsync(async (req, res, next) => {
     passwordChangedAt: req.body.passwordChangedAt,
     role: req.body.role,
   });
-
   /*  ex:
   the value of property: _id from a newly created user: 5ede44f1202c03583865838d
 
@@ -93,6 +92,13 @@ exports.signup = catchAsync(async (req, res, next) => {
   "exp": 1599400946
 }
   */
+
+  //
+  const url = `${req.protocol}://${req.get('host')}/me`;
+
+  //
+  await new EmailWithNodeMailer(newUser, url).sendWelcome();
+
   // res.status(201).json({ // 201 Created
   //   status: 'success',
   //   token: token,
@@ -420,14 +426,14 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   // 3) Send URL with reset token suffix to user's email //req.protocol is current http or https protocol
   const resetURL = `${req.protocol}://${req.get('host')}/api/va/users/resetPassword/${resetToken}`;
 
-  const messageForResetting = `Forgot your password? Submit a Patch request with your newpassword and passwordConfirm to: ${resetURL}.\nIf you didn't forget your password, please ingore this email!`;
+  const messageForResetting = `Forgot your password? Submit a Patch request with your newpassword and passwordConfirm to: ${resetURL}  \nIf you didn't forget your password, please ingore this email!`;
 
   try {
-    await sendEmail({ // use function imported(require) from './../utils/email'
-      email: user.email,
-      subject: 'Your password reset token (valid for 10 min)',
-      message: messageForResetting,
-    });
+    // await sendEmail({ // use function imported(require) from './../utils/email'
+    //   email: user.email,
+    //   subject: 'Your password reset token (valid for 10 min)',
+    //   message: messageForResetting,
+    // });
 
     res.status(200).json({
       status: 'success',
