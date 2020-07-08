@@ -73,7 +73,7 @@ exports.uploadUserPhoto = upload.single('photo');
 */
 
 // Resize user's photo upon uploading it
-exports.resizeUserPhoto = (req, res, next) => {
+exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
   // 1) first check if there's any uploaded file
   if (!req.file) return next();
 
@@ -82,7 +82,7 @@ exports.resizeUserPhoto = (req, res, next) => {
 
   // 3) save file to memory first instead of disk. This will make it return a Buffer obj due to the setting: const multerStorage = multer.memoryStorage()
   // // ref:  https://www.npmjs.com/package/multer#memorystorage
-  sharp(req.file.buffer)
+  await sharp(req.file.buffer)
     // resize(width, height)
     .resize(500, 500)
     .toFormat('jpeg')
@@ -93,7 +93,7 @@ exports.resizeUserPhoto = (req, res, next) => {
   // ref: https://sharp.pixelplumbing.com/api-resize#parameters
 
   next();
-};
+});
 
 //Obj for filtering fields that are input from the keys in req.body obj
 const filterObj = (obj, ...allowedFields) => {
