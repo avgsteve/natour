@@ -7,7 +7,7 @@ const authController = require(`./../controllers/authController`);
 const router = express.Router();
 
 //router is for user to get session only
-router.get('/checkout-session/:tourID', authController.protect, bookingController.getCheckoutSession);
+router.get('/checkout-session/:tourId', authController.protect, bookingController.getCheckoutSession);
 
 
 module.exports = router;
