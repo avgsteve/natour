@@ -25,6 +25,8 @@ const globalErrorHandler = require('./controllers/errorController'); // appError
 const tourRouter = require('./routes/tourRoutes'); // tourRoutes.js
 const userRouter = require('./routes/userRoutes'); // userRoutes.js
 const reviewRouter = require('./routes/reviewRoutes');
+const bookingRouter = require('./routes/bookingRoutes');
+
 const viewRouter = require('./routes/viewRoutes');
 const startServer = require('./server'); // server.js
 
@@ -165,6 +167,9 @@ app.use('/api/v1/users', userRouter);
 
 //
 app.use('/api/v1/reviews', reviewRouter);
+
+//
+app.use('api/v1/bookings, bookingRouter');
 
 
 // =============== GLOBAL ERROR HANDLING MIDDLEWARE ===============
