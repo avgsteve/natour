@@ -3,17 +3,14 @@
 const express = require('express');
 const viewsController = require('../controllers/viewsController');
 const authController = require('../controllers/authController');
+const bookingController = require('../controllers/bookingController');
 
 const router = express.Router();
-
-// Move this route handler above router.use(authController.isLoggedIn);
-// to prevent the other routes are protected twice by .protect and .isLoggedIn
-router.get('/me', authController.protect, viewsController.getAccount);
 
 // ***The authController.isLoggedIn middle ware can store document
 // from a logged-in user in response as "res.locals.user"
 // so after this middle ware, all the .pug templates can access the "user" property as locals
-router.use(authController.isLoggedIn);
+// router.use(authController.isLoggedIn);
 
 /* The for testing purpose
 const router = express.Router();
@@ -38,14 +35,36 @@ router.get('/', (req, res) => {
 // ======= DEFAULT PAGE AND PAGES FOR EACH TOUR DETAILS =======
 
 // default page for all tours
-router.get('/', viewsController.getOverview);
+router.get('/',
+  bookingController.createBookingCheckout,
+  authController.isLoggedIn,
+  viewsController.getOverview);
+
+/*Note: authController.isLoggedIn,
+  will check JWT in cookie and assign user data to res.locals
+  as in "res.locals.user = currentUser;"
+  for other functions to use the locals data
+*/
+
+
 
 // For routing to the individual page for tour details
 // link from: overview.pug -->  a.btn.btn--green.btn--small(href=`/tour/${tour.slug}`) Details
-router.get('/tour/:slug', viewsController.getTour);
+router.get('/tour/:slug',
+  authController.isLoggedIn,
+  viewsController.getTour);
 
 // Routing user to login page
-router.get('/login', viewsController.getLoginForm);
+router.get('/login',
+  authController.isLoggedIn,
+  viewsController.getLoginForm);
+
+// Move this route handler above router.use(authController.isLoggedIn);
+// to prevent the other routes are protected twice by .protect and .isLoggedIn
+router.get('/me',
+  authController.protect,
+  viewsController.getAccount);
+
 
 // Using form's attribute: action='/submit-user-data' method='POST' to update data
 // Then reload the page by rendering account.pug file with the data from res.locals

@@ -18,6 +18,7 @@ html
       //- In the tour.pug file, the code : block append head
       //- will append the script file and its source path back to this base.pug's block "head section"
 
+
       //- #{variable} will be pug syntax like template literal in ES6
       //- and get value from "locals" variable's value from the route handler
       <title>Natours | #{title} </title>
@@ -42,8 +43,13 @@ html
     //- script(src='/js/mapbox.js')
     //- script(src='/js/login.js')
 
+    //- 
+    //- ref:  https://stripe.com/docs/js/including
+    script(src="https://js.stripe.com/v3/")
+
     //- all script files will be bundled together into one single .js file
     script(src='/js/bundle.js')
+
         
         
         

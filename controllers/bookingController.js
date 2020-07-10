@@ -1,6 +1,7 @@
 /*jshint esversion: 6 */
 /*jshint esversion: 8 */
 const Tour = require('./../models/tourModel');
+const Booking = require('./../models/bookingModel');
 const catchAsync = require('./../utils/catchAsync');
 const factory = require('./handlerFactory');
 const AppError = require('./../utils/appError');
@@ -25,7 +26,9 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
 
     // === required parameters(properties) ====
     payment_method_types: ['card'],
-    success_url: `${req.protocol}://${req.get('host')}/`, // *_url is the page for redirecting the user to after payment is successful
+    // (not secure)
+    success_url: `${req.protocol}://${req.get('host')}/?tour=${req.params.tourId}&user=${req.user.id}&price=${tour.price}`, // *_url is the page for redirecting the user to after payment is successful
+
     cancel_url: `${req.protocol}://${req.get('host')}/tours/${tour.slug}`,
 
     //Property: "line_items" is an Array contains details and info about current product
@@ -58,6 +61,43 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   });
 
 
+});
+
+
+//
+exports.createBookingCheckout = catchAsync(async (req, res, next) => {
+
+  const {
+    tour,
+    user,
+    price
+  } = req.query;
+
+  if (!tour || !user || !price) return next();
+  /* In viewsRoutes.js:
+           router.get('/',
+      //==>   bookingController.createBookingCheckout,
+              authController.isLoggedIn,
+              viewsController.getOverview);
+  */
+
+  //
+  await Booking.create({
+    tour,
+    user,
+    price
+  });
+
+  // ${req.protocol}://${req.get('host')}
+
+  /*
+  After booking is successful, stripe will redirect user to a URL has request with query string which has data to be sent to this middleware  "createBookingCheckout" to create new Booking data.
+
+  In order to protect data, redirect user again in this middleware so the data in query string won't be revealed
+*/
+  res.redirect(req.originalUrl.split('?')[0]);
+
+  next();
 
 
 });
