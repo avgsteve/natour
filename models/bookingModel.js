@@ -24,7 +24,7 @@ const bookingSchema = new Schema({
   user: {
     //refer to parent schema
     type: mongoose.Schema.ObjectId,
-    ref: 'Tour',
+    ref: 'User',
     required: [true, 'Booking must belong to a User!']
   },
   price: {
@@ -47,11 +47,19 @@ const bookingSchema = new Schema({
 // populate the "user" field for every document queried with "find" method
 bookingSchema.pre(/^find/, function(next) {
 
-  this.populate('user')
-    .populate({
-      path: 'tour',
-      select: 'name',
-    });
+  // // console.log('\n === this :=== \n');
+  // console.log(this);
+  //
+  // console.log('\n === req.user :=== \n');
+  // console.log(req.user);
+
+  this.populate('user').populate({
+    path: 'tour',
+    select: 'name',
+  });
+
+  next();
+
 });
 
 

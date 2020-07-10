@@ -2,6 +2,7 @@
 /*jshint esversion: 8 */
 const Tour = require('../models/tourModel');
 const User = require('../models/userModel'); //to get user's document data
+const Booking = require('../models/bookingModel'); //to get user's document data
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
@@ -73,11 +74,60 @@ exports.getTour = catchAsync(async (req, res, next) => {
 });
 
 // User's management page with the URL: host/me. No need to verify user or set locals again
-exports.getAccount = (req, res) => {
+exports.getAccount = (req, res, next) => {
   res.status(200).render('account', {
     title: 'Your account'
   });
 };
+
+
+// Render booked tours in user's page
+exports.getMyTours = catchAsync(async (req, res, next) => {
+
+  // 1) Find all bookings with matched user id collection of Booking model and document
+
+  // Use current user's id  in req.user (from authController.protect) to query document's value in "user" field
+  const bookings = await Booking.find({
+    user: req.user.id
+  });
+
+  // "bookings" will be an Array contains all Booking documents are matched with user id
+
+  console.log('\n === bookings :=== \n');
+  console.log(bookings);
+
+  // 2) Find the tour id within the booking documents, then return the tour id as a new array (by iterating the bookings data for the tour Object nested in booking Object)
+  const tourIDs = bookings.map(el => el.tour._id);
+
+  console.log('\n === tourIDs :=== \n');
+  console.log(tourIDs);
+
+  const tours = await Tour.find({
+    //Then find the documents in Tour collection with the field "_id" and matched tour Id from variable "tourIDs"
+
+    _id: {
+      $in: tourIDs,
+      // [{ // This code works, too!
+      //     _id: "5c88fa8cf4afda39709c2974",
+      //     name: 'The Northern Lights',
+      //   },
+      //   {
+      //     _id: "5c88fa8cf4afda39709c295d",
+      //     name: 'The Northern Lights',
+      //   }
+      // ]
+    }
+  });
+
+  console.log('\n === tours :=== \n');
+  console.log(tours);
+
+  res.status(200).render('overview', {
+    title: 'My tours',
+    tours: tours,
+  });
+});
+
 
 //
 exports.getLoginForm = catchAsync(async (req, res, next) => {

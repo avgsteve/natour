@@ -46,8 +46,6 @@ router.get('/',
   for other functions to use the locals data
 */
 
-
-
 // For routing to the individual page for tour details
 // link from: overview.pug -->  a.btn.btn--green.btn--small(href=`/tour/${tour.slug}`) Details
 router.get('/tour/:slug',
@@ -59,11 +57,15 @@ router.get('/login',
   authController.isLoggedIn,
   viewsController.getLoginForm);
 
-// Move this route handler above router.use(authController.isLoggedIn);
-// to prevent the other routes are protected twice by .protect and .isLoggedIn
+// User's personal data, reviews and password reset
 router.get('/me',
   authController.protect,
   viewsController.getAccount);
+
+// User's booking data
+router.get('/my-tours',
+  authController.protect,
+  viewsController.getMyTours);
 
 
 // Using form's attribute: action='/submit-user-data' method='POST' to update data
