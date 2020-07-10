@@ -42,7 +42,7 @@ router.get('/', viewsController.getOverview);
 
 // For routing to the individual page for tour details
 // link from: overview.pug -->  a.btn.btn--green.btn--small(href=`/tour/${tour.slug}`) Details
-router.get('/tour/:slug', authController.protect, viewsController.getTour);
+router.get('/tour/:slug', viewsController.getTour);
 
 // Routing user to login page
 router.get('/login', viewsController.getLoginForm);

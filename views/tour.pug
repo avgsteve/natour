@@ -179,4 +179,19 @@ block content
         //- p.cta__text 10 days. 1 adventure. Infinite memories. Make it yours today!
         p.cta__text=`${tour.duration} days. 1 adventure. Infinite memories. Make it yours today!`
         
-        button.btn.btn--green.span-all-rows Book tour now!
+
+        //- If there's no user logged in, use this button to ask user to log in
+        if user  
+
+          //- use attribute (data-tour-id=`${tour.id}`) to let route handler access this tour's id because this html pug file is rendered by viewsController.getTour function
+          button.btn.btn--green.span-all-rows#book-tour(data-tour-id=`${tour.id}`) Book tour now!
+          
+        else
+                    
+          a.button.btn.btn--green.span-all-rows(href='/login') Log in to book this tour!
+
+          
+          
+          
+          
+          
