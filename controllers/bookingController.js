@@ -30,7 +30,7 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
 
     //Property: "line_items" is an Array contains details and info about current product
     line_items: [
-      // Use obj's key and value to input details
+      // Use key and value in obj argument to input details
       // ref:  https://stripe.com/docs/api/checkout/sessions/create?lang=node#create_checkout_session-line_items
       {
         name: `${tour.name} Tour`,
