@@ -1,5 +1,7 @@
 /*jshint esversion: 6 */
 /*jshint esversion: 8 */
+// All packages and imported scripts will be consolidated into one single file bundle.js by package "parcel-bundler": "^1.12.4" with command :  npm run watch:js  or  npm run build:js
+
 import '@babel/polyfill';
 import {
   displayMap
@@ -14,19 +16,25 @@ import {
 import {
   updateSettings //for updating user's name & email @host/me page
 } from './updateSettings';
+import {
+  bookTour
+} from './stripe'; //
 
 
-// == 1) preparation before executing functions with DOM elements
-// == setting up variables for DOM ELEMENTS to be used in later on
+// ==== 1) Preparation before executing functions with DOM elements
+// by setting up variables for DOM ELEMENTS to be used in later on
 const mapBox = document.getElementById('map'); //for #map id
 const loginForm = document.querySelector('.form--login'); //for .form class
 const logOutBtn = document.querySelector('.nav__el--logout'); //
 const userDataForm = document.querySelector('.form-user-data'); // for updating user's name & email from form class .form-user-data with updateDate()
 const userPasswordForm = document.querySelector('.form-user-password'); // for updating user's password & with updateDate()
+const bookBtn = document.getElementById('book-tour'); //for #map id
 
-// == 2) Set .addEventListener to elements that are present in the HTML for triggering functions
 
-// === (login.js) Get email and password from the form in host/login page
+// ==== 2) Set .addEventListener to elements that are present in the HTML for triggering functions
+
+//  --== (From login.js ==--
+//  Get email and password from the form in host/login page
 if (loginForm) {
 
   loginForm.addEventListener('submit', element => {
@@ -43,7 +51,10 @@ if (loginForm) {
 
 }
 
-// ==== for mapbox.js ===
+
+// --== for mapbox.js ==--
+// Render map on single tour page
+
 /* Note for using mapbox in index.js:
 // Will need to pass in the locations data as argument into displayMap() to render map in HTML section with id: #map
 
@@ -56,12 +67,14 @@ if (mapBox) {
   displayMap(locations);
 }
 
+
 // ==== Log user out with the "logout" function from login.js ===
 if (logOutBtn) {
 
   logOutBtn.addEventListener('click', logout);
 
 }
+
 
 // ==== Update user's name and email when there's form with class .form-user-data===
 if (userDataForm) {
@@ -135,6 +148,30 @@ if (userPasswordForm) {
 
   });
 }
+
+
+if (bookBtn) {
+  bookBtn.addEventListener('click', element => {
+
+    element.target.textContent = 'Processing ...';
+
+    const tourId = element.target.dataset.tourId; //get the Id of the current tour page
+
+    /*Note for using "element.target.dataset.tourId" :
+    1) In tour.pug,
+    button.btn.btn--green.span-all-rows#book-tour(data-tour-id=`${tour.id}`) Book tour now!
+    2) Can use syntax like this:  const {tourId} = e.target.dataset;
+    */
+
+    console.log('\n  (from js/index.js) The tour id in page: ' + tourId);
+
+    bookTour(tourId); // Create session by using function bookTour = async tourId => { ... in stripe.js
+
+  });
+
+}
+
+
 
 //
 //

@@ -5,6 +5,8 @@ const express = require('express');
 const authController = require(`./../controllers/authController`);
 
 const router = express.Router();
+// In app.js,
+// app.use('/api/v1/bookings', bookingRouter);
 
 //router is for user to get session only
 router.get('/checkout-session/:tourId', authController.protect, bookingController.getCheckoutSession);
