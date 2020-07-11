@@ -32,8 +32,10 @@ export const updateSettings = async (dataToUpdate, typeOfUpdate) => {
   try {
     //decide what end-point of URL to use for updating either password or data.
     const urlEndPoint = typeOfUpdate === 'password' ?
-      'http://127.0.0.1:3000/api/v1/users/updateMyPassword' :
-      'http://127.0.0.1:3000/api/v1/users/updateMe';
+      // 'http://127.0.0.1:3000/api/v1/users/updateMyPassword' :
+      // 'http://127.0.0.1:3000/api/v1/users/updateMe';
+      '/api/v1/users/updateMyPassword' :
+      '/api/v1/users/updateMe';
 
     const res = await axios({
       method: 'PATCH',

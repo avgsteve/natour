@@ -25,7 +25,7 @@ export const bookTour = async tourId => {
 
   try {
     // 1) Get checkout session via API from backend
-    const sessionForCheckout = await axios(`http://127.0.0.1:3000/api/v1/bookings/checkout-session/${tourId}`); // will trigger bookingController.getCheckoutSession
+    const sessionForCheckout = await axios(`/api/v1/bookings/checkout-session/${tourId}`); // will trigger bookingController.getCheckoutSession
 
     //  Log session data in browser
     console.log('\n  (from js/stripe.js) The session  for checkout created with the tour id sent to server with axios: ' + tourId + ":\n");

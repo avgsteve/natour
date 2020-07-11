@@ -108,15 +108,20 @@ mongoose.connect(DB, {
 
 //=======================================================
 
-
 const app = require("./app"); // getting all config from app.js , so use nodemon server.js to start server
 
 const port = process.env.PORT || 3000; // the port to be used for the localhost page
 
+
 const server = app.listen(port, () => {
+
+  // var host = server.address();
+  // var port = server.address().port;
+
   console.log("\x1b[31m",
     `\n\n(from ${scriptName}:) =>> App running on port: ${port}...` + "\x1b[0m" + `\n\nThe full address is: ${'\x1b[4m'}http://127.0.0.1:${port}` +
     "\x1b[0m" + "\n\n");
+
 
   //IIFE with a IIFE has a delayed log
   (
@@ -126,5 +131,6 @@ const server = app.listen(port, () => {
       }, 1000);
     }
   )();
+
 
 });

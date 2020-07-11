@@ -15,7 +15,8 @@ export const login = async (email, password) => {
 
     const result = await axios({
       method: 'POST',
-      url: 'http://127.0.0.1:3000/api/v1/users/login',
+      // url: 'http://127.0.0.1:3000/api/v1/users/login',
+      url: '/api/v1/users/login', // relative URL
       data: {
         email: email,
         password: password
@@ -71,7 +72,8 @@ export const logout = async (email, password) => {
     // Send a get request to server to get a token for log-out
     const res = await axios({
       method: 'GET',
-      url: 'http://127.0.0.1:3000/api/v1/users/logout'
+      // url: 'http://127.0.0.1:3000/api/v1/users/logout'
+      url: '/api/v1/users/logout', // relative URL
     });
 
     // if the GET req is successful

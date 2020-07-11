@@ -11,6 +11,7 @@ const xss = require('xss-clean');
 const hpp = require('hpp');
 const path = require('path');
 const cookieParser = require('cookie-parser');
+const compression = require('compression');
 
 // for reading Environment Variables from config.env file
 dotenv.config({
@@ -80,6 +81,10 @@ app.use(xss()); //https://www.npmjs.com/package/xss-clean
 app.use(hpp({
   whitelist: ['duration', 'ratingsQuantity', 'ratingsAverage', 'maxGroupSize', 'difficulty', 'price'],
 }));
+
+// === Data compression === (exclude compressed images)
+app.use(compression()); //https://github.com/expressjs/compression#options
+
 
 
 // ===== REQUEST Limiter for IP ======
