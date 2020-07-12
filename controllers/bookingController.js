@@ -102,9 +102,14 @@ const createBookingCheckout = async () => {
   //line_items will be display_items
   const price = session.display_items[0].amount / 100;
 
+  console.log("\x1b[33m" + "\n=== The log of createBookingCheckout fow NEW BOOKING ===\n" + "\x1b[0m");
+  console.log(`The tour Id:  ${tour} ,  user Id: ${userId} ,  price: ${price}`);
+  console.log("\x1b[33m" + "\n=== end of log of createBookingCheckout ===\n\n" + "\x1b[0m");
+
+
   await Booking.create({
     tour,
-    user,
+    userId,
     price
   });
 };
