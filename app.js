@@ -11,6 +11,8 @@ const xss = require('xss-clean');
 const hpp = require('hpp');
 const path = require('path');
 const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+
 const compression = require('compression');
 const cors = require('cors');
 
@@ -123,7 +125,7 @@ app.use('/api', limiter);
 
 // === Webhooks from Stripe for creating a new booking data after completing checkout
 
-app.post('/webhook-checkout', express.raw({
+app.post('/webhook-checkout', bodyParser.raw({
   type: 'application/json'
 }), bookingController.webhookCheckout);
 // https://proj-natours-with-steve.herokuapp.com/webhook-checkout
