@@ -122,8 +122,6 @@ exports.webhookCheckout = (req, res, next) => {
 
   console.log(req.headers);
 
-  console.log(flattenObject(req.headers));
-
   console.log("\x1b[33m" + "\n=== end of log of createBookingCheckout ===\n\n" + "\x1b[0m");
 
 
