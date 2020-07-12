@@ -33,6 +33,9 @@ const startServer = require('./server'); // server.js
 
 
 const app = express();
+
+// For deploying on Heroku as it uses proxy
+app.enable('trust proxy');
 //
 app.set('view engine', 'pug');
 //And create a path with a joined path name

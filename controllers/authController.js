@@ -30,34 +30,55 @@ const signToken = id => {
 };
 
 
-const createSendToken = (user, statusCode, res) => {
+// Sign a token and set cookie for user
+const createSendToken = (user, statusCode, req, res) => {
 
+  //
   const token = signToken(user._id);
 
-  //cookieOptions is used in res.cookie as a setting option for res.cookie which can save cookie for client
-  const cookieOptions = {
-    // Option: expires .  Expiry date of the cookie in GMT. If not specified or set to 0, creates a session cookie.
+  res.cookie('jwt', token, {
+    // res.cookie(name, value [, options Obj])
+    // ref: http://expressjs.com/en/5x/api.html#res.cookie
+
     expires: new Date(
+      // Option: expires . Set expiry date of the cookie in GMT. If not specified or set to 0, creates a session cookie.
+
       //conver the value in .JWT_COOKIE_EXPIRES_IN to day (* 24 * 60 * 60 * 1000)
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000 // * 24 * 60 * 60 * 1000 => one day
     ),
 
-    // secure: true, // via https only (switching this value with below code)
-    httpOnly: true // Flags the cookie to be accessible only by the web server to preven cross site scripting attack
-  };
+    secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
+    // secure: If true, this will mark the cookie to be used with HTTPS only.
 
-  if (process.env.NODE_ENV === 'production') {
-    // set secure option to true when in production mode
-    cookieOptions.secure = false;
-  }
+    // req.secure: A Boolean property that is true if a TLS connection is established. Equivalent to the following: req.protocol === 'https'  . ref:  http://expressjs.com/en/5x/api.html#req.secure
 
-  //res.cookie(name, value [, options Obj])
-  res.cookie('jwt', token, cookieOptions
-    //ref for res.cookie & CookieOptions:  https://expressjs.com/en/api.html#res.cookie
-  );
+    // req.headers: ( ref to Notes 3) )https://developer.mozilla.org/en-US/docs/Glossary/Request_header
 
-  // temperarily set user.password to undefined which will not actually save it to document. Doing so , we can hide the password field from the user results
-  user.password = "not to be shown";
+    /*Notes:
+    1) https://stackoverflow.com/questions/35564896/req-secure-in-node-alwys-false
+
+    Solution: req.get('x-forwarded-proto')
+
+    2) https://stackoverflow.com/questions/40876599/express-js-force-https-ssl-redirect-error-too-many-redirects
+
+    Solution: req.get('X-Forwarded-Proto')=='https'
+
+    3) Heroku headers
+    https://devcenter.heroku.com/articles/http-routing#heroku-headers
+
+    All headers are considered to be case-insensitive, as per HTTP Specification. The X-Forwarded-For, X-Forwarded-By, X-Forwarded-Proto, and X-Forwarded-Host headers are not trusted for security reasons, because it is not possible to know the order in which already existing fields were added (as per Forwarded HTTP Extension).
+
+    X-Forwarded-Proto: the originating protocol of the HTTP request (example: https)
+
+    */
+
+    httpOnly: true, // Flags the cookie to be accessible only by the web server to preven cross site scripting attack
+
+  });
+  //ref for res.cookie & CookieOptions:  https://expressjs.com/en/api.html#res.cookie
+
+  // ==== temperarily set user.password to undefined which will not actually save it to document. Doing so , we can hide the password field from the user results
+  user.password = "not to be shown :";
 
   res.status(statusCode).json({
     status: 'success',
@@ -67,6 +88,8 @@ const createSendToken = (user, statusCode, res) => {
     },
   });
 };
+
+
 
 // ========== SIGN UP ===========
 exports.signup = catchAsync(async (req, res, next) => {
@@ -107,7 +130,7 @@ exports.signup = catchAsync(async (req, res, next) => {
   //   },
   // });
   // === replace above code with below: ==
-  createSendToken(newUser, 201, res);
+  createSendToken(newUser, 201, req, res);
 
   /*result:
   _id : 5ed84b10cc2af35554aac39f
@@ -178,7 +201,7 @@ exports.login = catchAsync(async (req, res, next) => {
   //   },
   // });
   // === replace above code with below: == */
-  createSendToken(user, 200, res);
+  createSendToken(user, 200, req, res);
 
 
 });
