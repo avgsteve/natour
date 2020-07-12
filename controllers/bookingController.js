@@ -19,8 +19,7 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
 
   // 1) Get the currently booked tour
   const tour = await Tour.findById(req.params.tourId);
-  console.log(tour);
-
+  // console.log(tour);
 
   // 2) Create checkout session
   const session = await stripe.checkout.sessions.create({
@@ -89,9 +88,10 @@ exports.createBookingCheckout = catchAsync(async (req, res, next) => {
 */
 
 
-const createBookingCheckout = async () => {
+const createBookingCheckout = async session => {
 
   const tour = session.client_reference_id;
+
   const userId = (
     await User.findOne( //find user's data(document) with the email
       {
@@ -116,26 +116,6 @@ const createBookingCheckout = async () => {
 
 //receive body from req and create event with signature to create new booking
 exports.webhookCheckout = (req, res, next) => {
-
-  var flattenObject = function(ob) {
-    var toReturn = {};
-
-    for (var i in ob) {
-      if (!ob.hasOwnProperty(i)) continue;
-
-      if ((typeof ob[i]) == 'object') {
-        var flatObject = flattenObject(ob[i]);
-        for (var x in flatObject) {
-          if (!flatObject.hasOwnProperty(x)) continue;
-
-          toReturn[i + '.' + x] = flatObject[x];
-        }
-      } else {
-        toReturn[i] = ob[i];
-      }
-    }
-    return toReturn;
-  };
 
 
   console.log("\x1b[33m" + "\n=== The log of req.headers in webhookCheckout ===\n" + "\x1b[0m");
@@ -162,6 +142,7 @@ exports.webhookCheckout = (req, res, next) => {
     console.log("\x1b[33m" + "\n=== There's an error in webhookCheckout.bookingController===\n" + "\x1b[0m");
     console.log(error);
     console.log("\x1b[33m" + "\n=== end of error log in webhookCheckout.bookingController===\n\n" + "\x1b[0m");
+
     return res.status(400).send(`Webhooks error: ${error.message}`);
   }
 
