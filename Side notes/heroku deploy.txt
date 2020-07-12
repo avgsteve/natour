@@ -1,0 +1,54 @@
+heroku config:set NODE_ENV=production
+
+heroku config:set DATABASE='mongodb+srv://steveleng:<PASSWORD>@cluster0-pjopu.mongodb.net/natours?retryWrites=true'
+
+
+
+https://www.udemy.com/course/nodejs-express-mongodb-bootcamp/learn/lecture/15087432#questions/8271010
+
+1)
+If you're on Windows, use double quotes to set the string:
+
+heroku config:set DATABASE="mongodb+srv://tmurv:<PASSWORD>@cluster0-tbeby.mongodb.net/natours?retryWrites=true&w=majority"
+
+
+2) Heroku has a web interface where you can enter the environment variables:
+dashboard.heroku.com/apps/YOUR-APP-NAME-Here/settings
+
+===>  
+dashboard.heroku.com/apps/limitless-ravine-63116/settings
+
+
+
+3) heroku config:setDATABASE_PASSWORD=BojLO0179hJ9kGYV
+
+
+
+heroku open
+
+heroku logs -t
+
+heroku apps:rename project-natours-with-steve
+
+
+
+https://www.giftofspeed.com/gzip-test/
+
+
+4) Re-deploy server after making changes
+
+git add -A
+
+git commit -m 'Add heroku config'
+
+git push heroku master
+
+
+5) Sending SIGTERM
+
+heroku ps
+
+heroku ps:restart
+
+heroku logs --tail
+
