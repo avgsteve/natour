@@ -117,6 +117,36 @@ const createBookingCheckout = async () => {
 //receive body from req and create event with signature to create new booking
 exports.webhookCheckout = (req, res, next) => {
 
+  var flattenObject = function(ob) {
+    var toReturn = {};
+
+    for (var i in ob) {
+      if (!ob.hasOwnProperty(i)) continue;
+
+      if ((typeof ob[i]) == 'object') {
+        var flatObject = flattenObject(ob[i]);
+        for (var x in flatObject) {
+          if (!flatObject.hasOwnProperty(x)) continue;
+
+          toReturn[i + '.' + x] = flatObject[x];
+        }
+      } else {
+        toReturn[i] = ob[i];
+      }
+    }
+    return toReturn;
+  };
+
+
+  console.log("\x1b[33m" + "\n=== The log of req.headers in webhookCheckout ===\n" + "\x1b[0m");
+
+  console.log(req.headers);
+
+  console.log(flattenObject(req.headers));
+
+  console.log("\x1b[33m" + "\n=== end of log of createBookingCheckout ===\n\n" + "\x1b[0m");
+
+
   //stripe will create a signature in the req.headers
   const signature = req.headers['stripe-signature'];
 

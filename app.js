@@ -83,19 +83,43 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev')); // https://www.npmjs.com/package/morgan#dev
 }
 
+// ===== REQUEST Limiter for IP ======
+const limiter = rateLimit({
+  max: 100,
+  windowMs: 60 * 60 * 1000,
+  message: 'Too many request from this IP, please try again in an hour.',
+  //ref:  https://www.npmjs.com/package/express-rate-limit
+});
+
+app.use('/api', limiter);
+
+// === Webhooks from Stripe for creating a new booking data after completing checkout
+app.post(
+  '/webhook-checkout',
+  bodyParser.raw({
+    type: 'application/json'
+  }),
+  bookingController.webhookCheckout
+);
+// https://proj-natours-with-steve.herokuapp.com/webhook-checkout
+// http://expressjs.com/en/api.html#express.raw
+// must update to above express.js version 4.17.0
+//
+
 // === req.body parser . Reading data from body into req.body===
 app.use(express.json({
   limit: '10kb',
 })); //middleware的使用解說參照git commit 54-1 Node.js Express 的 Middleware的使用 &解說
-
-// === Parsing Cookie from client request ===
-app.use(cookieParser()); // will display req.cookie in test middle ware
 
 // === Parse request data from form submitted
 app.use(express.urlencoded({
   extended: true,
   limit: '10kb'
 }));
+
+// === Parsing Cookie from client request ===
+app.use(cookieParser()); // will display req.cookie in test middle ware
+
 
 // === Data sanitization against NoSQL query injection attack ===
 app.use(mongoSanitize()); //https://www.npmjs.com/package/express-mongo-sanitize
@@ -110,28 +134,6 @@ app.use(hpp({
 
 // === Data compression === (exclude compressed images)
 app.use(compression()); //https://github.com/expressjs/compression#options
-
-
-
-// ===== REQUEST Limiter for IP ======
-const limiter = rateLimit({
-  max: 100,
-  windowMs: 60 * 60 * 1000,
-  message: 'Too many request from this IP, please try again in an hour.',
-  //ref:  https://www.npmjs.com/package/express-rate-limit
-});
-
-app.use('/api', limiter);
-
-// === Webhooks from Stripe for creating a new booking data after completing checkout
-
-app.post('/webhook-checkout', bodyParser.raw({
-  type: 'application/json'
-}), bookingController.webhookCheckout);
-// https://proj-natours-with-steve.herokuapp.com/webhook-checkout
-// http://expressjs.com/en/api.html#express.raw
-// must update to above express.js version 4.17.0
-//
 
 
 // //for testing middleware
