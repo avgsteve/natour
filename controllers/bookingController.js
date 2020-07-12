@@ -93,7 +93,7 @@ const createBookingCheckout = async () => {
 
   const tour = session.client_reference_id;
   const userId = (
-    await User.findyOne( //find user's data(document) with the email
+    await User.findOne( //find user's data(document) with the email
       {
         email: session.customer_email,
       } //
