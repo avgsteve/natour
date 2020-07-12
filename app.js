@@ -33,6 +33,8 @@ const userRouter = require('./routes/userRoutes'); // userRoutes.js
 const reviewRouter = require('./routes/reviewRoutes');
 const bookingRouter = require('./routes/bookingRoutes');
 
+const bookingController = require('./controllers/bookingController');
+
 const viewRouter = require('./routes/viewRoutes');
 const startServer = require('./server'); // server.js
 
@@ -119,6 +121,13 @@ const limiter = rateLimit({
 
 app.use('/api', limiter);
 
+// === Webhooks from Stripe for creating a new booking data after completing checkout
+
+app.post('/webhook-checkout', express.raw({
+  type: 'application/json'
+}), bookingController.webhookCheckout);
+// https://proj-natours-with-steve.herokuapp.com/webhook-checkout
+// http://expressjs.com/en/api.html#express.raw
 
 
 

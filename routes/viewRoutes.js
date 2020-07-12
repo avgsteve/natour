@@ -36,7 +36,6 @@ router.get('/', (req, res) => {
 
 // default page for all tours
 router.get('/',
-  bookingController.createBookingCheckout,
   authController.isLoggedIn,
   viewsController.getOverview);
 

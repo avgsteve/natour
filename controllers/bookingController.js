@@ -2,6 +2,7 @@
 /*jshint esversion: 8 */
 const Tour = require('./../models/tourModel');
 const Booking = require('./../models/bookingModel');
+const User = require('./../models/userModel');
 const catchAsync = require('./../utils/catchAsync');
 const factory = require('./handlerFactory');
 const AppError = require('./../utils/appError');
@@ -27,9 +28,10 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
     // === required parameters(properties) ====
     payment_method_types: ['card'],
     // (not secure)
-    success_url: `${req.protocol}://${req.get('host')}/?tour=${req.params.tourId}&user=${req.user.id}&price=${tour.price}`, // *_url is the page for redirecting the user to after payment is successful
-
+    // success_url: `${req.protocol}://${req.get('host')}/?tour=${req.params.tourId}&user=${req.user.id}&price=${tour.price}`, // *_url is the page for redirecting the user to after payment is successful
+    success_url: `${req.protocol}://${req.get('host')}/my-tours`,
     cancel_url: `${req.protocol}://${req.get('host')}/tours/${tour.slug}`,
+    customer_email: req.user.email,
 
     //Property: "line_items" is an Array contains details and info about current product
     line_items: [
@@ -63,45 +65,83 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
 
 });
 
-
-//
+/* // exports.createBookingCheckout
 exports.createBookingCheckout = catchAsync(async (req, res, next) => {
-
-  const {
-    tour,
-    user,
-    price
-  } = req.query;
-
+  const {    tour,    user,    price  } = req.query;
   if (!tour || !user || !price) return next();
-  /* In viewsRoutes.js:
-           router.get('/',
-      //==>   bookingController.createBookingCheckout,
-              authController.isLoggedIn,
-              viewsController.getOverview);
-  */
 
-  //
+  // In viewsRoutes.js:
+  //          router.get('/',
+  //     //==>   bookingController.createBookingCheckout,
+  //             authController.isLoggedIn,
+  //             viewsController.getOverview);
+
+  await Booking.create({    tour,    user,    price  });
+
+  // ${req.protocol}://${req.get('host')}
+
+  // After booking is successful, stripe will redirect user to a URL has request with query string which has data to be sent to this middleware  "createBookingCheckout" to create new Booking data.
+  // In order to protect data, redirect user again in this middleware so the data in query string won't be revealed
+
+  res.redirect(req.originalUrl.split('?')[0]);
+  next();
+});
+*/
+
+
+const createBookingCheckout = async () => {
+
+  const tour = session.client_reference_id;
+  const userId = (
+    await User.findyOne( //find user's data(document) with the email
+      {
+        email: session.customer_email,
+      } //
+    )
+  ).id;
+  //line_items will be display_items
+  const price = session.display_items[0].amount / 100;
+
   await Booking.create({
     tour,
     user,
     price
   });
+};
 
-  // ${req.protocol}://${req.get('host')}
+//receive body from req and create event with signature to create new booking
+exports.webhookCheckout = (req, res, next) => {
 
-  /*
-  After booking is successful, stripe will redirect user to a URL has request with query string which has data to be sent to this middleware  "createBookingCheckout" to create new Booking data.
+  //stripe will create a signature in the req.headers
+  const signature = req.headers['stripe-signature'];
 
-  In order to protect data, redirect user again in this middleware so the data in query string won't be revealed
-*/
-  res.redirect(req.originalUrl.split('?')[0]);
+  let event;
 
-  next();
+  try {
+    event = stripe.webhooks.constructEvent(
+      req.body, //req.body must be in raw form
+      signature,
+      process.env.STRIPE_WEBHOOK_SECRET_KEY // webhooks secret:  https://dashboard.stripe.com/test/webhooks/
+    );
+  } catch (error) {
+    console.log("\x1b[33m" + "\n=== There's an error in webhookCheckout.bookingController===\n" + "\x1b[0m");
+    console.log(error);
+    console.log("\x1b[33m" + "\n=== end of error log in webhookCheckout.bookingController===\n\n" + "\x1b[0m");
+    return res.status(400).send(`Webhooks error: ${error.message}`);
+  }
 
+  //
+  if (event.type === 'checkout.session.completed') {
+    createBookingCheckout(event.data.object); // create new Booking document
+  }
 
-});
+  //send data to stripe
+  res.status(200).json({
+    received: true
+  });
+  //ref:  https://stripe.com/docs/webhooks/signatures
 
+};
 
 exports.createBooking = factory.createOne(Booking);
 exports.getOneBooking = factory.getOne(Booking);
