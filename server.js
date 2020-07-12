@@ -131,7 +131,7 @@ const port = process.env.PORT || 3000; // the port to be used for the localhost 
 
 const server = app.listen(port, () => {
 
-  var hostAddress = server.address() === "::" ? server.address() : '127.0.0.1';
+  var hostAddress = server.address() ? server.address() : '127.0.0.1';
   var port = server.address().port;
   const timestamp = timeStamp.getTimeStamp();
 

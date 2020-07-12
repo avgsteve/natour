@@ -12,6 +12,8 @@ const hpp = require('hpp');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const compression = require('compression');
+const cors = require('cors');
+
 const timeStamp = require('./utils/timeStamp');
 
 
@@ -46,6 +48,20 @@ app.set('views', path.join(__dirname, 'views')); // which is the "views" folder 
 
 
 // 1) ============== MIDDLE-WARES ==============
+
+// === Implement CORS ===
+app.use(cors());
+// set header : Access-Control-Allow-Origin
+
+// To allow certain specific domain or site to access API
+// app.use(cors({
+//   origin: 'https://proj-natours-with-steve.herokuapp.com/',
+// }));
+
+// To allow access on all routes
+app.options('*', cors());
+// // To allow only certain routes
+// app.options('/api/v1/tours/:id', cors());
 
 // === SERVING STATIC FILES ===
 // build-in middleware "express.static" for serving static file like .html
@@ -172,6 +188,8 @@ app.use('/', viewRouter);
 
 // --->>> 3-2) 將 tourRouter.route('/:id').get(getTour).patch(updateTour).delete(deleteTour);    移到 tourRouter.js，針對此URI '/api/v1/tours'  改為使用 tourRouter middleware的方式作為 router
 app.use('/api/v1/tours', tourRouter);
+// app.use('/api/v1/tours', cors(), tourRouter); // Allow cors for this route
+
 
 // --->>> 3-3) 將 route actions for users  //移到 tourRouter.js，針對此URI '/api/v1/users'  改為使用 middleware的方式作為 router
 app.use('/api/v1/users', userRouter);
