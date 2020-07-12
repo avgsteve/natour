@@ -66,17 +66,31 @@ MongooseError [MongooseServerSelectionError]: Could not connect to any servers i
 
 // });
 
-// process.on('uncaughtException', err => {
-//
-//   console.log("uncaught exception! 🤔 And shutting down now...");
-//   console.log('\n\n=== uncaughtException error log ===\n');
-//   console.log(err.name, err.message); //see below for full error log
-//
-//   server.close(() => {
-//     process.exit(1);
-//   });
-//
-// });
+process.on('uncaughtException', err => {
+
+  console.log("uncaught exception! 🤔 And shutting down now...");
+  console.log('\n\n=== uncaughtException error log ===\n');
+  console.log(err.name, err.message); //see below for full error log
+
+  server.close(() => {
+    process.exit(1);
+  });
+
+});
+
+
+// Log the message when Heroku sending a SIGTERM for shutting down after inactivity every 24 hours
+process.on('SIGTERM', () => {
+
+  console.log(`\nSIGTERM RECEIVED! Shutting down now ... 👋 \n`);
+
+  //Log a message for terminating all process when closing server
+  server.close(() => {
+    console.log(`All processes terminated! 🔚`);
+  });
+});
+
+
 
 
 //==============  DATABASE RELATED SECTION  ================
