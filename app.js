@@ -12,6 +12,9 @@ const hpp = require('hpp');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const compression = require('compression');
+const timeStamp = require('./utils/timeStamp');
+
+
 
 // for reading Environment Variables from config.env file
 dotenv.config({

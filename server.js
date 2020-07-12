@@ -4,6 +4,8 @@ const path = require('path');
 const scriptName = path.basename(__filename);
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
+const timeStamp = require('./utils/timeStamp');
+
 
 // ==================================
 //process.on ==> event listener
@@ -115,11 +117,12 @@ const port = process.env.PORT || 3000; // the port to be used for the localhost 
 
 const server = app.listen(port, () => {
 
-  // var host = server.address();
-  // var port = server.address().port;
+  var hostAddress = server.address() === "::" ? server.address() : '127.0.0.1';
+  var port = server.address().port;
+  const timestamp = timeStamp.getTimeStamp();
 
   console.log("\x1b[31m",
-    `\n\n(from ${scriptName}:) =>> App running on port: ${port}...` + "\x1b[0m" + `\n\nThe full address is: ${'\x1b[4m'}http://127.0.0.1:${port}` +
+    `\n\n(from ${scriptName}:) =>> App running on port: ${port}...` + "\x1b[0m" + `\n\nThe full address is: ${'\x1b[4m'}http://${hostAddress}:${port}` +
     "\x1b[0m" + "\n\n");
 
 
@@ -128,7 +131,8 @@ const server = app.listen(port, () => {
     () => {
       setTimeout(() => {
         console.log("Establishing connection to database ...");
-      }, 1000);
+        console.log(`\nCurrent time : ${timestamp} (UCT+8)`);
+      }, 300);
     }
   )();
 
