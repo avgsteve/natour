@@ -31,6 +31,10 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
     success_url: `${req.protocol}://${req.get('host')}/my-tours`,
     cancel_url: `${req.protocol}://${req.get('host')}/tours/${tour.slug}`,
     customer_email: req.user.email,
+    // ==== optional parameters(properties)
+    // To create a new booking
+    client_reference_id: req.params.tourId,
+
 
     //Property: "line_items" is an Array contains details and info about current product
     line_items: [
@@ -47,9 +51,6 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
     ],
     mode: 'payment',
 
-    // ==== optional parameters(properties)
-    // To create a new booking
-    client_reference_id: req.params.tourId,
 
 
   });
@@ -92,13 +93,11 @@ const createBookingCheckout = async session => {
 
   const tour = session.client_reference_id;
 
-  const userId = (
-    await User.findOne( //find user's data(document) with the email
-      {
-        email: session.customer_email,
-      } //
-    )
-  ).id;
+  const userId = (await User.findOne( //find user's data(document) with the email
+    {
+      email: session.customer_email,
+    } //
+  ))._id;
   //line_items will be display_items
   const price = session.display_items[0].amount / 100;
 
@@ -120,7 +119,7 @@ exports.webhookCheckout = (req, res, next) => {
 
   console.log("\x1b[33m" + "\n=== The log of req.headers in webhookCheckout ===\n" + "\x1b[0m");
 
-  console.log(req.headers);
+  console.log(req.headers); //
 
   console.log("\x1b[33m" + "\n=== end of log of createBookingCheckout ===\n\n" + "\x1b[0m");
 
