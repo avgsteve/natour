@@ -111,7 +111,7 @@ app.use(express.json({
   limit: '10kb',
 })); //middleware的使用解說參照git commit 54-1 Node.js Express 的 Middleware的使用 &解說
 
-// === Parse request data from form submitted
+// === Parse request data from form submitted //
 app.use(express.urlencoded({
   extended: true,
   limit: '10kb'

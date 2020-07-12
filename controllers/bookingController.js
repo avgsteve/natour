@@ -146,7 +146,7 @@ exports.webhookCheckout = (req, res, next) => {
     createBookingCheckout(event.data.object); // create new Booking document
   }
 
-  //send data to stripe
+  //send data to stripe //
   res.status(200).json({
     received: true
   });

@@ -10,7 +10,7 @@ const router = express.Router();
 
 router.use(authController.protect);
 
-//router is for user to get session only
+//router is for user to get session only //
 router.get('/checkout-session/:tourId', bookingController.getCheckoutSession);
 
 
