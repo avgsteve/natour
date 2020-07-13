@@ -1,8 +1,9 @@
 /*jshint esversion: 6 */
 /*jshint esversion: 8 */
 /*jshint esversion: 9 */
+const timeStamp = require('./../utils/timeStamp');
+const timestamp = timeStamp.getTimeStamp(); // use console.log(`\nCurrent time : ${timestamp} (UCT+8)`);
 const AppError = require('./../utils/appError');
-
 //transform the mongoose err obj to easy-to-ready AppError obj
 const handleCastErrorDB = err => {
   const message = `Invalid ${err.path}: ${err.value}.}`;
@@ -146,6 +147,7 @@ module.exports = (err, req, res, next) => {
   // Ex: from the const err = new Error(`Can't find ...) inside the function app.all('*', (req, res, next) => {
   console.log(`\n=== Error log track from errorController.js ( (err, req, res, next) => { ... ===\n`);
   console.log(err.stack);
+  console.log(`\n↑↑↑ The error is logged at: ${timestamp} (UCT+8) ↑↑↑\n`);
   console.log(`\n=== End of Error log track from errorController.js ( (err, req, res, next) => { ... ===\n\n`);
 
   //to process income error code by express.js

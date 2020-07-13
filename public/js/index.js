@@ -108,7 +108,7 @@ if (userDataForm) {
 
 }
 
-// ==== Update user's password when there's form with class .form-user-data===
+// ==== Update user's password when there's form with class .form-user-data ===
 if (userPasswordForm) {
 
   userPasswordForm.addEventListener('submit', async (element) => {
@@ -116,14 +116,16 @@ if (userPasswordForm) {
     // Button to be clicked for saving password
     const btnSavePwd = document.querySelector('.btn--save-passowrd');
     // Fields for inputs for updating password
+
+    // !! value will be sent to API route for resetting password via Axios with function updateSettings() in updateSettings.js (as below)
     const passwordCurrent = document.getElementById('password-current');
-    const password = document.getElementById('password');
+    const newPassword = document.getElementById('newPassword');
     const passwordConfirm = document.getElementById('password-confirm');
 
     btnSavePwd.textContent = 'Updating password ...';
 
     // if new password doesn't match the password in confirm field
-    if (password.value !== passwordConfirm.value) {
+    if (newPassword.value !== passwordConfirm.value) {
       //
       btnSavePwd.textContent = 'Save password';
       return showAlert('error', 'Your NEW password doesn\'t match ! Please check them again!');
@@ -137,12 +139,15 @@ if (userPasswordForm) {
 
     // update user's data with async function
     // updateSettings(data, type) in updateSettings.js
-    await updateSettings({
-      passwordCurrent: passwordCurrent.value,
-      password: password.value,
-      passwordConfirm: passwordConfirm.value,
-      //keys will be parsed into req.body like req.body.passwordConfirm in authController.updatePassword()
-    }, 'password');
+    await updateSettings(
+      // first argument (as obj):
+      // this obj will be passed as "data" as argument in updateSettings()
+      {
+        passwordCurrent: passwordCurrent.value,
+        password: newPassword.value,
+        passwordConfirm: passwordConfirm.value,
+        //keys will be parsed into req.body like req.body.passwordConfirm in authController.updatePassword()
+      }, 'password');
 
     btnSavePwd.textContent = 'Save password';
 

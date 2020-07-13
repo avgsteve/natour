@@ -9,6 +9,11 @@ const {
 } = require('util');
 const EmailWithNodeMailer = require('./../utils/email');
 const crypto = require('crypto');
+const timeStamp = require('./../utils/timeStamp');
+const timestamp = timeStamp.getTimeStamp(); // use console.log(`\nCurrent time : ${timestamp} (UCT+8)`);
+
+
+
 
 //getting token with jwt.sign method by passing in the id as argument
 const signToken = id => {
@@ -560,7 +565,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
     token: token,
   });
   // === replace above code with below: == */
-  createSendToken(user, 200, res);
+  createSendToken(user, 200, req, res);
 
 
 
@@ -568,36 +573,52 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
 //will received document and ._id property from req.user passed-in from protect middlware
 exports.updatePassword = catchAsync(async (req, res, next) => {
+
+  console.log("\n\x1b[33m" + "The user: \"" + req.user.name + "\" is trying to update the password" + "\x1b[0m" + "\n"); //req.user is passed in from previous authController.protect middleware
+
   // 1) Get user from collection (.select password field and use the password for verification)
   const user = await User.findById(req.user.id).select('+password'); //takes 1.27 second
-
-  /* // log req.user.id
-    console.log(`\nreq.user.id : ${req.user.id}\n`);
-    console.log(`\nreq.user._id : ${req.user._id}\n`);
-    console.log(`\nreq : ${req.body}\n`);
-    console.log(req.body);
-    */
-  // const user = await User.findOne(req.user._id).select('+password'); // takes 22 seconds
-
-  // const user = await User.findOne({
-  //   _id: req.user._id
-  // }).select('+password'); // takes 23 seconds
+  // await User.findOne(req.user._id) is equivalent to User.findById(req.user.id)
 
 
   // 2) Check if the password from POSTed req is correct (matched with the password currently stored in database)
+
   // Via bcrypt.compare() in schema's user.correctPassword() , will get boolean value
   if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
+
+    console.log("\n\x1b[31m" + "The user: \"" + req.user.name + "\" has entered wrong password!" + "\x1b[0m" + "\n"); //req.user is passed in from previous authController.protect middleware
+
     return next(new AppError('Your current password is incorrect', 401));
   }
 
-  // 3) If so, updatePassword
-  user.password = req.body.password;
-  user.passwordConfirm = req.body.passwordConfirm;
-  // (Also, the .save() function will trigger the validator in schema to see if the value in .password field matches the value in .passwordConfirm field, if not matched , will throw an validation error)
+  // 3) If user's password if correct, user.correctPassword method will return Boolean
+  if (
+    (await user.correctPassword(req.body.passwordCurrent, user.password))
+    // if this Boolean result is true, the
+  ) {
 
-  await user.save(); // ref: https://mongoosejs.com/docs/api.html#model_Model-save
+    user.password = req.body.password;
+    user.passwordConfirm = req.body.passwordConfirm;
+    // a) The USer Model's schama will compare if user.password user.passwordConfirm are matched
 
-  // 4) Log user in, send JWT
-  createSendToken(user, 200, res);
+    // b) Then the password assigned to user.password will be hashed (encrypted) by bcryp by pre-middleware while the document is being saved by user.save() method
+
+    await user.save();
+    // user.save() will trigger pre-middleware in userModels to hash password with bcryp as the code below:
+    // this.password = await bcrypt.hash(this.password, 12);
+
+    // ref: https://mongoosejs.com/docs/api.html#model_Model-save
+
+    // Log for password update is successful
+    console.log("\n\x1b[32m" + "The user: \"" + req.user.name + "\" has successfully update the password" + "\x1b[0m" + "\n"); //req.user is passed in from previous authController.protect middleware
+
+
+
+    // 4) Log user in, send JWT via createSendToken() function and res.cookie()
+    createSendToken(user, 200, req, res);
+  }
+
+
+  console.log(`\n↑↑↑ Password updated at: ${timestamp} (UCT+8) ↑↑↑\n`);
 
 });

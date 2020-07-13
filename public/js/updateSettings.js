@@ -41,6 +41,20 @@ export const updateSettings = async (dataToUpdate, typeOfUpdate) => {
       method: 'PATCH',
       url: urlEndPoint,
       data: dataToUpdate,
+      /* dataToUpdate obj should have the key and value:
+
+      {
+        password: theValueOfNewPassWord
+        passwordConfirm
+      }
+
+
+      user.password = req.body.password;
+      user.passwordConfirm = req.body.passwordConfirm;
+
+
+      */
+
 
       //this PATCH request will rendered as :
       //GET /me?name=Laura+Wilson+Test&email=laura%40example.com 200 2793.498 ms - 4055

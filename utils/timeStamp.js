@@ -1,4 +1,11 @@
 /*jshint esversion: 6 */
+/*Usage:
+const timeStamp = require('./utils/timeStamp');
+const timestamp = timeStamp.getTimeStamp();
+
+console.log(`\nCurrent time : ${timestamp} (UCT+8)`);
+
+*/
 
 //ref:  https://codepen.io/tomhodgins/pen/rVVKQN?editors=0010
 
