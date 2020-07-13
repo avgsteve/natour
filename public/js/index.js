@@ -29,8 +29,6 @@ const logOutBtn = document.querySelector('.nav__el--logout'); //
 const userDataForm = document.querySelector('.form-user-data'); // for updating user's name & email from form class .form-user-data with updateDate()
 const userPasswordForm = document.querySelector('.form-user-password'); // for updating user's password & with updateDate()
 const bookBtn = document.getElementById('book-tour'); //for #map id
-// === Get alert type from URL query string : ?alert=(alertType) ex: ?alert=booking for rendering alert window on the top of page ===
-const alertMessage_fromBody = document.querySelector('body').dataset.alert; //Get the dataset attribute "alert" and use its value (the error message set by .pug file) for showAlert() to decide what kind of alert message to be displayed
 
 
 // ==== 2) Set .addEventListener to elements that are present in the HTML for triggering functions
@@ -172,6 +170,10 @@ if (bookBtn) {
   });
 
 }
+
+
+// === Get alert type from URL query string : ?alert=(alertType) ex: ?alert=booking for rendering alert window on the top of page ===
+const alertMessage_fromBody = document.querySelector('body').dataset.alert; //Get the dataset attribute "alert" and use its value (the error message set by .pug file) for showAlert() to decide what kind of alert message to be displayed
 
 
 if (alertMessage_fromBody) showAlert('success', alertMessage_fromBody, 6);

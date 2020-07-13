@@ -19,8 +19,11 @@ dashboard.heroku.com/apps/YOUR-APP-NAME-Here/settings
 dashboard.heroku.com/apps/limitless-ravine-63116/settings
 
 
+3) Heroku CLI
 
-3) heroku config:setDATABASE_PASSWORD=BojLO0179hJ9kGYV
+https://devcenter.heroku.com/articles/heroku-cli
+
+heroku git:remote -a proj-natours-with-steve
 
 
 
@@ -36,6 +39,9 @@ https://www.giftofspeed.com/gzip-test/
 
 
 4) Re-deploy server after making changes
+
+heroku login
+
 
 git add -A
 
