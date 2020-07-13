@@ -24,8 +24,9 @@ html
       <title>Natours | #{title} </title>
         
 
-  body
-    // The comment from pug to be rendered in browser
+  //- data-alert attibute is set with the obj "alert" from "req.locals" when booking is created successful via getCheckoutSession.bookingController.js
+  body(data-alert=`${alert ? alert : ""}`)
+    //- If "alert" exists (req.locals.alert), write the value from req.locals.alert to the value of data-alert attribute
     
     // HEADER
     include _header

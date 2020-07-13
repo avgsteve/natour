@@ -32,7 +32,9 @@ router.get('/', (req, res) => {
 });
 */
 
-// ======= DEFAULT PAGE AND PAGES FOR EACH TOUR DETAILS =======
+
+// Set alert message in res.locals.alert for.pug template to render corresponding alert message as pop-up in page
+router.use(viewsController.alerts);
 
 // default page for all tours
 router.get('/',

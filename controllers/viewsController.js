@@ -18,6 +18,22 @@ app.set('views', path.join(__dirname, 'views')); // which is the "views" folder 
 */
 
 //
+exports.alerts = (req, res, next) => {
+
+  const {
+    alert
+  } = req.query; // use Query parameters ?alert and the value from URL ex: ?alert=booking to set a sub-Object in res.locals
+
+  if (alert === 'booking') {
+    //set res.locals for .pug file to access the property and value in .locals obj
+    res.locals.alert = "Your booking is successful! Please check your mail for a confirmation.";
+  }
+
+  next();
+
+};
+
+//
 exports.getOverview = catchAsync(async (req, res, next) => {
   // 1) Get tour data from collection (from database)
   const tours = await Tour.find();
